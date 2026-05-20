@@ -4,7 +4,24 @@ const cors = require('cors');
 const fs = require('fs');
 
 const app = express();
-const PORT = process.env.PORT || 3303;
+// Load port from process.env.PORT, site-config.json, or default to 3303
+let PORT = process.env.PORT;
+if (!PORT) {
+  try {
+    const cfgPath = path.join(__dirname, 'site-config.json');
+    if (fs.existsSync(cfgPath)) {
+      const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
+      if (cfg.port) {
+        PORT = cfg.port;
+      }
+    }
+  } catch (e) {
+    console.error('Error reading port from site-config.json:', e);
+  }
+}
+if (!PORT) {
+  PORT = 3303;
+}
 
 app.use(cors());
 app.use(express.json());
@@ -632,7 +649,7 @@ app.get('/api/admin/site-config', requireAuth, (req, res) => {
 // Update site config
 app.put('/api/admin/site-config', requireAuth, (req, res) => {
   try {
-    const { siteName, themeColor, cardColor, platformsColor, updateColor, bgColor, buttonColor, navbarBgColor, footerBgColor, footerTextColor, displayName, username, whatsapp, instagram } = req.body;
+    const { siteName, themeColor, cardColor, platformsColor, updateColor, bgColor, buttonColor, navbarBgColor, footerBgColor, footerTextColor, displayName, username, whatsapp, instagram, port } = req.body;
     const current = readSiteConfig();
 
     if (siteName !== undefined) current.siteName = siteName;
@@ -658,8 +675,24 @@ app.put('/api/admin/site-config', requireAuth, (req, res) => {
       if (instagram.color !== undefined) current.instagram.color = instagram.color;
     }
 
+    let portChanged = false;
+    if (port !== undefined) {
+      const newPortVal = port ? parseInt(port, 10) : null;
+      if (current.port !== newPortVal) {
+        current.port = newPortVal;
+        portChanged = true;
+      }
+    }
+
     writeSiteConfig(current);
-    res.json({ success: true });
+    res.json({ success: true, portChanged });
+
+    if (portChanged) {
+      console.log(`[PORT CHANGE] Port changed to ${current.port}. Restarting process...`);
+      setTimeout(() => {
+        process.exit(0);
+      }, 1000);
+    }
   } catch (e) {
     console.error('Site config update error:', e);
     res.status(500).json({ error: e.message });

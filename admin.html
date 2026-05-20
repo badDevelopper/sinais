@@ -1439,6 +1439,10 @@
                                 <input type="text" id="se-site-name" placeholder="Ex: Slot">
                             </div>
                             <div class="se-field">
+                                <label>Porta HTTP do Servidor (Opcional)</label>
+                                <input type="number" id="se-server-port" placeholder="Ex: 3303" min="1" max="65535">
+                            </div>
+                            <div class="se-field">
                                 <label>Favicon</label>
                                 <div class="se-favicon-row">
                                     <img src="/assets/favicon.png" class="se-favicon-thumb" id="se-favicon-thumb"
@@ -2481,6 +2485,7 @@
         function fillSiteEditor(cfg) {
             // Site info
             document.getElementById('se-site-name').value = cfg.siteName || '';
+            document.getElementById('se-server-port').value = cfg.port || '';
             document.getElementById('se-favicon-thumb').src = cfg.favicon || '/assets/favicon.png';
 
             // Theme color
@@ -2878,6 +2883,7 @@
 
             const payload = {
                 siteName: document.getElementById('se-site-name').value.trim(),
+                port: document.getElementById('se-server-port').value.trim() ? parseInt(document.getElementById('se-server-port').value.trim(), 10) : null,
                 themeColor: document.getElementById('se-theme-color').value,
                 cardColor: document.getElementById('se-card-color').value,
                 platformsColor: document.getElementById('se-platforms-color').value,
@@ -2910,6 +2916,13 @@
                 const data = await res.json();
 
                 if (data.success) {
+                    if (data.portChanged) {
+                        showToast('Porta alterada! Reiniciando o servidor em 3s...');
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 3000);
+                        return;
+                    }
                     showToast('Configura\u00e7\u00f5es do site salvas com sucesso!');
                     btn.innerHTML = '<i class="fa-solid fa-check"></i> Salvo!';
                     setTimeout(() => {
