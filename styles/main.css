@@ -514,29 +514,47 @@
 .rtp-historico-row {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-top: -3px;
+  align-items: flex-end;
+  margin-top: 1px;
 }
 
 .rtp-hist-left {
   display: flex;
   flex-direction: column;
-  gap: 0.5px;
+  gap: 1px;
+  align-items: flex-start;
 }
 
 .rtp-label {
   font-size: 8.5px;
-  font-weight: 700;
-  color: #9ca3af;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.6);
   letter-spacing: 0.5px;
+  line-height: 1;
+}
+
+.hist-change-row {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  flex-wrap: wrap;
+}
+
+.hist-label {
+  font-size: 8.5px;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.6);
+  letter-spacing: 0.5px;
+  line-height: 1;
 }
 
 .hist-change {
   font-size: 9px;
-  font-weight: 800;
+  font-weight: 900;
   display: flex;
   align-items: center;
   gap: 1.5px;
+  line-height: 1;
 }
 
 .change-up {
@@ -544,7 +562,7 @@
 }
 
 .change-down {
-  color: #ef4444;
+  color: #ff0055; /* Ultra high-vibrancy glowing neon red/pink */
 }
 
 .rtp-value {
@@ -623,22 +641,39 @@
 .gcard-progress-bars {
   display: flex;
   flex-direction: column;
-  gap: 2.5px;
+  gap: 6px;
+  margin-top: 2px;
+  margin-bottom: 2px;
 }
 
 .progress-bar-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 5px;
+  gap: 8px;
+  padding: 6px 10px;
+  background: color-mix(in srgb, var(--gcard-color) 4%, rgba(255, 255, 255, 0.02));
+  border: 1.2px solid color-mix(in srgb, var(--gcard-color) 25%, rgba(255, 255, 255, 0.06));
+  border-radius: 12px;
+  backdrop-filter: blur(20px) saturate(200%);
+  -webkit-backdrop-filter: blur(20px) saturate(200%);
+  box-shadow: inset 0 1px 1.5px rgba(255, 255, 255, 0.15), 0 3px 8px rgba(0, 0, 0, 0.4);
+  transition: all 0.3s ease;
+}
+
+.progress-bar-row:hover {
+  transform: scale(1.02);
+  background: color-mix(in srgb, var(--gcard-color) 8%, rgba(255, 255, 255, 0.04));
+  border-color: color-mix(in srgb, var(--gcard-color) 40%, rgba(255, 255, 255, 0.12));
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.25), 0 5px 12px rgba(0, 0, 0, 0.55);
 }
 
 .progress-label {
   font-size: 9.5px;
   font-weight: 800;
-  color: var(--gcard-color, #9ca3af);
+  color: rgba(255, 255, 255, 0.6);
   width: 28px;
-  text-shadow: 0 0 4px var(--gcard-color), 0 0 8px var(--gcard-color);
+  text-shadow: none;
 }
 
 .progress-outer {
@@ -658,16 +693,17 @@
 
 .progress-val {
   font-size: 9.5px;
-  font-weight: 800;
-  color: var(--gcard-color, #fff);
+  font-weight: 900;
+  color: #fff;
   width: 28px;
   text-align: right;
-  text-shadow: 0 0 4px var(--gcard-color);
+  text-shadow: 0 0 6px var(--gcard-color), 0 0 12px var(--gcard-color);
 }
 
 /* Suggested bets — glassmorphism 3-column layout matching iOS liquid glass theme */
 .suggested-bets-container {
   padding: 0;
+  margin-top: 2px;
 }
 
 .suggested-bets-title {
@@ -690,14 +726,22 @@
 .bet-column {
   display: flex;
   flex-direction: column;
-  gap: 3px;
-  padding: 6px 6px 5px;
-  background: rgba(255, 255, 255, 0.03); /* Translucent iPhone frosted glass */
-  border: 1px solid rgba(255, 255, 255, 0.08); /* Frosted border */
-  border-radius: 10px;
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.12), 0 4px 10px rgba(0, 0, 0, 0.3); /* iOS top-edge light reflection */
+  gap: 4px;
+  padding: 8px 8px 6px;
+  background: color-mix(in srgb, var(--gcard-color) 4%, rgba(255, 255, 255, 0.02));
+  border: 1.2px solid color-mix(in srgb, var(--gcard-color) 35%, rgba(255, 255, 255, 0.08));
+  border-radius: 12px;
+  backdrop-filter: blur(20px) saturate(200%);
+  -webkit-backdrop-filter: blur(20px) saturate(200%);
+  box-shadow: inset 0 1px 1.5px rgba(255, 255, 255, 0.15), 0 6px 15px rgba(0, 0, 0, 0.5);
+  transition: all 0.3s ease;
+}
+
+.bet-column:hover {
+  transform: translateY(-1.5px);
+  background: color-mix(in srgb, var(--gcard-color) 8%, rgba(255, 255, 255, 0.04));
+  border-color: color-mix(in srgb, var(--gcard-color) 50%, rgba(255, 255, 255, 0.15));
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.25), 0 8px 20px rgba(0, 0, 0, 0.6);
 }
 
 .bet-col-header {
@@ -706,8 +750,8 @@
   color: var(--gcard-color);
   text-align: center;
   text-transform: uppercase;
-  padding-bottom: 3px;
-  margin-bottom: 3px;
+  padding-bottom: 2px;
+  margin-bottom: 2px;
   text-shadow: 0 0 4px var(--gcard-color), 0 0 8px var(--gcard-color);
   letter-spacing: 0.5px;
 }
@@ -716,32 +760,36 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 7px;
+  font-size: 7.5px;
   font-family: 'Inter', sans-serif;
-  padding: 1px 2px;
+  padding: 2px 4px;
 }
 
 .bet-type {
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.4);
-  font-size: 6.5px;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 7px;
+  letter-spacing: 0.2px;
 }
 
 .bet-amount {
-  font-weight: 800;
-  color: rgba(255, 255, 255, 0.95);
-  font-size: 7.5px;
+  font-weight: 900;
+  color: #ffffff;
+  font-size: 8px;
 }
 
 /* Card footer buttons */
 .gcard-footer {
   margin-top: auto;
-  padding-top: 2px;
+  padding-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .gcard-action-btn {
   width: 100%;
-  padding: 7px;
+  padding: 8px;
   border-radius: 8px;
   font-weight: 900;
   font-size: 10px;
@@ -763,6 +811,34 @@
 .gcard-action-btn:hover {
   transform: translateY(-1.5px);
   box-shadow: 0 0 20px color-mix(in srgb, var(--btn-bg, var(--theme, #ff007f)) 60%, transparent), 0 0 40px color-mix(in srgb, var(--btn-bg, var(--theme, #ff007f)) 25%, transparent), 0 5px 12px rgba(0, 0, 0, 0.4);
+}
+
+.gcard-secondary-btn {
+  width: 100%;
+  padding: 7px 10px;
+  border-radius: 8px;
+  font-weight: 800;
+  font-size: 9.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s;
+  letter-spacing: 0.5px;
+  font-family: 'Inter', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid color-mix(in srgb, var(--gcard-color) 40%, rgba(255, 255, 255, 0.05));
+  background: color-mix(in srgb, var(--gcard-color) 12%, #0e0716);
+  color: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+.gcard-secondary-btn:hover {
+  transform: translateY(-1px);
+  border-color: var(--gcard-color);
+  background: color-mix(in srgb, var(--gcard-color) 20%, #150b22);
+  color: #fff;
+  box-shadow: 0 0 10px color-mix(in srgb, var(--gcard-color) 30%, transparent);
 }
 
 .gcard-prices {
@@ -788,6 +864,46 @@
 
   .gcard-banner img {
     height: 120px;
+  }
+
+  .progress-bar-row {
+    padding: 4px 6px;
+    gap: 4px;
+    border-radius: 8px;
+  }
+
+  .progress-label {
+    width: 22px;
+    font-size: 8px;
+  }
+
+  .progress-val {
+    width: 22px;
+    font-size: 8px;
+  }
+
+  .bet-column {
+    padding: 5px 4px 4px;
+    gap: 2px;
+    border-radius: 8px;
+  }
+
+  .bet-col-header {
+    font-size: 7.5px;
+    margin-bottom: 1px;
+  }
+
+  .bet-row {
+    padding: 1px 2px;
+    font-size: 6.5px;
+  }
+
+  .bet-type {
+    font-size: 6px;
+  }
+
+  .bet-amount {
+    font-size: 7px;
   }
 
   .ftab {

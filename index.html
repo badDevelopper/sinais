@@ -478,14 +478,31 @@
                     s = 100; // Force 100% saturation for neon look
                     
                     // Boost dark colors to high brightness
-                    if (l < 0.45) {
+                    if (h >= 200 && h <= 275) {
+                        l = 0.68; // Make blue/purple neon pop and glow intensely!
+                    } else if (l < 0.45) {
                         l = 0.55;
                     } else if (l > 0.7) {
-                        l = 0.6;
+                        l = 0.62;
                     }
                     l = Math.round(l * 100);
 
                     return `hsl(${h}, ${s}%, ${l}%)`;
+                }
+
+                // Helper to check if a color is light for button contrast
+                function isColorLight(color) {
+                    if (color.startsWith('hsl')) {
+                        const matches = color.match(/\d+/g);
+                        if (matches && matches.length >= 3) {
+                            const h = parseInt(matches[0]);
+                            const s = parseInt(matches[1]);
+                            const l = parseInt(matches[2]);
+                            if (h >= 40 && h <= 70) return true; // yellow/gold
+                            if (h >= 75 && h <= 150 && l > 45) return true; // light green
+                        }
+                    }
+                    return false;
                 }
 
                 // Seeded random / deterministic value generator based on game properties
@@ -687,8 +704,7 @@
                             : `window.open('${g.link}','_blank')`;
 
                         // Button colors
-                        const isLight = (neonColor.includes('255, 215, 0') || neonColor.includes('#ffd') || neonColor.includes('#ffeb') || neonColor.includes('yellow') || neonColor.includes('#eab308') || neonColor.includes('80%, 90%') || neonColor.includes('70%, 80%'));
-                        const btnTextColor = isLight ? '#000' : '#fff';
+                        const btnTextColor = isColorLight(neonColor) ? '#000' : '#fff';
 
                         return `
                         <div class="gcard" style="--gcard-color: ${neonColor}; --btn-bg: ${neonColor}; --btn-color: ${btnTextColor}">
@@ -712,9 +728,10 @@
                                 <!-- RTP & Variação Histórica -->
                                 <div class="rtp-historico-row">
                                     <div class="rtp-hist-left">
-                                        <div class="rtp-label" style="color: ${neonColor}">RTP HISTÓRICO</div>
-                                        <div class="hist-change ${d.changeClass}">
-                                            ${d.changeIcon} ${d.changeText}
+                                        <span class="rtp-label">RTP</span>
+                                        <div class="hist-change-row">
+                                            <span class="hist-label">HISTÓRICO</span>
+                                            <span class="hist-change ${d.changeClass}">${d.changeIcon} ${d.changeText}</span>
                                         </div>
                                     </div>
                                     <div class="rtp-value" style="color: ${neonColor}; text-shadow: 0 0 10px ${neonColor}, 0 0 20px ${neonColor}">${d.rtp.toFixed(2)}%</div>
@@ -727,29 +744,29 @@
                                 
                                 <!-- Volatilidade -->
                                 <div class="gcard-volat-row">
-                                    <span style="color: ${neonColor}">VOLAT.</span>
+                                    <span>VOLAT.</span>
                                     <span class="volat-val" style="color: ${d.volatColor}">${d.volatText}</span>
                                 </div>
                                 
                                 <!-- Distribuição e Progresso -->
                                 <div class="gcard-dist-row">
-                                    <span style="color: ${neonColor}">Distrib.:</span>
+                                    <span>Distrib.:</span>
                                     <span class="dist-val" style="color: ${neonColor}; text-shadow: 0 0 6px ${neonColor}">${Math.floor(d.rtp)}%</span>
                                 </div>
                                 
                                 <div class="gcard-progress-bars">
                                     <div class="progress-bar-row">
-                                        <span class="progress-label" style="color:${neonColor}">Mín:</span>
+                                        <span class="progress-label">Mín:</span>
                                         <div class="progress-outer"><div class="progress-inner" style="width:${g.min}%; background:${neonColor}"></div></div>
                                         <span class="progress-val" style="color:${neonColor}">${g.min}%</span>
                                     </div>
                                     <div class="progress-bar-row">
-                                        <span class="progress-label" style="color:${neonColor}">Pad:</span>
+                                        <span class="progress-label">Pad:</span>
                                         <div class="progress-outer"><div class="progress-inner" style="width:${g.padrao}%; background:${neonColor}"></div></div>
                                         <span class="progress-val" style="color:${neonColor}">${g.padrao}%</span>
                                     </div>
                                     <div class="progress-bar-row">
-                                        <span class="progress-label" style="color:${neonColor}">Máx:</span>
+                                        <span class="progress-label">Máx:</span>
                                         <div class="progress-outer"><div class="progress-inner" style="width:${g.max}%; background:${neonColor}"></div></div>
                                         <span class="progress-val" style="color:${neonColor}">${g.max}%</span>
                                     </div>
@@ -785,9 +802,13 @@
                                 
                                 <!-- Footer / Button -->
                                 <div class="gcard-footer">
-                                    <button class="gcard-action-btn" onclick="${btnAction}">
-                                        ${btnText}
+                                    <button class="gcard-action-btn" onclick="window.open('${g.link}', '_blank')">
+                                        ▶ ACESSAR ${siteConfigData?.siteName?.toUpperCase() || 'MESMOPG'}
                                     </button>
+                                    <div class="gcard-secondary-btn" onclick="window.open('${siteConfigData?.whatsapp?.link || '#'}', '_blank')">
+                                        <span>DYGRUPO ${siteConfigData?.siteName?.toUpperCase() || 'MESMOPG'}</span>
+                                        <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 8.5px; opacity: 0.85;"></i>
+                                    </div>
                                 </div>
                             </div>
                         </div>
