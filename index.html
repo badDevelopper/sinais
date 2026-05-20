@@ -485,8 +485,8 @@
                     };
                 }
 
-                // Generates inline SVG path for pointed sparkline chart with spikes and final indicator dot
-                function generateSparklineSVG(gId, themeColor, baseRtp) {
+                // Generates inline SVG path for pointed sparkline chart with spikes based on min, pad, max values
+                function generateSparklineSVG(gId, themeColor, baseRtp, minVal, padVal, maxVal) {
                     const numPoints = 18; 
                     const width = 174;
                     const height = 46;
@@ -498,33 +498,50 @@
                         return x - Math.floor(x);
                     }
                     
-                    const points = [];
-                    let seed = gId * 5.7 + 2.3;
+                    // Helper to scale progress percentage to pixel height (10-38 range)
+                    function scale(val, fallback) {
+                        const finalVal = (val !== undefined && val !== null && val > 0) ? Number(val) : fallback;
+                        return 10 + (finalVal / 100) * 28;
+                    }
                     
+                    const minH = scale(minVal, 40);
+                    const padH = scale(padVal, 50);
+                    const maxH = scale(maxVal, 65);
+                    
+                    const points = [];
                     for (let i = 0; i < numPoints; i++) {
-                        // Base height is low zig-zag between 10px and 16px from bottom
-                        let baseVal = 10 + (pseudoRandom(seed + i) * 6);
+                        let val = 12;
                         
-                        // Add a sharp major spike around the middle (index 11)
+                        // Deterministic high-frequency zig-zag noise
+                        const seed = gId * 5.1 + i * 7.3;
+                        const zig = (i % 2 === 0 ? 3.5 : -3.5) + Math.sin(seed) * 1.5;
+                        
                         if (i === 11) {
-                            baseVal = 32 + (pseudoRandom(seed + 88) * 8); // spike to 32-40px
+                            val = maxH; // Major spike based on maxVal
                         } else if (i === 10 || i === 12) {
-                            baseVal = 18 + (pseudoRandom(seed + i) * 4); // sharp shoulder
+                            val = Math.max(8, minH - 4); // Sharp shoulder/drop next to the major spike
+                        } else if (i === 3) {
+                            val = minH; // First smaller peak based on minVal
+                        } else if (i === 15) {
+                            val = ((minH + maxH) / 2) + zig; // Second peak based on average of min & max
+                        } else if (i === 17) {
+                            val = padH; // Last point based on standard (pad) value
+                        } else {
+                            // Interpolate between regions with zig-zag noise
+                            if (i < 3) {
+                                val = padH - (3 - i) * 2.5 + zig;
+                            } else if (i < 10) {
+                                val = minH + zig;
+                            } else if (i < 15) {
+                                val = padH + zig;
+                            } else {
+                                val = padH - (17 - i) * 1.5 + zig;
+                            }
                         }
                         
-                        // Add a second sharp spike around index 15
-                        if (i === 15) {
-                            baseVal = 26 + (pseudoRandom(seed + 99) * 6); // spike to 26-32px
-                        } else if (i === 14 || i === 16) {
-                            baseVal = 14 + (pseudoRandom(seed + i) * 4);
-                        }
-                        
-                        // The last point (index 17) terminates high
-                        if (i === 17) {
-                            baseVal = 32 + (pseudoRandom(seed + 44) * 6); // final peak 32-38px
-                        }
-                        
-                        points.push(baseVal);
+                        // Clamp to stay within chart container boundaries (between 6 and 42 px)
+                        val = Math.max(6, Math.min(42, val));
+                        points.push(val);
                     }
                     
                     let pathD = `M 0,${height - points[0]}`;
@@ -629,7 +646,7 @@
                                 
                                 <!-- Gráfico Sparkline -->
                                 <div class="gcard-chart-container">
-                                    ${generateSparklineSVG(g.id, g.cor, d.baseRtp)}
+                                    ${generateSparklineSVG(g.id, g.cor, d.baseRtp, g.min, g.padrao, g.max)}
                                 </div>
                                 
                                 <!-- Volatilidade -->
