@@ -380,7 +380,7 @@
   max-width: 220px;
   background-color: #0c0612;
   border: 2px solid var(--gcard-color, #d4007a);
-  box-shadow: 0 0 10px color-mix(in srgb, var(--gcard-color, #d4007a) 25%, transparent), 0 8px 25px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--gcard-color, #d4007a) 50%, transparent), 0 0 40px color-mix(in srgb, var(--gcard-color, #d4007a) 25%, transparent), 0 8px 25px rgba(0, 0, 0, 0.7);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   display: flex;
   flex-direction: column;
@@ -388,7 +388,7 @@
 
 .gcard:hover {
   transform: scale(1.03);
-  box-shadow: 0 0 22px color-mix(in srgb, var(--gcard-color, #d4007a) 55%, transparent), 0 12px 35px rgba(0, 0, 0, 0.9);
+  box-shadow: 0 0 30px color-mix(in srgb, var(--gcard-color, #d4007a) 70%, transparent), 0 0 60px color-mix(in srgb, var(--gcard-color, #d4007a) 35%, transparent), 0 12px 35px rgba(0, 0, 0, 0.9);
 }
 
 /* Header tags bar */
@@ -551,6 +551,7 @@
   font-size: 15px;
   font-weight: 900;
   letter-spacing: -0.3px;
+  text-shadow: 0 0 8px currentColor, 0 0 16px currentColor;
 }
 
 /* Chart Container & SVG */
@@ -609,8 +610,9 @@
 }
 
 .dist-val {
-  color: #fff;
+  color: var(--gcard-color, #fff);
   font-weight: 800;
+  text-shadow: 0 0 6px var(--gcard-color, transparent);
 }
 
 .gcard-progress-bars {
@@ -628,14 +630,15 @@
 
 .progress-label {
   font-size: 9.5px;
-  font-weight: 700;
-  color: #9ca3af;
-  width: 25px;
+  font-weight: 800;
+  color: var(--gcard-color, #9ca3af);
+  width: 28px;
+  text-shadow: 0 0 4px var(--gcard-color, transparent);
 }
 
 .progress-outer {
   flex: 1;
-  height: 3.5px;
+  height: 4px;
   background: rgba(255, 255, 255, 0.08);
   border-radius: 3px;
   overflow: hidden;
@@ -645,75 +648,76 @@
   height: 100%;
   border-radius: 3px;
   transition: width 0.5s ease;
-  box-shadow: 0 0 5px var(--gcard-color, #d4007a);
+  box-shadow: 0 0 8px var(--gcard-color, #d4007a);
 }
 
 .progress-val {
   font-size: 9.5px;
   font-weight: 800;
-  color: #fff;
-  width: 25px;
+  color: var(--gcard-color, #fff);
+  width: 28px;
   text-align: right;
+  text-shadow: 0 0 4px var(--gcard-color, transparent);
 }
 
-/* Suggested bets */
+/* Suggested bets — table layout matching reference */
 .suggested-bets-container {
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.5);
   border-radius: 8px;
-  padding: 4px 5px;
-  border: 1px solid rgba(255, 255, 255, 0.03);
+  padding: 5px 6px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .suggested-bets-title {
   text-align: center;
-  font-size: 7.5px;
+  font-size: 8px;
   font-weight: 900;
-  color: #eab308;
-  letter-spacing: 0.5px;
-  margin-bottom: 3.5px;
+  color: var(--gcard-color, #eab308);
+  letter-spacing: 1px;
+  margin-bottom: 4px;
   text-transform: uppercase;
+  text-shadow: 0 0 6px var(--gcard-color, #eab308);
 }
 
-.suggested-bets-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 4px;
+.suggested-bets-table {
+  width: 100%;
+  border-collapse: collapse;
   text-align: center;
+  font-family: 'Inter', sans-serif;
 }
 
-.bet-column {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-}
-
-.bet-col-header {
-  font-size: 7.5px;
+.suggested-bets-table thead th {
+  font-size: 8px;
   font-weight: 900;
   color: #fff;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-  padding-bottom: 1px;
-  margin-bottom: 1px;
   text-transform: uppercase;
+  padding: 3px 2px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
 }
 
-.bet-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 7.2px;
-  font-family: 'Inter', monospace;
-  color: rgba(255, 255, 255, 0.85);
-  gap: 2px;
-}
-
-.bet-type {
-  font-weight: 700;
+.suggested-bets-table thead th:first-child {
+  text-align: left;
   color: #9ca3af;
 }
 
-.bet-amount {
+.suggested-bets-table tbody td {
+  font-size: 7.5px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.9);
+  padding: 2.5px 2px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.suggested-bets-table tbody td:first-child {
+  text-align: left;
+  color: #9ca3af;
   font-weight: 800;
+}
+
+.suggested-bets-table tbody td:not(:first-child) {
+  font-weight: 800;
+  color: var(--gcard-color, #fff);
+  text-shadow: 0 0 3px var(--gcard-color, transparent);
 }
 
 /* Card footer buttons */
@@ -740,12 +744,12 @@
   gap: 4px;
   background: var(--btn-bg, var(--theme, #d4007a));
   color: var(--btn-color, #fff);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--btn-bg, var(--theme, #d4007a)) 40%, transparent), 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
 .gcard-action-btn:hover {
   transform: translateY(-1.5px);
-  box-shadow: 0 0 15px color-mix(in srgb, var(--btn-bg, var(--theme, #ff007f)) 50%, transparent), 0 5px 12px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 0 20px color-mix(in srgb, var(--btn-bg, var(--theme, #ff007f)) 60%, transparent), 0 0 40px color-mix(in srgb, var(--btn-bg, var(--theme, #ff007f)) 25%, transparent), 0 5px 12px rgba(0, 0, 0, 0.4);
 }
 
 .gcard-prices {

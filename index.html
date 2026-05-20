@@ -457,19 +457,25 @@
                     // Base line for chart (proportional to display RTP)
                     const baseRtp = (rtpVal - 1.5 - ((seed * 3) % 20) / 10).toFixed(1);
 
-                    // Suggested bets formulas: MÍN, PAD, MÁX
-                    let minBet = '2.40';
-                    let padBet = '15.80';
-                    let maxBet = '152.00';
-                    if (seed % 3 === 0) {
-                        minBet = '1.20';
-                        padBet = '6.40';
-                        maxBet = '60.00';
-                    } else if (seed % 3 === 2) {
-                        minBet = '3.60';
-                        padBet = '11.10';
-                        maxBet = '106.00';
-                    }
+                    // Suggested bets: each row (DHS, CSX, EXT) has different values per column (MÍN, PAD, MÁX)
+                    const betSeed = (seed * 13) % 7;
+                    const bets = {
+                        dhs: {
+                            min: (2.40 + (betSeed * 0.80)).toFixed(2),
+                            pad: (20.40 + (betSeed * 2.10)).toFixed(2),
+                            max: (152.00 + (betSeed * 12.00)).toFixed(2)
+                        },
+                        csx: {
+                            min: (2.60 + (betSeed * 0.60)).toFixed(2),
+                            pad: (20.60 + (betSeed * 1.80)).toFixed(2),
+                            max: (153.00 + (betSeed * 8.00)).toFixed(2)
+                        },
+                        ext: {
+                            min: (3.40 + (betSeed * 0.90)).toFixed(2),
+                            pad: (21.40 + (betSeed * 2.50)).toFixed(2),
+                            max: (152.00 + (betSeed * 15.00)).toFixed(2)
+                        }
+                    };
                     
                     return {
                         rtp: rtpVal,
@@ -479,9 +485,7 @@
                         volatText,
                         volatColor,
                         baseRtp,
-                        minBet,
-                        padBet,
-                        maxBet
+                        bets
                     };
                 }
 
@@ -645,12 +649,12 @@
                                 <!-- RTP & Variação Histórica -->
                                 <div class="rtp-historico-row">
                                     <div class="rtp-hist-left">
-                                        <div class="rtp-label">RTP HISTÓRICO</div>
+                                        <div class="rtp-label" style="color: ${g.cor}">RTP HISTÓRICO</div>
                                         <div class="hist-change ${d.changeClass}">
                                             ${d.changeIcon} ${d.changeText}
                                         </div>
                                     </div>
-                                    <div class="rtp-value" style="color: ${g.cor}">${d.rtp.toFixed(2)}%</div>
+                                    <div class="rtp-value" style="color: ${g.cor}; text-shadow: 0 0 10px ${g.cor}, 0 0 20px ${g.cor}">${d.rtp.toFixed(2)}%</div>
                                 </div>
                                 
                                 <!-- Gráfico Sparkline -->
@@ -660,60 +664,67 @@
                                 
                                 <!-- Volatilidade -->
                                 <div class="gcard-volat-row">
-                                    <span>VOLAT.</span>
+                                    <span style="color: ${g.cor}">VOLAT.</span>
                                     <span class="volat-val" style="color: ${d.volatColor}">${d.volatText}</span>
                                 </div>
                                 
                                 <!-- Distribuição e Progresso -->
                                 <div class="gcard-dist-row">
-                                    <span>Distrib.:</span>
-                                    <span class="dist-val">${Math.floor(d.rtp)}%</span>
+                                    <span style="color: ${g.cor}">Distrib.:</span>
+                                    <span class="dist-val" style="color: ${g.cor}; text-shadow: 0 0 6px ${g.cor}">${Math.floor(d.rtp)}%</span>
                                 </div>
                                 
                                 <div class="gcard-progress-bars">
                                     <div class="progress-bar-row">
-                                        <span class="progress-label">Mín</span>
+                                        <span class="progress-label" style="color:${g.cor}">Mín:</span>
                                         <div class="progress-outer"><div class="progress-inner" style="width:${g.min}%; background:${g.cor}"></div></div>
-                                        <span class="progress-val">${g.min}%</span>
+                                        <span class="progress-val" style="color:${g.cor}">${g.min}%</span>
                                     </div>
                                     <div class="progress-bar-row">
-                                        <span class="progress-label">Pad</span>
+                                        <span class="progress-label" style="color:${g.cor}">Pad:</span>
                                         <div class="progress-outer"><div class="progress-inner" style="width:${g.padrao}%; background:${g.cor}"></div></div>
-                                        <span class="progress-val">${g.padrao}%</span>
+                                        <span class="progress-val" style="color:${g.cor}">${g.padrao}%</span>
                                     </div>
                                     <div class="progress-bar-row">
-                                        <span class="progress-label">Máx</span>
+                                        <span class="progress-label" style="color:${g.cor}">Máx:</span>
                                         <div class="progress-outer"><div class="progress-inner" style="width:${g.max}%; background:${g.cor}"></div></div>
-                                        <span class="progress-val">${g.max}%</span>
+                                        <span class="progress-val" style="color:${g.cor}">${g.max}%</span>
                                     </div>
                                 </div>
                                 
                                 <!-- Apostas Sugeridas -->
                                 <div class="suggested-bets-container">
                                     <div class="suggested-bets-title">Apostas Sugeridas</div>
-                                    <div class="suggested-bets-grid">
-                                        <!-- MÍN Column -->
-                                        <div class="bet-column">
-                                            <div class="bet-col-header">Mín</div>
-                                            <div class="bet-row"><span class="bet-type">DHS</span><span class="bet-amount">${d.minBet}</span></div>
-                                            <div class="bet-row"><span class="bet-type">CSX</span><span class="bet-amount">${d.minBet}</span></div>
-                                            <div class="bet-row"><span class="bet-type">EXT</span><span class="bet-amount">${d.minBet}</span></div>
-                                        </div>
-                                        <!-- PAD Column -->
-                                        <div class="bet-column">
-                                            <div class="bet-col-header">Pad</div>
-                                            <div class="bet-row"><span class="bet-type">DHS</span><span class="bet-amount">${d.padBet}</span></div>
-                                            <div class="bet-row"><span class="bet-type">CSX</span><span class="bet-amount">${d.padBet}</span></div>
-                                            <div class="bet-row"><span class="bet-type">EXT</span><span class="bet-amount">${d.padBet}</span></div>
-                                        </div>
-                                        <!-- MÁX Column -->
-                                        <div class="bet-column">
-                                            <div class="bet-col-header">Máx</div>
-                                            <div class="bet-row"><span class="bet-type">DHS</span><span class="bet-amount">${d.maxBet}</span></div>
-                                            <div class="bet-row"><span class="bet-type">CSX</span><span class="bet-amount">${d.maxBet}</span></div>
-                                            <div class="bet-row"><span class="bet-type">EXT</span><span class="bet-amount">${d.maxBet}</span></div>
-                                        </div>
-                                    </div>
+                                    <table class="suggested-bets-table">
+                                        <thead>
+                                            <tr>
+                                                <th></th>
+                                                <th>MÍN</th>
+                                                <th>PAD</th>
+                                                <th>MÁX</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>DHS</td>
+                                                <td>${d.bets.dhs.min}</td>
+                                                <td>${d.bets.dhs.pad}</td>
+                                                <td>${d.bets.dhs.max}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>CSX</td>
+                                                <td>${d.bets.csx.min}</td>
+                                                <td>${d.bets.csx.pad}</td>
+                                                <td>${d.bets.csx.max}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>EXT</td>
+                                                <td>${d.bets.ext.min}</td>
+                                                <td>${d.bets.ext.pad}</td>
+                                                <td>${d.bets.ext.max}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
                                 </div>
                                 
                                 <!-- Footer / Button -->
