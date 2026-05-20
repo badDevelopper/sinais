@@ -30,7 +30,7 @@ Não foi utilizado nenhum framework ou biblioteca para o desenvolvimento deste p
 
 ## Contato
 Se tiver dúvidas ou precisar de mais informações, sinta-se à vontade para entrar em contato:
-- whatsapp : wa.me/559184330784
+- whatsapp : https://wa.me/559184330784
 
 --- 
 
