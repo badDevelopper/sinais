@@ -30,7 +30,7 @@ Não foi utilizado nenhum framework ou biblioteca para o desenvolvimento deste p
 
 ## Contato
 Se tiver dúvidas ou precisar de mais informações, sinta-se à vontade para entrar em contato:
-- whatsapp : [contato@daanrox.com](mailto:+55 91 8433-0784)
+- whatsapp : wa.me/559184330784
 
 --- 
 
