@@ -783,6 +783,36 @@ app.put('/api/admin/site-config/banners-order', requireAuth, (req, res) => {
   }
 });
 
+// Run system updates via GitHub script
+app.post('/api/admin/update-system', requireAuth, (req, res) => {
+  console.log('[UPDATE] Admin triggered system update...');
+  const { exec } = require('child_process');
+  
+  const isWin = process.platform === 'win32';
+  const cmd = isWin 
+    ? 'powershell.exe -ExecutionPolicy Bypass -File ./update.ps1' 
+    : 'bash update.sh';
+    
+  exec(cmd, (err, stdout, stderr) => {
+    if (err) {
+      console.error('[UPDATE] Error executing update script:', err);
+      return res.status(500).json({ 
+        error: err.message, 
+        stdout: stdout, 
+        stderr: stderr 
+      });
+    }
+    
+    console.log('[UPDATE] System update completed successfully. Restarting process...');
+    res.json({ success: true, log: stdout });
+    
+    // Exit process with 0 so docker/pterodactyl/pm2 can restart it
+    setTimeout(() => {
+      process.exit(0);
+    }, 1500);
+  });
+});
+
 /* ===================================================
    PAGE ROUTES - serve correct HTML for each path
    =================================================== */

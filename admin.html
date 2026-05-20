@@ -1910,6 +1910,34 @@
                 </div>
             </div>
 
+            <!-- ═══════ SEÇÃO 9: ATUALIZAÇÃO DO SISTEMA ═══════ -->
+            <div class="se-section sec-system-update">
+                <div class="se-section-header" onclick="toggleSection(this)">
+                    <div class="se-section-icon"><i class="fa-solid fa-arrows-rotate"></i></div>
+                    <div>
+                        <div class="se-section-title">Atualização do Sistema</div>
+                        <div class="se-section-desc">Puxar atualizações mais recentes do GitHub e reiniciar o servidor</div>
+                    </div>
+                    <i class="fa-solid fa-chevron-down se-chevron"></i>
+                </div>
+                <div class="se-section-body">
+                    <div class="se-section-content">
+                        <p style="font-size: 13px; color: #94a3b8; margin-bottom: 15px; line-height: 1.6;">
+                            Clique no botão abaixo para baixar os arquivos mais recentes do GitHub e atualizar o site. 
+                            Esse processo preserva suas configurações locais (nome do site, links de plataformas, fotos e credenciais).
+                            O servidor será reiniciado automaticamente após a conclusão da atualização.
+                        </p>
+                        <button type="button" class="btn-se-save" id="btn-update-system" onclick="runSystemUpdate()" style="width: auto; padding: 12px 24px; background: linear-gradient(135deg, #10b981, #059669); margin-bottom: 15px;">
+                            <i class="fa-solid fa-cloud-arrow-down"></i> Iniciar Atualização do GitHub
+                        </button>
+                        
+                        <div id="update-status-msg" style="display:none; font-size:13px; font-weight:600; margin-top:8px; margin-bottom:8px;"></div>
+                        
+                        <pre id="update-log" style="display:none; background:#0f172a; color:#38bdf8; padding:15px; border-radius:8px; font-family:monospace; font-size:12px; max-height:250px; overflow-y:auto; border:1px solid rgba(255,255,255,0.1); white-space:pre-wrap;"></pre>
+                    </div>
+                </div>
+            </div>
+
             <!-- BOTÃO SALVAR -->
             <div class="se-save-row">
                 <button class="btn-se-save" id="btn-se-save">
@@ -2927,6 +2955,75 @@
                 colorEl.dispatchEvent(new Event('input'));
             }
         };
+
+        // Run system update via API
+        async function runSystemUpdate() {
+            const btn = document.getElementById('btn-update-system');
+            const statusMsg = document.getElementById('update-status-msg');
+            const logPre = document.getElementById('update-log');
+            
+            if (!confirm('Deseja realmente iniciar a atualização do sistema? O servidor será reiniciado e ficará offline por alguns segundos.')) {
+                return;
+            }
+            
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Atualizando...';
+            statusMsg.style.display = 'block';
+            statusMsg.style.color = '#e2e8f0';
+            statusMsg.innerHTML = '<i class="fa-solid fa-arrows-rotate fa-spin"></i> Executando o script de atualização no servidor, por favor aguarde...';
+            logPre.style.display = 'none';
+            logPre.textContent = '';
+            
+            try {
+                const res = await fetch('/api/admin/update-system', {
+                    method: 'POST',
+                    headers: authHeaders()
+                });
+                const data = await res.json();
+                
+                logPre.style.display = 'block';
+                if (res.ok && data.success) {
+                    logPre.textContent = data.log || 'Atualização concluída sem logs.';
+                    statusMsg.style.color = '#10b981';
+                    statusMsg.innerHTML = '<i class="fa-solid fa-circle-check"></i> Sistema atualizado com sucesso! Reiniciando o servidor em breve...';
+                    showToast('Atualização concluída com sucesso!');
+                    
+                    // Show a count down for reconnection attempt
+                    let seconds = 5;
+                    const interval = setInterval(() => {
+                        seconds--;
+                        if (seconds <= 0) {
+                            clearInterval(interval);
+                            statusMsg.innerHTML = '<i class="fa-solid fa-arrows-rotate fa-spin"></i> Tentando reconectar ao painel...';
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1000);
+                        } else {
+                            statusMsg.innerHTML = `<i class="fa-solid fa-circle-check"></i> Sistema atualizado! Recarregando página em ${seconds} segundos...`;
+                        }
+                    }, 1000);
+                } else {
+                    logPre.textContent = (data.error || 'Erro desconhecido') + '\n\n' + (data.stderr || '') + '\n\n' + (data.stdout || '');
+                    statusMsg.style.color = '#ef4444';
+                    statusMsg.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> Ocorreu um erro durante a atualização.';
+                    showToast('Falha na atualização', 'error');
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-down"></i> Iniciar Atualização do GitHub';
+                }
+            } catch (err) {
+                // Network error is expected because the server restarts and closes connections
+                logPre.style.display = 'block';
+                logPre.textContent = 'Conexão interrompida. O servidor está reiniciando para carregar a atualização.';
+                statusMsg.style.color = '#10b981';
+                statusMsg.innerHTML = '<i class="fa-solid fa-circle-check"></i> O comando foi executado. O servidor está reiniciando...';
+                showToast('Servidor reiniciando...', 'info');
+                
+                setTimeout(() => {
+                    window.location.reload();
+                }, 5000);
+            }
+        }
+        window.runSystemUpdate = runSystemUpdate;
 
     </script>
 </body>
