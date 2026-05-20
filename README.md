@@ -4,7 +4,7 @@
 Site gerador de Sinais para Slots de Cassino
 Desenvolvido para o Grupo FP
 
-Para um melhor desempenho, e segurança utilize a hospedagem na Hostinger através deste link: [https://hostinger.com.br](https://hostinger.com.br?REFERRALCODE=1DANIEL1306)
+Para um melhor desempenho, e segurança utilize a hospedagem na Hostinger através deste link: [https://painel.iblgroup.cloud]
 
 
 # Doação
