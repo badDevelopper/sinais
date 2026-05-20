@@ -570,69 +570,58 @@
 
                 // Generates inline SVG path for pointed sparkline chart with sharp spikes based on min, pad, max values
                 function generateSparklineSVG(gId, themeColor, baseRtp, minVal, padVal, maxVal) {
-                    const numPoints = 18; 
+                    const numPoints = 32; 
                     const width = 174;
                     const height = 46;
                     const stepX = width / (numPoints - 1);
                     
-                    // Helper to scale progress percentage to pixel height (6-40 range)
+                    // Helper to scale progress percentage to pixel height (8-38 range)
                     function scale(val, fallback) {
                         const finalVal = (val !== undefined && val !== null && val >= 0) ? Number(val) : fallback;
-                        // Map 0-100% to height range 8 to 40
-                        return 8 + (finalVal / 100) * 32;
+                        // Map 0-100% to height range 8 to 38
+                        return 8 + (finalVal / 100) * 30;
                     }
                     
                     const minH = scale(minVal, 20);
                     const padH = scale(padVal, 28);
-                    const maxH = scale(maxVal, 40);
-                    
-                    // Determine dynamic, game-specific peak positions to ensure each graph looks completely unique!
-                    // min peak in the first third (indices 2 to 5)
-                    const posMin = 2 + (gId % 4);
-                    // pad peak in the middle third (indices 7 to 10)
-                    const posPad = 7 + ((gId + 2) % 4);
-                    // max peak in the final third (indices 12 to 15)
-                    const posMax = 12 + ((gId + 5) % 4);
+                    const maxH = scale(maxVal, 38);
                     
                     const points = [];
                     for (let i = 0; i < numPoints; i++) {
-                        let val = 8; // default baseline valley
+                        // Deterministic pseudo-random seed based on game ID and index
+                        const seed = (gId * 17.3 + i * 29.7);
                         
-                        // Deterministic high-frequency zig-zag noise
-                        const seed = gId * 3.7 + i * 5.9;
-                        const noise = (Math.sin(seed) * 3); // subtle noise
+                        // 1. Base wave using multiple sine frequencies for organic wave feel (bem movimentado!)
+                        const wave1 = Math.sin(i * 0.4 + gId) * 6;
+                        const wave2 = Math.cos(i * 0.9 - gId * 1.5) * 3;
+                        const wave3 = Math.sin(i * 1.8 + gId * 3) * 1.5;
                         
-                        if (i === posMin) {
-                            val = minH;
-                        } else if (i === posPad) {
-                            val = padH;
-                        } else if (i === posMax) {
-                            val = maxH;
-                        } else if (i === 0) {
-                            // Start value is a moderate level based on pad/min
-                            val = (minH + padH) / 2.5 + noise;
-                        } else if (i === numPoints - 1) {
-                            // End on a dynamic value near the last peak
-                            val = padH * 0.9 + noise;
-                        } else {
-                            // Valley points (between peaks)
-                            // We drop low to create sharp, pointed, dramatic spikes!
-                            const distToMin = Math.abs(i - posMin);
-                            const distToPad = Math.abs(i - posPad);
-                            const distToMax = Math.abs(i - posMax);
-                            const minDist = Math.min(distToMin, distToPad, distToMax);
-                            
-                            if (minDist === 1) {
-                                // Right next to a peak, drop significantly to make it "pointy"
-                                val = 8 + noise;
-                            } else {
-                                // Standard valley floor
-                                val = 6 + Math.abs(noise);
-                            }
+                        // Valley/baseline floor centered around a dynamic middle
+                        let val = 16 + wave1 + wave2 + wave3;
+                        
+                        // 2. Add realistic micro-jitter (high frequency noise)
+                        const jitter = (Math.sin(seed) * 1.2);
+                        val += jitter;
+                        
+                        // 3. Inject deterministic spikes to represent min, pad, and max
+                        // We place a spike at index ~8 (Min), index ~18 (Pad), and make it peak at the end
+                        if (i === 8 || i === 9) {
+                            val = Math.max(val, minH + (Math.sin(seed) * 2));
+                        }
+                        if (i === 18 || i === 19) {
+                            val = Math.max(val, padH + (Math.sin(seed) * 2));
                         }
                         
-                        // Clamp to stay within chart container boundaries (between 5 and 42 px)
-                        val = Math.max(5, Math.min(42, val));
+                        // 4. Make the line rise dynamically towards the end to reach the absolute MAXIMUM height!
+                        if (i >= numPoints - 4) {
+                            // Smoothly transition the last few points up to maxH
+                            const progress = (i - (numPoints - 4)) / 3; // 0 to 1
+                            const targetHeight = maxH;
+                            val = val * (1 - progress) + targetHeight * progress;
+                        }
+                        
+                        // Clamp to stay within chart container boundaries (between 4 and 42 px)
+                        val = Math.max(4, Math.min(42, val));
                         points.push(val);
                     }
                     
@@ -665,8 +654,8 @@
                         <path d="${fillD}" fill="url(#grad-${gId})" />
                         <!-- Bold neon trend line -->
                         <path d="${pathD}" fill="none" stroke="${themeColor}" stroke-width="2" stroke-linejoin="miter" stroke-linecap="square" />
-                        <!-- Final Indicator Dot -->
-                        <circle cx="${width}" cy="${height - points[numPoints - 1]}" r="3.5" fill="${themeColor}" stroke="#fff" stroke-width="1.2" />
+                        <!-- Final Indicator Dot (Glowing white center + neon outer matching Giza / Ganesha) -->
+                        <circle cx="${width}" cy="${height - points[numPoints - 1]}" r="4.5" fill="#ffffff" stroke="${themeColor}" stroke-width="1.8" style="filter: drop-shadow(0 0 4px ${themeColor});" />
                     </svg>
                     `;
                 }
