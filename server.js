@@ -699,9 +699,9 @@ const uploadBanner = multer({
       cb(null, 'banner-' + Date.now() + ext);
     }
   }),
-  limits: { fileSize: 10 * 1024 * 1024 },
+  limits: { fileSize: 30 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
-    const allowed = ['.jpg', '.jpeg', '.png', '.webp', '.gif'];
+    const allowed = ['.jpg', '.jpeg', '.png', '.webp', '.gif', '.mp4', '.webm', '.mov', '.ogg'];
     const ext = path.extname(file.originalname).toLowerCase();
     cb(null, allowed.includes(ext));
   }

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 
 <head>
@@ -1248,6 +1248,34 @@
             pointer-events: none;
         }
 
+        /* Preset color picker styles */
+        .se-presets-row {
+            display: flex;
+            gap: 6px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .preset-btn {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            cursor: pointer;
+            transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+            background-color: currentColor;
+            color: var(--preset-color, #fff);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+            padding: 0;
+        }
+
+        .preset-btn:hover {
+            transform: scale(1.25);
+            border-color: #fff;
+            box-shadow: 0 0 10px currentColor;
+        }
+
         @media (max-width: 768px) {
             .game-row {
                 flex-wrap: wrap;
@@ -1430,12 +1458,28 @@
                                     <input type="color" id="se-theme-color" value="#d4007a">
                                     <input type="text" id="se-theme-color-text" placeholder="#d4007a">
                                 </div>
+                                <div class="se-presets-row">
+                                    <button type="button" class="preset-btn" style="--preset-color: #ff007f;" onclick="applyPresetColor('se-theme-color', 'se-theme-color-text', '#ff007f')" title="Rosa Neon"></button>
+                                    <button type="button" class="preset-btn" style="--preset-color: #a200ff;" onclick="applyPresetColor('se-theme-color', 'se-theme-color-text', '#a200ff')" title="Roxo Neon"></button>
+                                    <button type="button" class="preset-btn" style="--preset-color: #00e5ff;" onclick="applyPresetColor('se-theme-color', 'se-theme-color-text', '#00e5ff')" title="Ciano Neon"></button>
+                                    <button type="button" class="preset-btn" style="--preset-color: #ffd700;" onclick="applyPresetColor('se-theme-color', 'se-theme-color-text', '#ffd700')" title="Ouro Neon"></button>
+                                    <button type="button" class="preset-btn" style="--preset-color: #00ffcc;" onclick="applyPresetColor('se-theme-color', 'se-theme-color-text', '#00ffcc')" title="Verde Neon"></button>
+                                    <button type="button" class="preset-btn" style="--preset-color: #ff003c;" onclick="applyPresetColor('se-theme-color', 'se-theme-color-text', '#ff003c')" title="Vermelho Neon"></button>
+                                    <button type="button" class="preset-btn" style="--preset-color: #ff6d00;" onclick="applyPresetColor('se-theme-color', 'se-theme-color-text', '#ff6d00')" title="Laranja Neon"></button>
+                                </div>
                             </div>
                             <div class="se-field">
                                 <label>Cor de Fundo do Site</label>
                                 <div class="se-color-row">
                                     <input type="color" id="se-bg-color" value="#1a0011">
                                     <input type="text" id="se-bg-color-text" placeholder="#1a0011">
+                                </div>
+                                <div class="se-presets-row">
+                                    <button type="button" class="preset-btn" style="--preset-color: #1a0011;" onclick="applyPresetColor('se-bg-color', 'se-bg-color-text', '#1a0011')" title="Fundo Rosa Escuro"></button>
+                                    <button type="button" class="preset-btn" style="--preset-color: #0c0612;" onclick="applyPresetColor('se-bg-color', 'se-bg-color-text', '#0c0612')" title="Fundo Roxo Escuro"></button>
+                                    <button type="button" class="preset-btn" style="--preset-color: #0a0e1a;" onclick="applyPresetColor('se-bg-color', 'se-bg-color-text', '#0a0e1a')" title="Fundo Azul Escuro"></button>
+                                    <button type="button" class="preset-btn" style="--preset-color: #00120b;" onclick="applyPresetColor('se-bg-color', 'se-bg-color-text', '#00120b')" title="Fundo Verde Escuro"></button>
+                                    <button type="button" class="preset-btn" style="--preset-color: #000000;" onclick="applyPresetColor('se-bg-color', 'se-bg-color-text', '#000000')" title="Preto Puro"></button>
                                 </div>
                             </div>
                         </div>
@@ -1466,6 +1510,13 @@
                                     <input type="color" id="se-navbar-bg-color" value="#000000">
                                     <input type="text" id="se-navbar-bg-color-text" placeholder="#000000">
                                 </div>
+                                <div class="se-presets-row">
+                                    <button type="button" class="preset-btn" style="--preset-color: #000000;" onclick="applyPresetColor('se-navbar-bg-color', 'se-navbar-bg-color-text', '#000000')" title="Preto Puro"></button>
+                                    <button type="button" class="preset-btn" style="--preset-color: #0c0612;" onclick="applyPresetColor('se-navbar-bg-color', 'se-navbar-bg-color-text', '#0c0612')" title="Roxo Escuro"></button>
+                                    <button type="button" class="preset-btn" style="--preset-color: #0a0e1a;" onclick="applyPresetColor('se-navbar-bg-color', 'se-navbar-bg-color-text', '#0a0e1a')" title="Azul Escuro"></button>
+                                    <button type="button" class="preset-btn" style="--preset-color: #1a0011;" onclick="applyPresetColor('se-navbar-bg-color', 'se-navbar-bg-color-text', '#1a0011')" title="Rosa Escuro"></button>
+                                    <button type="button" class="preset-btn" style="--preset-color: #111827;" onclick="applyPresetColor('se-navbar-bg-color', 'se-navbar-bg-color-text', '#111827')" title="Cinza Grafite"></button>
+                                </div>
                             </div>
                         </div>
                         <div style="margin-top:12px; font-size:12px; color:#94a3b8; font-weight:600; margin-bottom:8px">
@@ -1492,14 +1543,14 @@
                     <div class="se-section-icon"><i class="fa-solid fa-images"></i></div>
                     <div>
                         <div class="se-section-title">Banners do Carrossel</div>
-                        <div class="se-section-desc">Imagens que aparecem no topo do site</div>
+                        <div class="se-section-desc">Imagens e vídeos (GIF/MP4) que aparecem no topo do site</div>
                     </div>
                     <i class="fa-solid fa-chevron-down se-chevron"></i>
                 </div>
                 <div class="se-section-body">
                     <div class="se-section-content">
                         <div class="se-banners-grid" id="se-banners-grid"></div>
-                        <input type="file" id="se-banner-input" accept="image/*" style="display:none">
+                        <input type="file" id="se-banner-input" accept="image/*,video/*" style="display:none">
                     </div>
                 </div>
             </div>
@@ -1571,6 +1622,15 @@
                                     <input type="color" id="se-card-color" value="#b5006e">
                                     <input type="text" id="se-card-color-text" placeholder="#b5006e">
                                 </div>
+                                <div class="se-presets-row">
+                                    <button type="button" class="preset-btn" style="--preset-color: #ff007f;" onclick="applyPresetColor('se-card-color', 'se-card-color-text', '#ff007f')" title="Rosa Neon"></button>
+                                    <button type="button" class="preset-btn" style="--preset-color: #a200ff;" onclick="applyPresetColor('se-card-color', 'se-card-color-text', '#a200ff')" title="Roxo Neon"></button>
+                                    <button type="button" class="preset-btn" style="--preset-color: #00e5ff;" onclick="applyPresetColor('se-card-color', 'se-card-color-text', '#00e5ff')" title="Ciano Neon"></button>
+                                    <button type="button" class="preset-btn" style="--preset-color: #ffd700;" onclick="applyPresetColor('se-card-color', 'se-card-color-text', '#ffd700')" title="Ouro Neon"></button>
+                                    <button type="button" class="preset-btn" style="--preset-color: #00ffcc;" onclick="applyPresetColor('se-card-color', 'se-card-color-text', '#00ffcc')" title="Verde Neon"></button>
+                                    <button type="button" class="preset-btn" style="--preset-color: #ff003c;" onclick="applyPresetColor('se-card-color', 'se-card-color-text', '#ff003c')" title="Vermelho Neon"></button>
+                                    <button type="button" class="preset-btn" style="--preset-color: #ff6d00;" onclick="applyPresetColor('se-card-color', 'se-card-color-text', '#ff6d00')" title="Laranja Neon"></button>
+                                </div>
                             </div>
                         </div>
                         <div style="margin-top:12px; font-size:12px; color:#94a3b8; font-weight:600; margin-bottom:8px">
@@ -1607,6 +1667,13 @@
                                     <input type="color" id="se-wa-color" value="#25d366">
                                     <input type="text" id="se-wa-color-text" placeholder="#25d366">
                                 </div>
+                                <div class="se-presets-row">
+                                    <button type="button" class="preset-btn" style="--preset-color: #25d366;" onclick="applyPresetColor('se-wa-color', 'se-wa-color-text', '#25d366')" title="WhatsApp Verde"></button>
+                                    <button type="button" class="preset-btn" style="--preset-color: #00ffcc;" onclick="applyPresetColor('se-wa-color', 'se-wa-color-text', '#00ffcc')" title="Verde Neon"></button>
+                                    <button type="button" class="preset-btn" style="--preset-color: #00e5ff;" onclick="applyPresetColor('se-wa-color', 'se-wa-color-text', '#00e5ff')" title="Ciano Neon"></button>
+                                    <button type="button" class="preset-btn" style="--preset-color: #ffffff;" onclick="applyPresetColor('se-wa-color', 'se-wa-color-text', '#ffffff')" title="Branco"></button>
+                                    <button type="button" class="preset-btn" style="--preset-color: #ff007f;" onclick="applyPresetColor('se-wa-color', 'se-wa-color-text', '#ff007f')" title="Rosa Neon"></button>
+                                </div>
                             </div>
                         </div>
                         <div class="se-field">
@@ -1629,6 +1696,13 @@
                                 <div class="se-color-row">
                                     <input type="color" id="se-ig-color" value="#e1306c">
                                     <input type="text" id="se-ig-color-text" placeholder="#e1306c">
+                                </div>
+                                <div class="se-presets-row">
+                                    <button type="button" class="preset-btn" style="--preset-color: #e1306c;" onclick="applyPresetColor('se-ig-color', 'se-ig-color-text', '#e1306c')" title="Instagram Rosa"></button>
+                                    <button type="button" class="preset-btn" style="--preset-color: #a200ff;" onclick="applyPresetColor('se-ig-color', 'se-ig-color-text', '#a200ff')" title="Roxo Neon"></button>
+                                    <button type="button" class="preset-btn" style="--preset-color: #ff007f;" onclick="applyPresetColor('se-ig-color', 'se-ig-color-text', '#ff007f')" title="Rosa Neon"></button>
+                                    <button type="button" class="preset-btn" style="--preset-color: #ffffff;" onclick="applyPresetColor('se-ig-color', 'se-ig-color-text', '#ffffff')" title="Branco"></button>
+                                    <button type="button" class="preset-btn" style="--preset-color: #ffd700;" onclick="applyPresetColor('se-ig-color', 'se-ig-color-text', '#ffd700')" title="Ouro Neon"></button>
                                 </div>
                             </div>
                         </div>
@@ -1658,6 +1732,15 @@
                                 <div class="se-color-row">
                                     <input type="color" id="se-platforms-color" value="#b5006e">
                                     <input type="text" id="se-platforms-color-text" placeholder="#b5006e">
+                                </div>
+                                <div class="se-presets-row">
+                                    <button type="button" class="preset-btn" style="--preset-color: #ff007f;" onclick="applyPresetColor('se-platforms-color', 'se-platforms-color-text', '#ff007f')" title="Rosa Neon"></button>
+                                    <button type="button" class="preset-btn" style="--preset-color: #a200ff;" onclick="applyPresetColor('se-platforms-color', 'se-platforms-color-text', '#a200ff')" title="Roxo Neon"></button>
+                                    <button type="button" class="preset-btn" style="--preset-color: #00e5ff;" onclick="applyPresetColor('se-platforms-color', 'se-platforms-color-text', '#00e5ff')" title="Ciano Neon"></button>
+                                    <button type="button" class="preset-btn" style="--preset-color: #ffd700;" onclick="applyPresetColor('se-platforms-color', 'se-platforms-color-text', '#ffd700')" title="Ouro Neon"></button>
+                                    <button type="button" class="preset-btn" style="--preset-color: #00ffcc;" onclick="applyPresetColor('se-platforms-color', 'se-platforms-color-text', '#00ffcc')" title="Verde Neon"></button>
+                                    <button type="button" class="preset-btn" style="--preset-color: #ff003c;" onclick="applyPresetColor('se-platforms-color', 'se-platforms-color-text', '#ff003c')" title="Vermelho Neon"></button>
+                                    <button type="button" class="preset-btn" style="--preset-color: #ff6d00;" onclick="applyPresetColor('se-platforms-color', 'se-platforms-color-text', '#ff6d00')" title="Laranja Neon"></button>
                                 </div>
                             </div>
                         </div>
@@ -1698,6 +1781,15 @@
                                     <input type="color" id="se-update-color" value="#b5006e">
                                     <input type="text" id="se-update-color-text" placeholder="#b5006e">
                                 </div>
+                                <div class="se-presets-row">
+                                    <button type="button" class="preset-btn" style="--preset-color: #ff007f;" onclick="applyPresetColor('se-update-color', 'se-update-color-text', '#ff007f')" title="Rosa Neon"></button>
+                                    <button type="button" class="preset-btn" style="--preset-color: #a200ff;" onclick="applyPresetColor('se-update-color', 'se-update-color-text', '#a200ff')" title="Roxo Neon"></button>
+                                    <button type="button" class="preset-btn" style="--preset-color: #00e5ff;" onclick="applyPresetColor('se-update-color', 'se-update-color-text', '#00e5ff')" title="Ciano Neon"></button>
+                                    <button type="button" class="preset-btn" style="--preset-color: #ffd700;" onclick="applyPresetColor('se-update-color', 'se-update-color-text', '#ffd700')" title="Ouro Neon"></button>
+                                    <button type="button" class="preset-btn" style="--preset-color: #00ffcc;" onclick="applyPresetColor('se-update-color', 'se-update-color-text', '#00ffcc')" title="Verde Neon"></button>
+                                    <button type="button" class="preset-btn" style="--preset-color: #ff003c;" onclick="applyPresetColor('se-update-color', 'se-update-color-text', '#ff003c')" title="Vermelho Neon"></button>
+                                    <button type="button" class="preset-btn" style="--preset-color: #ff6d00;" onclick="applyPresetColor('se-update-color', 'se-update-color-text', '#ff6d00')" title="Laranja Neon"></button>
+                                </div>
                             </div>
                         </div>
                         <div style="margin-top:12px; font-size:12px; color:#94a3b8; font-weight:600; margin-bottom:8px">
@@ -1735,6 +1827,15 @@
                                     <input type="color" id="se-button-color" value="#d4007a">
                                     <input type="text" id="se-button-color-text" placeholder="#d4007a">
                                 </div>
+                                <div class="se-presets-row">
+                                    <button type="button" class="preset-btn" style="--preset-color: #ff007f;" onclick="applyPresetColor('se-button-color', 'se-button-color-text', '#ff007f')" title="Rosa Neon"></button>
+                                    <button type="button" class="preset-btn" style="--preset-color: #a200ff;" onclick="applyPresetColor('se-button-color', 'se-button-color-text', '#a200ff')" title="Roxo Neon"></button>
+                                    <button type="button" class="preset-btn" style="--preset-color: #00e5ff;" onclick="applyPresetColor('se-button-color', 'se-button-color-text', '#00e5ff')" title="Ciano Neon"></button>
+                                    <button type="button" class="preset-btn" style="--preset-color: #ffd700;" onclick="applyPresetColor('se-button-color', 'se-button-color-text', '#ffd700')" title="Ouro Neon"></button>
+                                    <button type="button" class="preset-btn" style="--preset-color: #00ffcc;" onclick="applyPresetColor('se-button-color', 'se-button-color-text', '#00ffcc')" title="Verde Neon"></button>
+                                    <button type="button" class="preset-btn" style="--preset-color: #ff003c;" onclick="applyPresetColor('se-button-color', 'se-button-color-text', '#ff003c')" title="Vermelho Neon"></button>
+                                    <button type="button" class="preset-btn" style="--preset-color: #ff6d00;" onclick="applyPresetColor('se-button-color', 'se-button-color-text', '#ff6d00')" title="Laranja Neon"></button>
+                                </div>
                             </div>
                         </div>
                         <div style="margin-top:12px; font-size:12px; color:#94a3b8; font-weight:600; margin-bottom:8px">
@@ -1771,12 +1872,26 @@
                                     <input type="color" id="se-footer-bg-color" value="#000000">
                                     <input type="text" id="se-footer-bg-color-text" placeholder="#000000">
                                 </div>
+                                <div class="se-presets-row">
+                                    <button type="button" class="preset-btn" style="--preset-color: #000000;" onclick="applyPresetColor('se-footer-bg-color', 'se-footer-bg-color-text', '#000000')" title="Preto Puro"></button>
+                                    <button type="button" class="preset-btn" style="--preset-color: #0c0612;" onclick="applyPresetColor('se-footer-bg-color', 'se-footer-bg-color-text', '#0c0612')" title="Roxo Escuro"></button>
+                                    <button type="button" class="preset-btn" style="--preset-color: #0a0e1a;" onclick="applyPresetColor('se-footer-bg-color', 'se-footer-bg-color-text', '#0a0e1a')" title="Azul Escuro"></button>
+                                    <button type="button" class="preset-btn" style="--preset-color: #1a0011;" onclick="applyPresetColor('se-footer-bg-color', 'se-footer-bg-color-text', '#1a0011')" title="Rosa Escuro"></button>
+                                    <button type="button" class="preset-btn" style="--preset-color: #111827;" onclick="applyPresetColor('se-footer-bg-color', 'se-footer-bg-color-text', '#111827')" title="Cinza Grafite"></button>
+                                </div>
                             </div>
                             <div class="se-field">
                                 <label>Cor do Texto do Rodapé</label>
                                 <div class="se-color-row">
                                     <input type="color" id="se-footer-text-color" value="#94a3b8">
                                     <input type="text" id="se-footer-text-color-text" placeholder="#94a3b8">
+                                </div>
+                                <div class="se-presets-row">
+                                    <button type="button" class="preset-btn" style="--preset-color: #94a3b8;" onclick="applyPresetColor('se-footer-text-color', 'se-footer-text-color-text', '#94a3b8')" title="Cinza Claro"></button>
+                                    <button type="button" class="preset-btn" style="--preset-color: #ffffff;" onclick="applyPresetColor('se-footer-text-color', 'se-footer-text-color-text', '#ffffff')" title="Branco"></button>
+                                    <button type="button" class="preset-btn" style="--preset-color: #f472b6;" onclick="applyPresetColor('se-footer-text-color', 'se-footer-text-color-text', '#f472b6')" title="Rosa Suave"></button>
+                                    <button type="button" class="preset-btn" style="--preset-color: #fbbf24;" onclick="applyPresetColor('se-footer-text-color', 'se-footer-text-color-text', '#fbbf24')" title="Dourado Suave"></button>
+                                    <button type="button" class="preset-btn" style="--preset-color: #38bdf8;" onclick="applyPresetColor('se-footer-text-color', 'se-footer-text-color-text', '#38bdf8')" title="Azul Suave"></button>
                                 </div>
                             </div>
                         </div>
@@ -2479,15 +2594,23 @@
         // Banner grid render
         function renderBannerGrid(banners) {
             const grid = document.getElementById('se-banners-grid');
-            grid.innerHTML = banners.map((src, i) => `
-                <div class="se-banner-item">
-                    <img src="${escapeHtml(src)}" alt="Banner ${i + 1}" onerror="this.style.background='#1a1a2e';this.style.minHeight='120px';">
-                    <span class="se-banner-index">#${i + 1}</span>
-                    <button class="se-banner-delete" onclick="deleteBanner(${i})" title="Remover banner">
-                        <i class="fa-solid fa-trash"></i>
-                    </button>
-                </div>
-            `).join('') + `
+            grid.innerHTML = banners.map((src, i) => {
+                const cleanSrc = src.split('?')[0].split('#')[0];
+                const isVideo = /\.(mp4|webm|ogg|mov)$/i.test(cleanSrc);
+                const mediaTag = isVideo 
+                    ? `<video src="${escapeHtml(src)}" autoplay loop muted playsinline style="width:100%;height:100%;object-fit:cover;min-height:120px;"></video>`
+                    : `<img src="${escapeHtml(src)}" alt="Banner ${i + 1}" onerror="this.style.background='#1a1a2e';this.style.minHeight='120px';">`;
+                
+                return `
+                    <div class="se-banner-item">
+                        ${mediaTag}
+                        <span class="se-banner-index">#${i + 1}</span>
+                        <button class="se-banner-delete" onclick="deleteBanner(${i})" title="Remover banner">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+            }).join('') + `
                 <div class="se-banner-add" onclick="document.getElementById('se-banner-input').click()">
                     <i class="fa-solid fa-plus"></i>
                     Adicionar Banner
@@ -2499,8 +2622,8 @@
         document.getElementById('se-banner-input').addEventListener('change', async (e) => {
             const file = e.target.files[0];
             if (!file) return;
-            if (file.size > 10 * 1024 * 1024) {
-                showToast('Banner deve ter no m\u00e1ximo 10MB', 'error');
+            if (file.size > 30 * 1024 * 1024) {
+                showToast('Banner deve ter no m\u00e1ximo 30MB', 'error');
                 return;
             }
             const formData = new FormData();
@@ -2794,6 +2917,16 @@
             }
         });
 
+        // Helper to apply preset color to a color picker input pair and trigger live preview
+        window.applyPresetColor = function(colorId, textId, value) {
+            const colorEl = document.getElementById(colorId);
+            const textEl = document.getElementById(textId);
+            if (colorEl && textEl) {
+                colorEl.value = value;
+                textEl.value = value;
+                colorEl.dispatchEvent(new Event('input'));
+            }
+        };
 
     </script>
 </body>
