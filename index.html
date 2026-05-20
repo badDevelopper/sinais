@@ -556,9 +556,9 @@
                     if (idx < 3) {
                         status = 'Alta';
                     } else {
-                        // Better distribution: 60% Alta, 30% Média, 10% Baixa
+                        // Better distribution: 40% Alta, 50% Média, 10% Baixa
                         const statusChoice = (seed * 11 + idx * 7) % 10;
-                        if (statusChoice < 6) status = 'Alta';
+                        if (statusChoice < 4) status = 'Alta';
                         else if (statusChoice < 9) status = 'Média';
                         else status = 'Baixa';
                     }
