@@ -7,12 +7,6 @@ Desenvolvido para o Grupo FP
 Para um melhor desempenho, e segurança utilize a hospedagem na Hostinger através deste link: [https://painel.iblgroup.cloud]
 
 
-# Doação
-
-Para fazer uma doação em agradecimento pelo projeto! Acesse: [https://roxcheckout.shop](https://roxcheckout.shop)
-
-
-
 
 
 ![FP Sinais Slots](front_example.jpg)
