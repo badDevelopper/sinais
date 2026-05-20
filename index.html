@@ -485,20 +485,46 @@
                     };
                 }
 
-                // Generates inline SVG path for smooth sparkline chart
-                function generateSparklineSVG(gId, themeColor) {
-                    const numPoints = 20; // More points = smoother line
-                    const width = 180;
+                // Generates inline SVG path for pointed sparkline chart with spikes and final indicator dot
+                function generateSparklineSVG(gId, themeColor, baseRtp) {
+                    const numPoints = 18; 
+                    const width = 174;
                     const height = 46;
                     const stepX = width / (numPoints - 1);
                     
+                    // Simple LCG or sine-based pseudo-random generator
+                    function pseudoRandom(seed) {
+                        const x = Math.sin(seed) * 10000;
+                        return x - Math.floor(x);
+                    }
+                    
                     const points = [];
+                    let seed = gId * 5.7 + 2.3;
+                    
                     for (let i = 0; i < numPoints; i++) {
-                        // Smooth wave using overlapping sines/cosines
-                        const angle1 = i * 0.5 + (gId * 1.3);
-                        const angle2 = i * 0.25 - (gId * 0.7);
-                        const y = 23 + Math.sin(angle1) * 8 + Math.cos(angle2) * 4;
-                        points.push(y);
+                        // Base height is low zig-zag between 10px and 16px from bottom
+                        let baseVal = 10 + (pseudoRandom(seed + i) * 6);
+                        
+                        // Add a sharp major spike around the middle (index 11)
+                        if (i === 11) {
+                            baseVal = 32 + (pseudoRandom(seed + 88) * 8); // spike to 32-40px
+                        } else if (i === 10 || i === 12) {
+                            baseVal = 18 + (pseudoRandom(seed + i) * 4); // sharp shoulder
+                        }
+                        
+                        // Add a second sharp spike around index 15
+                        if (i === 15) {
+                            baseVal = 26 + (pseudoRandom(seed + 99) * 6); // spike to 26-32px
+                        } else if (i === 14 || i === 16) {
+                            baseVal = 14 + (pseudoRandom(seed + i) * 4);
+                        }
+                        
+                        // The last point (index 17) terminates high
+                        if (i === 17) {
+                            baseVal = 32 + (pseudoRandom(seed + 44) * 6); // final peak 32-38px
+                        }
+                        
+                        points.push(baseVal);
                     }
                     
                     let pathD = `M 0,${height - points[0]}`;
@@ -511,11 +537,11 @@
                     // Fill path
                     const fillD = `${pathD} L ${width},${height} L 0,${height} Z`;
                     
-                    // Dashed line at about y = height - 12 (represents the base line)
-                    const baseLineY = height - 12;
+                    // Base dash line vertical level (approx. 14px from bottom)
+                    const baseLineY = height - 14;
                     
                     return `
-                    <svg class="gcard-chart-svg" width="100%" height="${height}" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none">
+                    <svg class="gcard-chart-svg" width="100%" height="${height}" viewBox="0 0 182 ${height}" preserveAspectRatio="none">
                         <defs>
                             <linearGradient id="grad-${gId}" x1="0" y1="0" x2="0" y2="1">
                                 <stop offset="0%" stop-color="${themeColor}" stop-opacity="0.35" />
@@ -523,11 +549,15 @@
                             </linearGradient>
                         </defs>
                         <!-- Base Dash Line -->
-                        <line x1="0" y1="${baseLineY}" x2="${width}" y2="${baseLineY}" stroke="rgba(255,255,255,0.12)" stroke-dasharray="3,3" stroke-width="1" />
+                        <line x1="0" y1="${baseLineY}" x2="${width}" y2="${baseLineY}" stroke="${themeColor}" stroke-dasharray="2,3" stroke-width="0.8" opacity="0.6" />
+                        <!-- Base Text -->
+                        <text x="${width/2}" y="${baseLineY + 9}" fill="${themeColor}" font-size="7" font-family="'Inter', sans-serif" font-weight="900" text-anchor="middle" opacity="0.75">BASE ${baseRtp}%</text>
                         <!-- Fill area under curve -->
                         <path d="${fillD}" fill="url(#grad-${gId})" />
                         <!-- Bold neon trend line -->
-                        <path d="${pathD}" fill="none" stroke="${themeColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="${pathD}" fill="none" stroke="${themeColor}" stroke-width="2" stroke-linejoin="miter" stroke-linecap="square" />
+                        <!-- Final Indicator Dot -->
+                        <circle cx="${width}" cy="${height - points[numPoints - 1]}" r="3.5" fill="${themeColor}" stroke="#fff" stroke-width="1.2" />
                     </svg>
                     `;
                 }
@@ -599,8 +629,7 @@
                                 
                                 <!-- Gráfico Sparkline -->
                                 <div class="gcard-chart-container">
-                                    ${generateSparklineSVG(g.id, g.cor)}
-                                    <span class="gcard-chart-base">BASE ${d.baseRtp}%</span>
+                                    ${generateSparklineSVG(g.id, g.cor, d.baseRtp)}
                                 </div>
                                 
                                 <!-- Volatilidade -->
