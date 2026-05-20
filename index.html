@@ -506,16 +506,46 @@
                 }
 
                 // Seeded random / deterministic value generator based on game properties
-                function getDeterministicValues(g) {
+                function getDeterministicValues(g, idx) {
                     const seed = g.id || 1;
-                    
-                    // Decimals: (seed * 17) % 100
                     const decimals = (seed * 17) % 100;
-                    // Force display RTP to be between 94.20% and 99.90% for premium simulation
-                    const rtpVal = 94.2 + (seed % 5) + (decimals / 100) * 0.7;
                     
-                    // Historical change: (seed * 31) % 300 - 150 (range -1.50% to +1.50%)
-                    const changeNum = ((seed * 31) % 300 - 150) / 100;
+                    // Determine the game status: Alta, Média, Média-Baixa, Baixa
+                    let status = 'Alta';
+                    if (idx < 3) {
+                        status = 'Alta';
+                    } else {
+                        const statusChoice = (seed * 11 + idx * 7) % 4;
+                        if (statusChoice === 0) status = 'Alta';
+                        else if (statusChoice === 1) status = 'Média';
+                        else if (statusChoice === 2) status = 'Média-Baixa';
+                        else status = 'Baixa';
+                    }
+                    
+                    let rtpVal, changeNum;
+                    
+                    if (status === 'Alta') {
+                        // High RTP: 94.20% to 99.90%
+                        rtpVal = 94.2 + (seed % 5) + (decimals / 100) * 0.7;
+                        // Mostly positive changes (+0.10% to +1.80%)
+                        changeNum = 0.10 + ((seed * 23) % 170) / 100;
+                    } else if (status === 'Média') {
+                        // Medium RTP: 78.50% to 88.90%
+                        rtpVal = 78.5 + (seed % 9) + (decimals / 100) * 1.4;
+                        // Moderate changes (-0.80% to +0.80%)
+                        changeNum = ((seed * 23) % 160 - 80) / 100;
+                    } else if (status === 'Média-Baixa') {
+                        // Medium-Low RTP: 62.00% to 74.50%
+                        rtpVal = 62.0 + (seed % 11) + (decimals / 100) * 1.5;
+                        // Mostly negative changes (-1.90% to -0.10%)
+                        changeNum = -1.90 + ((seed * 23) % 180) / 100;
+                    } else {
+                        // Low RTP: 45.00% to 58.50%
+                        rtpVal = 45.0 + (seed % 12) + (decimals / 100) * 1.5;
+                        // Strongly negative changes (-3.80% to -1.20%)
+                        changeNum = -3.80 + ((seed * 23) % 260) / 100;
+                    }
+                    
                     const isPositive = changeNum >= 0;
                     const changeText = (isPositive ? '+' : '') + changeNum.toFixed(2) + '%';
                     const changeClass = isPositive ? 'change-up' : 'change-down';
@@ -523,7 +553,14 @@
                     
                     // Volatility
                     const volatilities = ['Baixa', 'Média', 'Média-Alta', 'Alta'];
-                    const volatIdx = (seed * 7) % volatilities.length;
+                    let volatIdx;
+                    if (status === 'Alta') {
+                        volatIdx = (seed * 7) % 3 + 1; // Média, Média-Alta, Alta
+                    } else if (status === 'Baixa') {
+                        volatIdx = 0; // Baixa
+                    } else {
+                        volatIdx = (seed * 7) % 3; // Baixa, Média, Média-Alta
+                    }
                     const volatText = volatilities[volatIdx];
                     const volatColors = {
                         'Baixa': '#00ffcc',
@@ -536,23 +573,24 @@
                     // Base line for chart (proportional to display RTP)
                     const baseRtp = (rtpVal - 1.5 - ((seed * 3) % 20) / 10).toFixed(1);
 
-                    // Suggested bets: each row (BNS, CNX, EXT) has different values per column (MÍN, PAD, MÁX)
+                    // Suggested bets: scale values down slightly for lower RTP states to be realistic
+                    const betMultiplier = status === 'Alta' ? 1.0 : status === 'Média' ? 0.7 : status === 'Média-Baixa' ? 0.5 : 0.3;
                     const betSeed = (seed * 13) % 7;
                     const bets = {
                         bns: {
-                            min: (2.40 + (betSeed * 0.80)).toFixed(2).replace('.', ','),
-                            pad: (20.40 + (betSeed * 2.10)).toFixed(2).replace('.', ','),
-                            max: (152.00 + (betSeed * 12.00)).toFixed(2).replace('.', ',')
+                            min: ( (2.40 + (betSeed * 0.80)) * betMultiplier ).toFixed(2).replace('.', ','),
+                            pad: ( (20.40 + (betSeed * 2.10)) * betMultiplier ).toFixed(2).replace('.', ','),
+                            max: ( (152.00 + (betSeed * 12.00)) * betMultiplier ).toFixed(2).replace('.', ',')
                         },
                         cnx: {
-                            min: (2.60 + (betSeed * 0.60)).toFixed(2).replace('.', ','),
-                            pad: (20.60 + (betSeed * 1.80)).toFixed(2).replace('.', ','),
-                            max: (153.00 + (betSeed * 8.00)).toFixed(2).replace('.', ',')
+                            min: ( (2.60 + (betSeed * 0.60)) * betMultiplier ).toFixed(2).replace('.', ','),
+                            pad: ( (20.60 + (betSeed * 1.80)) * betMultiplier ).toFixed(2).replace('.', ','),
+                            max: ( (153.00 + (betSeed * 8.00)) * betMultiplier ).toFixed(2).replace('.', ',')
                         },
                         ext: {
-                            min: (3.40 + (betSeed * 0.90)).toFixed(2).replace('.', ','),
-                            pad: (21.40 + (betSeed * 2.50)).toFixed(2).replace('.', ','),
-                            max: (152.00 + (betSeed * 15.00)).toFixed(2).replace('.', ',')
+                            min: ( (3.40 + (betSeed * 0.90)) * betMultiplier ).toFixed(2).replace('.', ','),
+                            pad: ( (21.40 + (betSeed * 2.50)) * betMultiplier ).toFixed(2).replace('.', ','),
+                            max: ( (152.00 + (betSeed * 15.00)) * betMultiplier ).toFixed(2).replace('.', ',')
                         }
                     };
                     
@@ -585,9 +623,9 @@
                     const minH = scale(minVal, 20);
                     const padH = scale(padVal, 28);
                     
-                    // Map current RTP (e.g. 94.59) to high height range 36 to 42 px (always near the top!)
-                    const clampedRtp = Math.max(93.0, Math.min(100.0, Number(currentRtp) || 95.0));
-                    const finalH = 36 + ((clampedRtp - 93.0) / 7.0) * 6;
+                    // Map current RTP (e.g. 45.0 to 100.0) to height range 6 to 42 px (matching low/medium/high states)
+                    const clampedRtp = Math.max(45.0, Math.min(100.0, Number(currentRtp) || 95.0));
+                    const finalH = 6 + ((clampedRtp - 45.0) / 55.0) * 36;
                     
                     const points = [];
                     for (let i = 0; i < numPoints; i++) {
@@ -667,8 +705,8 @@
 
                 function renderGames(games) {
                     const grid = document.getElementById('game-grid');
-                    grid.innerHTML = games.map(g => {
-                        const d = getDeterministicValues(g);
+                    grid.innerHTML = games.map((g, idx) => {
+                        const d = getDeterministicValues(g, idx);
                         const neonColor = getNeonColor(g.cor);
                         
                         // Provider label & class
