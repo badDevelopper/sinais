@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerar Sinal - Slot</title>
+    <link rel="stylesheet" href="/styles/globalStyles.css">
+    <link rel="stylesheet" href="/styles/header.css">
+    <link rel="stylesheet" href="/styles/main.css">
+    <link rel="stylesheet" href="/styles/footer.css">
+    <link rel="shortcut icon" href="/assets/favicon.png" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        .signal-container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px 16px 40px;
+        }
+
+        .signal-card {
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        .signal-card-img {
+            width: 100%;
+            aspect-ratio: 16/9;
+            object-fit: cover;
+            display: block;
+        }
+
+        .signal-card-title {
+            text-align: center;
+            font-family: 'Inter', sans-serif;
+            font-weight: 800;
+            font-size: 16px;
+            color: #fff;
+            text-transform: uppercase;
+            padding: 12px 0 8px;
+            letter-spacing: 1px;
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.3) 0%, transparent 100%);
+        }
+
+        .signal-body {
+            padding: 8px 16px 20px;
+        }
+
+        .signal-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 16px 20px;
+            margin: 8px 0;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(4px);
+        }
+
+        .signal-row-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .signal-row-icon.normal {
+            background: linear-gradient(135deg, #ff007f, #d4007a);
+        }
+
+        .signal-row-icon.turbo {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        }
+
+        .signal-row-icon.jogue {
+            background: linear-gradient(135deg, #6366f1, #4338ca);
+        }
+
+        .signal-row-label {
+            font-family: 'Inter', sans-serif;
+            font-weight: 800;
+            font-size: 15px;
+            color: #fff;
+        }
+
+        .signal-row-value {
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-left: 8px;
+        }
+
+        .signal-row-value.loaded {
+            color: #ff007f;
+            font-weight: 800;
+        }
+
+        .spinner-sm {
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-left: 8px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .signal-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 16px;
+            margin-top: 12px;
+            border: none;
+            border-radius: 14px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 800;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #fff;
+        }
+
+        .signal-btn.ready {
+            background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 50%, #2563eb 100%);
+            box-shadow: 0 4px 20px rgba(37, 99, 235, 0.4);
+        }
+
+        .signal-btn.ready:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 25px rgba(37, 99, 235, 0.6);
+        }
+
+        .signal-btn.loading {
+            background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%);
+            cursor: not-allowed;
+        }
+
+        .signal-btn.cooldown {
+            background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+            cursor: not-allowed;
+        }
+
+        .signal-btn .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #86efac;
+            animation: pulse-dot 1.5s infinite;
+        }
+
+        @keyframes pulse-dot {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.3;
+            }
+        }
+
+        .signal-btn .spinner-btn {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <nav id="main-nav">
+        <img src="/assets/navbar/fundo-atras-botoes.png" class="nav-bg" alt="">
+        <div class="nav-inner">
+            <a href="/" class="nav-link">
+                <img src="/assets/navbar/pgsoft.png" alt="PG Soft" class="nav-btn-img">
+            </a>
+            <a href="/pp-games" class="nav-link">
+                <img src="/assets/navbar/pragmatic.png" alt="Pragmatic" class="nav-btn-img">
+            </a>
+            <a href="/gerar-sinais" class="nav-link active">
+                <img src="/assets/navbar/gerar-sinais.png" alt="Gerar Sinais" class="nav-btn-img">
+            </a>
+            <a href="" class="nav-link" target="_blank">
+                <img src="/assets/navbar/jogue-agora.png" alt="Jogue Agora" class="nav-btn-img">
+            </a>
+            <a href="/wg-games" class="nav-link">
+                <img src="/assets/navbar/wg-games.png" alt="WG Games" class="nav-btn-img">
+            </a>
+            <a href="/tada-games" class="nav-link">
+                <img src="/assets/navbar/tada-games.png" alt="Tada Games" class="nav-btn-img">
+            </a>
+
+        </div>
+    </nav>
+
+    <main>
+        <div class="nav-spacer"></div>
+
+        <div class="signal-container">
+            <div class="signal-card" id="signal-card">
+                <!-- loaded via JS -->
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="footer-inner">
+            <div class="footer-block">
+                <h2>DEFENSORES DO JOGO RESPONSÁVEL</h2>
+                <p>Nós do Grupo FP, promovemos o jogo responsável como uma forma de entretenimento. Se o jogo deixar de
+                    ser divertido, é hora de parar.</p>
+            </div>
+            <div class="footer-block">
+                <h2>AVISO LEGAL</h2>
+                <p>O site grupofpsinais.com é uma plataforma independente dedicada a cassinos online e jogos de cassino.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const slug = window.location.pathname.split('/').filter(Boolean).pop();
+        let gameData = null;
+        let cooldownTimer = null;
+
+        // Simple hash for generating consistent values per slug
+        function hashStr(str) {
+            let h = 0;
+            for (let i = 0; i < str.length; i++) {
+                h = ((h << 5) - h) + str.charCodeAt(i);
+                h |= 0;
+            }
+            return Math.abs(h);
+        }
+
+        // Generate values: NORMAL = 3-10X, TURBO = 2-7X, JOGUE ATÉ = now + 5min
+        function generateValues() {
+            const seed = Date.now();
+            const normal = (hashStr(slug + 'normal' + seed) % 8) + 3; // 3-10
+            const turbo = (hashStr(slug + 'turbo' + seed) % 6) + 2;   // 2-7
+            const now = new Date();
+            now.setMinutes(now.getMinutes() + 5);
+            const jogueAte = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+            return { normal: `${normal}X`, turbo: `${turbo}X`, jogueAte };
+        }
+
+        function renderCard(game, state, values) {
+            const card = document.getElementById('signal-card');
+            const bg = game.bgColor || 'rgb(13, 28, 124)';
+
+            let normalVal = '--';
+            let turboVal = '--';
+            let jogueVal = '--';
+            let valClass = '';
+
+            if (state === 'loading') {
+                normalVal = '<div class="spinner-sm"></div>';
+                turboVal = '<div class="spinner-sm"></div>';
+                jogueVal = '<div class="spinner-sm"></div>';
+            } else if ((state === 'done' || state === 'cooldown') && values) {
+                normalVal = values.normal;
+                turboVal = values.turbo;
+                jogueVal = values.jogueAte;
+                valClass = 'loaded';
+            }
+
+            let btnHtml = '';
+            if (state === 'ready') {
+                btnHtml = `<button class="signal-btn ready" onclick="onGenerate()">
+                    GERAR SINAL <span class="dot"></span>
+                </button>`;
+            } else if (state === 'loading') {
+                btnHtml = `<button class="signal-btn loading" disabled>
+                    IA LENDO O CASSINO <span class="spinner-btn"></span>
+                </button>`;
+            } else if (state === 'cooldown') {
+                btnHtml = `<button class="signal-btn cooldown" id="cooldown-btn" disabled>
+                    AGUARDE <span id="cooldown-sec">60</span>s PARA NOVO SINAL <span class="spinner-btn"></span>
+                </button>`;
+            }
+
+            card.style.background = bg;
+            card.innerHTML = `
+                <img src="${game.image}" alt="${game.title}" class="signal-card-img">
+                <div class="signal-card-title">${game.title}</div>
+                <div class="signal-body">
+                    <div class="signal-row">
+                        <div class="signal-row-icon normal"><i class="fa-solid fa-circle-check"></i></div>
+                        <span class="signal-row-label">NORMAL:</span>
+                        <span class="signal-row-value ${valClass}">${normalVal}</span>
+                    </div>
+                    <div class="signal-row">
+                        <div class="signal-row-icon turbo"><i class="fa-solid fa-bolt"></i></div>
+                        <span class="signal-row-label">TURBO:</span>
+                        <span class="signal-row-value ${valClass}">${turboVal}</span>
+                    </div>
+                    <div class="signal-row">
+                        <div class="signal-row-icon jogue"><i class="fa-regular fa-clock"></i></div>
+                        <span class="signal-row-label">JOGUE ATÉ:</span>
+                        <span class="signal-row-value ${valClass}">${jogueVal}</span>
+                    </div>
+                    ${btnHtml}
+                </div>
+            `;
+        }
+
+        function onGenerate() {
+            // Show loading state
+            renderCard(gameData, 'loading');
+
+            // Simulate AI reading casino (~5s)
+            setTimeout(() => {
+                const values = generateValues();
+                renderCard(gameData, 'cooldown', values);
+
+                // Start 60s cooldown
+                let sec = 60;
+                cooldownTimer = setInterval(() => {
+                    sec--;
+                    const el = document.getElementById('cooldown-sec');
+                    if (el) el.textContent = sec;
+                    if (sec <= 0) {
+                        clearInterval(cooldownTimer);
+                        renderCard(gameData, 'ready');
+                    }
+                }, 1000);
+            }, 5000);
+        }
+
+        // Load game data from API
+        fetch('/api/gerar-sinais')
+            .then(r => r.json())
+            .then(games => {
+                gameData = games.find(g => g.slug === slug);
+                if (!gameData) {
+                    document.getElementById('signal-card').innerHTML =
+                        '<p style="color:#fff;text-align:center;padding:40px">Jogo não encontrado</p>';
+                    return;
+                }
+                document.title = `${gameData.title.toUpperCase()} - Gerar Sinal`;
+                renderCard(gameData, 'ready');
+            });
+    </script>
+</body>
+
+</html>

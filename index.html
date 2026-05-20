@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slot</title>
+    <style>
+        :root {
+            --theme: #d4007a;
+            --theme-light: #ff3ea5;
+            --theme-dark: #b8006e;
+            --theme-darker: #a30060;
+            --theme-bg: #1a0011;
+        }
+    </style>
+    <link rel="stylesheet" href="/styles/globalStyles.css">
+    <link rel="stylesheet" href="/styles/header.css">
+    <link rel="stylesheet" href="/styles/main.css">
+    <link rel="stylesheet" href="/styles/footer.css">
+    <link rel="shortcut icon" href="/assets/favicon.png" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+
+    <meta name="author" content="Grupo FP Sinais">
+    <meta name="description" content="Slot - Site de Sinais Slots">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Slot">
+    <meta property="og:description" content="Slot - Site de Sinais Slots">
+    <meta property="og:url" content="https://www.grupofpsinais.com">
+    <meta property="og:image" content="https://www.grupofpsinais.com/assets/favicon.png">
+
+    <script src="https://cdn.jsdelivr.net/npm/notiflix@3.2.8/dist/notiflix-aio-3.2.8.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <nav id="main-nav">
+        <img src="/assets/navbar/fundo-atras-botoes.png" class="nav-bg" alt="">
+        <div class="nav-inner">
+            <a href="/" class="nav-link" data-provider="pg">
+                <img src="/assets/navbar/pgsoft.png" alt="PG Soft" class="nav-btn-img">
+            </a>
+            <a href="/pp-games" class="nav-link" data-provider="pp">
+                <img src="/assets/navbar/pragmatic.png" alt="Pragmatic" class="nav-btn-img">
+            </a>
+            <a href="/gerar-sinais" class="nav-link">
+                <img src="/assets/navbar/gerar-sinais.png" alt="Gerar Sinais" class="nav-btn-img">
+            </a>
+            <a href="#" class="nav-link" target="_blank">
+                <img src="/assets/navbar/jogue-agora.png" alt="Jogue Agora" class="nav-btn-img">
+            </a>
+            <a href="/wg-games" class="nav-link" data-provider="wg">
+                <img src="/assets/navbar/wg-games.png" alt="WG Games" class="nav-btn-img">
+            </a>
+            <a href="/tada-games" class="nav-link" data-provider="tada">
+                <img src="/assets/navbar/tada-games.png" alt="Tada Games" class="nav-btn-img">
+            </a>
+
+        </div>
+    </nav>
+
+    <main>
+        <div class="nav-spacer"></div>
+
+        <!-- HERO BANNER -->
+        <div class="carousel-wrapper">
+            <section id="carousel-container">
+                <div id="carousel"></div>
+            </section>
+        </div>
+        <script>
+            // Load site config and apply global settings
+            let siteConfigData = null;
+            (async function loadSiteGlobalConfig() {
+                try {
+                    const res = await fetch('/api/site-config');
+                    const cfg = await res.json();
+                    siteConfigData = cfg;
+
+                    // Site name
+                    if (cfg.siteName) document.title = cfg.siteName;
+
+                    // Favicon
+                    if (cfg.favicon) {
+                        const link = document.querySelector('link[rel="shortcut icon"]');
+                        if (link) link.href = cfg.favicon;
+                    }
+
+                    // Theme color
+                    if (cfg.themeColor) {
+                        const r = document.documentElement;
+                        const hex = cfg.themeColor;
+                        r.style.setProperty('--theme', hex);
+                        // Generate lighter/darker variants
+                        r.style.setProperty('--theme-light', adjustColor(hex, 40));
+                        r.style.setProperty('--theme-dark', adjustColor(hex, -20));
+                        r.style.setProperty('--theme-darker', adjustColor(hex, -40));
+
+                        // Parse RGB from hex for background glow
+                        const tr = parseInt(hex.slice(1, 3), 16);
+                        const tg = parseInt(hex.slice(3, 5), 16);
+                        const tb = parseInt(hex.slice(5, 7), 16);
+
+                        // Dark background derived from theme color
+                        const bgR = Math.round(tr * 0.08);
+                        const bgG = Math.round(tg * 0.08);
+                        const bgB = Math.round(tb * 0.08);
+                        r.style.setProperty('--theme-bg', `rgb(${bgR}, ${bgG}, ${bgB})`);
+
+                        // Neon glows for body background
+                        r.style.setProperty('--theme-glow1', `rgba(${tr}, ${tg}, ${tb}, 0.85)`);
+                        r.style.setProperty('--theme-glow2', `rgba(${Math.round(tr * 0.65)}, ${Math.round(tg * 0.65)}, ${Math.round(tb * 0.65)}, 0.6)`);
+                        r.style.setProperty('--theme-glow3', `rgba(${Math.round(tr * 0.5)}, ${Math.round(tg * 0.5)}, ${Math.round(tb * 0.5)}, 0.5)`);
+                    }
+
+                    // Custom background color (overrides auto-derived)
+                    if (cfg.bgColor) {
+                        document.documentElement.style.setProperty('--theme-bg', cfg.bgColor);
+                        // Regenerate glow colors from bgColor for proper background effect
+                        const br = parseInt(cfg.bgColor.slice(1, 3), 16);
+                        const bg2 = parseInt(cfg.bgColor.slice(3, 5), 16);
+                        const bb = parseInt(cfg.bgColor.slice(5, 7), 16);
+                        // Brighter glow from bg for subtle radial gradients
+                        document.documentElement.style.setProperty('--theme-glow1', `rgba(${Math.min(255, br + 80)}, ${Math.min(255, bg2 + 80)}, ${Math.min(255, bb + 80)}, 0.25)`);
+                        document.documentElement.style.setProperty('--theme-glow2', `rgba(${Math.min(255, br + 50)}, ${Math.min(255, bg2 + 50)}, ${Math.min(255, bb + 50)}, 0.15)`);
+                        document.documentElement.style.setProperty('--theme-glow3', `rgba(${Math.min(255, br + 30)}, ${Math.min(255, bg2 + 30)}, ${Math.min(255, bb + 30)}, 0.1)`);
+                    }
+
+                    // Card color
+                    if (cfg.cardColor) {
+                        const cc = cfg.cardColor;
+                        document.documentElement.style.setProperty('--card-color', cc);
+                        const cr = parseInt(cc.slice(1, 3), 16);
+                        const cg = parseInt(cc.slice(3, 5), 16);
+                        const cb = parseInt(cc.slice(5, 7), 16);
+                        const cdR = Math.max(0, cr - 20), cdG = Math.max(0, cg - 20), cdB = Math.max(0, cb - 20);
+                        document.documentElement.style.setProperty('--card-color-dark', `rgb(${cdR}, ${cdG}, ${cdB})`);
+                    }
+
+                    // Platforms color
+                    if (cfg.platformsColor) {
+                        const pc = cfg.platformsColor;
+                        document.documentElement.style.setProperty('--platforms-color', pc);
+                        const pr = parseInt(pc.slice(1, 3), 16);
+                        const pg2 = parseInt(pc.slice(3, 5), 16);
+                        const pb = parseInt(pc.slice(5, 7), 16);
+                        document.documentElement.style.setProperty('--platforms-color-light', `rgb(${Math.min(255, pr + 30)}, ${Math.min(255, pg2 + 30)}, ${Math.min(255, pb + 30)})`);
+                        document.documentElement.style.setProperty('--platforms-color-dark', `rgb(${Math.max(0, pr - 20)}, ${Math.max(0, pg2 - 20)}, ${Math.max(0, pb - 20)})`);
+                    }
+
+                    // Update section color
+                    if (cfg.updateColor) {
+                        const uc = cfg.updateColor;
+                        document.documentElement.style.setProperty('--update-color', uc);
+                        const ur = parseInt(uc.slice(1, 3), 16);
+                        const ug = parseInt(uc.slice(3, 5), 16);
+                        const ub = parseInt(uc.slice(5, 7), 16);
+                        const udR = Math.max(0, ur - 20), udG = Math.max(0, ug - 20), udB = Math.max(0, ub - 20);
+                        document.documentElement.style.setProperty('--update-color-dark', `rgb(${udR}, ${udG}, ${udB})`);
+                    }
+
+                    // Button color
+                    if (cfg.buttonColor) {
+                        const bc = cfg.buttonColor;
+                        document.documentElement.style.setProperty('--button-color', bc);
+                        const bR = parseInt(bc.slice(1, 3), 16);
+                        const bG = parseInt(bc.slice(3, 5), 16);
+                        const bB = parseInt(bc.slice(5, 7), 16);
+                        document.documentElement.style.setProperty('--button-color-dark', `rgb(${Math.max(0, bR - 30)}, ${Math.max(0, bG - 30)}, ${Math.max(0, bB - 30)})`);
+
+                        // Dynamic hue-rotate for navbar button images
+                        // Base image hue ≈ 130°, so rotation = targetHue - 130
+                        const r01 = bR / 255, g01 = bG / 255, b01 = bB / 255;
+                        const cmax = Math.max(r01, g01, b01), cmin = Math.min(r01, g01, b01);
+                        let hue = 0;
+                        if (cmax !== cmin) {
+                            const d = cmax - cmin;
+                            if (cmax === r01) hue = ((g01 - b01) / d + (g01 < b01 ? 6 : 0)) * 60;
+                            else if (cmax === g01) hue = ((b01 - r01) / d + 2) * 60;
+                            else hue = ((r01 - g01) / d + 4) * 60;
+                        }
+                        const navHue = Math.round(hue) - 130;
+                        document.documentElement.style.setProperty('--nav-btn-hue', navHue + 'deg');
+                    }
+
+                    // Navbar background color
+                    if (cfg.navbarBgColor) {
+                        document.documentElement.style.setProperty('--navbar-bg', cfg.navbarBgColor);
+                    }
+
+                    // Footer colors
+                    if (cfg.footerBgColor) {
+                        document.documentElement.style.setProperty('--footer-bg', cfg.footerBgColor);
+                    }
+                    if (cfg.footerTextColor) {
+                        document.documentElement.style.setProperty('--footer-text', cfg.footerTextColor);
+                    }
+
+                    // Load banners
+                    initCarousel(cfg.banners || ['/assets/jcsinais01.png', '/assets/jcsinais02.png', '/assets/jcsinais03.png', '/assets/jcsinais04.png']);
+                } catch (e) {
+                    console.error('Config error:', e);
+                    initCarousel(['/assets/jcsinais01.png', '/assets/jcsinais02.png', '/assets/jcsinais03.png', '/assets/jcsinais04.png']);
+                }
+            })();
+
+            function adjustColor(hex, amount) {
+                let r = parseInt(hex.slice(1, 3), 16);
+                let g = parseInt(hex.slice(3, 5), 16);
+                let b = parseInt(hex.slice(5, 7), 16);
+                r = Math.max(0, Math.min(255, r + amount));
+                g = Math.max(0, Math.min(255, g + amount));
+                b = Math.max(0, Math.min(255, b + amount));
+                return '#' + [r, g, b].map(c => c.toString(16).padStart(2, '0')).join('');
+            }
+
+            function initCarousel(banners) {
+                if (!banners.length) return;
+                const carousel = document.getElementById('carousel');
+                const container = document.getElementById('carousel-container');
+                let currentIndex = 0, interval, startX = 0, isDragging = false;
+
+                banners.forEach(src => {
+                    const img = document.createElement('img');
+                    img.src = src;
+                    img.style.cssText = 'width:100%;flex-shrink:0;object-fit:cover;height:100%';
+                    carousel.appendChild(img);
+                });
+                const firstClone = carousel.firstElementChild.cloneNode(true);
+                carousel.appendChild(firstClone);
+
+                function nextBanner() {
+                    currentIndex++;
+                    carousel.style.transform = `translateX(-${currentIndex * 100}%)`;
+                    if (currentIndex === banners.length) {
+                        setTimeout(() => {
+                            carousel.style.transition = 'none';
+                            currentIndex = 0;
+                            carousel.style.transform = 'translateX(0)';
+                            setTimeout(() => carousel.style.transition = 'transform 0.5s ease-in-out', 50);
+                        }, 500);
+                    }
+                }
+                function prevBanner() {
+                    currentIndex = currentIndex > 0 ? currentIndex - 1 : banners.length - 1;
+                    carousel.style.transform = `translateX(-${currentIndex * 100}%)`;
+                }
+                function startAutoSlide() { interval = setInterval(nextBanner, 5000); }
+                function resetAutoSlide() { clearInterval(interval); startAutoSlide(); }
+
+                container.addEventListener('touchstart', e => { startX = e.touches[0].clientX; isDragging = true; });
+                container.addEventListener('touchmove', e => { if (!isDragging) return; let m = e.touches[0].clientX - startX; if (Math.abs(m) > 50) { m > 0 ? prevBanner() : nextBanner(); isDragging = false; resetAutoSlide(); } });
+                container.addEventListener('touchend', () => isDragging = false);
+                container.addEventListener('mousedown', e => { startX = e.clientX; isDragging = true; });
+                container.addEventListener('mousemove', e => { if (!isDragging) return; let m = e.clientX - startX; if (Math.abs(m) > 50) { m > 0 ? prevBanner() : nextBanner(); isDragging = false; resetAutoSlide(); } });
+                container.addEventListener('mouseup', () => isDragging = false);
+                startAutoSlide();
+            }
+        </script>
+
+        <!-- PLATAFORMAS PARCEIRAS -->
+        <section class="platforms-section">
+            <div class="platforms-title">
+                <h2>PLATAFORMA</h2>
+            </div>
+            <div class="platforms-list" id="platforms-row"></div>
+        </section>
+
+        <!-- CONTATO WHATSAPP & INSTAGRAM -->
+        <section class="insta-section">
+            <div class="social-card" id="social-card">
+                <img src="/assets/favicon.png" class="social-avatar" id="social-avatar" alt="JC">
+                <div class="social-info">
+                    <span class="social-name" id="social-name">...</span>
+                    <span class="social-sub" id="social-sub">...</span>
+                </div>
+                <div class="social-buttons" id="social-buttons">
+                    <button class="social-btn social-btn-whatsapp" id="social-btn-wa">
+                        <i class="fa-brands fa-whatsapp"></i> WhatsApp
+                    </button>
+                    <button class="social-btn social-btn-instagram" id="social-btn-ig">
+                        <i class="fa-brands fa-instagram"></i> Instagram
+                    </button>
+                </div>
+            </div>
+        </section>
+        <script>
+            (async function loadSocialCard() {
+                try {
+                    const res = await fetch('/api/site-config');
+                    const cfg = await res.json();
+
+                    document.getElementById('social-avatar').src = cfg.profilePhoto || '/assets/favicon.png';
+                    document.getElementById('social-name').textContent = cfg.displayName || '';
+                    document.getElementById('social-sub').textContent = cfg.username || '';
+
+                    const waBtn = document.getElementById('social-btn-wa');
+                    waBtn.innerHTML = `<i class="fa-brands fa-whatsapp"></i> ${cfg.whatsapp?.label || 'WhatsApp'}`;
+                    waBtn.style.background = cfg.whatsapp?.color || '#25d366';
+                    waBtn.onclick = (e) => { e.stopPropagation(); window.open(cfg.whatsapp?.link || '#', '_blank'); };
+
+                    const igBtn = document.getElementById('social-btn-ig');
+                    igBtn.innerHTML = `<i class="fa-brands fa-instagram"></i> ${cfg.instagram?.label || 'Instagram'}`;
+                    igBtn.style.background = cfg.instagram?.color || '#e1306c';
+                    igBtn.onclick = (e) => { e.stopPropagation(); window.open(cfg.instagram?.link || '#', '_blank'); };
+                } catch (e) {
+                    console.error('Erro ao carregar config social:', e);
+                }
+            })();
+        </script>
+
+        <!-- ULTIMA ATUALIZAÇÃO -->
+        <section class="update-section">
+            <div class="update-box">
+                <div class="update-icon-wrap">
+                    <i class="fa-solid fa-arrows-rotate update-spinner"></i>
+                </div>
+                <div class="update-text">
+                    <strong>Última Atualização: <span id="update-time">--:--:--</span></strong>
+                    <span class="update-sub">Nosso site é Atualizado a cada 05 Minutos</span>
+                </div>
+            </div>
+            <p class="update-site">Slot</p>
+        </section>
+        <script>
+            (function () {
+                const now = Date.now();
+                const period = Math.floor(now / 300000);
+                const lastUpdate = new Date(period * 300000 + (period % 7) * 1000 + 2000); // +2~8s como o original
+                document.getElementById('update-time').textContent =
+                    `${String(lastUpdate.getHours()).padStart(2, '0')}:${String(lastUpdate.getMinutes()).padStart(2, '0')}:${String(lastUpdate.getSeconds()).padStart(2, '0')}`;
+            })();
+        </script>
+
+        <!-- FILTROS -->
+        <div class="filters-area">
+            <div class="filter-tabs">
+                <button class="ftab" data-filter="hot"><i class="fa-solid fa-fire"></i> HOT</button>
+                <button class="ftab" data-filter="new"><i class="fa-solid fa-star"></i> NEW</button>
+                <button class="ftab active" data-filter="all"><i class="fa-solid fa-list"></i> ALL</button>
+                <button class="ftab" data-filter="fav"><i class="fa-solid fa-heart"></i> FAV</button>
+            </div>
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass search-ico"></i>
+                <input type="text" id="search-input" placeholder="Pesquise seu jogo aqui...">
+            </div>
+        </div>
+
+        <!-- GAME GRID -->
+        <section class="game-grid" id="game-grid"></section>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                let allGames = [], filteredGames = [], currentProvider = 'pg';
+                let favorites = JSON.parse(localStorage.getItem('fp_fav') || '[]');
+
+                Notiflix.Loading.standard();
+
+                async function fetchGames() {
+                    try {
+                        const [resGames, resPlats] = await Promise.all([
+                            fetch('/api/games'),
+                            fetch('/api/platforms')
+                        ]);
+                        const games = await resGames.json();
+                        const platforms = await resPlats.json();
+
+                        Notiflix.Loading.remove();
+                        allGames = games.filter(g => g.provider === currentProvider);
+                        filteredGames = [...allGames];
+                        renderGames(filteredGames);
+                        renderPlatforms(platforms);
+                        Notiflix.Notify.success('Jogos disponíveis');
+                    } catch (e) {
+                        Notiflix.Loading.remove();
+                        Notiflix.Notify.failure('Erro ao carregar jogos.');
+                    }
+                }
+
+                function renderPlatforms(platforms) {
+                    const row = document.getElementById('platforms-row');
+                    if (platforms.length === 0) {
+                        row.innerHTML = '<span style="color:#cbd5e1;font-size:12px">Nenhuma plataforma cadastrada.</span>';
+                        return;
+                    }
+
+                    row.innerHTML = platforms.map(g => `
+                        <a href="${g.link}" target="_blank" class="plat-list-item">
+                            <span class="plat-list-name">${g.nome}</span>
+                            <span class="plat-list-url">${g.link}</span>
+                        </a>
+                    `).join('');
+                }
+
+                function getBarColor(v) {
+                    return v <= 35 ? '#ef4444' : v <= 65 ? '#eab308' : '#22c55e';
+                }
+
+                function isFav(id) { return favorites.includes(id); }
+                function toggleFav(id, ev) {
+                    ev.stopPropagation();
+                    ev.preventDefault();
+                    favorites = isFav(id) ? favorites.filter(f => f !== id) : [...favorites, id];
+                    localStorage.setItem('fp_fav', JSON.stringify(favorites));
+                    renderGames(filteredGames);
+                }
+                window.toggleFav = toggleFav;
+
+                function renderGames(games) {
+                    const grid = document.getElementById('game-grid');
+                    grid.innerHTML = games.map(g => `
+                        <div class="gcard" style="background-color:${g.cor}">
+                            <button class="gcard-fav ${isFav(g.id) ? 'fav-on' : ''}" onclick="toggleFav(${g.id},event)">
+                                <i class="fa-${isFav(g.id) ? 'solid' : 'regular'} fa-heart"></i>
+                            </button>
+                            ${g.badge ? '<span class="gcard-hot">' + g.badge + ' 🔥</span>' : ''}
+                            <a href="${g.link}" target="_blank" class="gcard-banner">
+                                <img src="${g.banner}" alt="${g.nome}" onerror="this.onerror=null;this.style.background='linear-gradient(135deg,#1a1a2e,#16213e)';this.style.minHeight='120px';">
+                                <div class="gcard-dist">Distribuição: ${g.rtp}%</div>
+                            </a>
+                            <div class="gcard-body">
+                                <div class="gcard-title-row">
+                                    <img src="${g.icon}" class="gcard-icon" alt="" onerror="this.onerror=null;this.style.background='#333';this.style.borderRadius='8px';">
+                                    <span class="gcard-name">${g.nome}</span>
+                                </div>
+                                <div class="gcard-bars">
+                                    <div class="bar-row">
+                                        <span>Mínima: ${g.min}%</span>
+                                        <div class="bar-outer"><div class="bar-inner" style="width:${g.min}%;background:${getBarColor(g.min)}"></div></div>
+                                    </div>
+                                    <div class="bar-row">
+                                        <span>Padrão: ${g.padrao}%</span>
+                                        <div class="bar-outer"><div class="bar-inner" style="width:${g.padrao}%;background:${getBarColor(g.padrao)}"></div></div>
+                                    </div>
+                                    <div class="bar-row">
+                                        <span>Máxima: ${g.max}%</span>
+                                        <div class="bar-outer"><div class="bar-inner" style="width:${g.max}%;background:${getBarColor(g.max)}"></div></div>
+                                    </div>
+                                </div>
+                                <div class="gcard-footer">
+                                    ${g.rtp >= 85
+                            ? (["Fortune Rabbit", "Fortune Tiger", "Fortune Ox", "Fortune Mouse", "Fortune Dragon"].includes(g.nome)
+                                ? `<button class="gcard-btn sinal-btn" onclick="window.location.href='/gerar-sinais/${g.nome.toLowerCase().replace(/ /g, '-')}'">GERAR SINAL</button>`
+                                : `<button class="gcard-btn jogue-btn" onclick="window.open('${g.link}','_blank')">JOGUE AGORA</button>`)
+                            : `<div class="gcard-prices"><p>Mínima R$0,40 a R$2,40</p><p>Padrão R$2,50 a R$9,90</p><p>Máxima acima de R$10,00</p></div>`
+                        }
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+
+                function applyFilter(f) {
+                    document.querySelectorAll('.ftab').forEach(b => b.classList.remove('active'));
+                    document.querySelector(`.ftab[data-filter="${f}"]`).classList.add('active');
+                    switch (f) {
+                        case 'hot': filteredGames = allGames.filter(g => g.hot).sort((a, b) => b.rtp - a.rtp); break;
+                        case 'new': filteredGames = allGames.filter(g => g.isNew); break;
+                        case 'all': filteredGames = [...allGames]; break;
+                        case 'fav': filteredGames = allGames.filter(g => favorites.includes(g.id)); break;
+                    }
+                    renderGames(filteredGames);
+                }
+
+                document.querySelectorAll('.ftab').forEach(b => {
+                    b.addEventListener('click', () => applyFilter(b.dataset.filter));
+                });
+
+                document.getElementById('search-input').addEventListener('input', function () {
+                    const q = this.value.toLowerCase();
+                    filteredGames = allGames.filter(g => g.nome.toLowerCase().includes(q));
+                    renderGames(filteredGames);
+                });
+
+                // Provider switching (nav)
+                document.querySelectorAll('.nav-link[data-provider]').forEach(btn => {
+                    btn.addEventListener('click', e => {
+                        e.preventDefault();
+                        document.querySelectorAll('.nav-link').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        currentProvider = btn.dataset.provider;
+                        Notiflix.Loading.standard();
+                        fetchGames();
+                    });
+                });
+
+                // Auto-detect provider from URL path
+                const pathMap = {
+                    '/pp-games': 'pp',
+                    '/wg-games': 'wg',
+                    '/tada-games': 'tada',
+                    '/gerar-sinais': 'pg',
+                };
+                const urlProvider = pathMap[window.location.pathname] || 'pg';
+                if (urlProvider !== 'pg') {
+                    currentProvider = urlProvider;
+                    document.querySelectorAll('.nav-link').forEach(b => b.classList.remove('active'));
+                    const activeBtn = document.querySelector(`.nav-link[data-provider="${urlProvider}"]`);
+                    if (activeBtn) activeBtn.classList.add('active');
+                }
+
+                fetchGames();
+            });
+        </script>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="footer-inner">
+            <div class="footer-block">
+                <h2>DEFENSORES DO JOGO RESPONSÁVEL</h2>
+                <p>Nós do Slot, promovemos o jogo responsável como uma forma de entretenimento. Se o jogo
+                    deixar de
+                    ser divertido, é hora de parar. Para informações sobre sinais de problemas com jogos de azar,
+                    visite BeGambleAware. O jogo é destinado a maiores de 18 anos – é ilegal para menores.</p>
+            </div>
+            <div class="footer-block">
+                <h2>AVISO LEGAL</h2>
+                <p>O Slot é uma plataforma independente dedicada a cassinos online e jogos de cassino.
+                    Fornecemos análises detalhadas e imparciais, mas recomendamos sempre verificar as regulamentações
+                    locais antes de participar de qualquer atividade de jogo.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        Notiflix.Notify.init({
+            width: '280px', position: 'right-bottom', distance: '10px',
+            opacity: 1, borderRadius: '8px', timeout: 3000,
+            fontFamily: 'Inter, sans-serif', fontSize: '13px',
+            cssAnimation: true, cssAnimationDuration: 400, cssAnimationStyle: 'from-right',
+            success: { background: '#d4007a', textColor: '#fff' },
+            failure: { background: '#990033', textColor: '#fff' },
+        });
+    </script>
+</body>
+
+</html>

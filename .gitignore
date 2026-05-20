@@ -1,0 +1,44 @@
+# ===========================
+# DADOS DO USUÁRIO (NUNCA subir pro GitHub)
+# ===========================
+
+# Configurações personalizadas do site
+site-config.json
+
+# Credenciais de admin
+credentials.json
+
+# Plataformas cadastradas pelo usuário
+platforms.json
+
+# Imagens uploadadas pelo usuário (perfil, banners customizados)
+assets/profile-photo.*
+assets/banner-*
+assets/favicon.png
+assets/2favicon.png
+
+# Imagens de jogos cacheadas/baixadas
+assets/games/
+downloaded/
+
+# Dados exportados do scrapper (links editados pelo admin)
+scrapper/export/
+scrapper/cards/
+
+# ===========================
+# DEPENDÊNCIAS E SISTEMA
+# ===========================
+node_modules/
+scrapper/node_modules/
+
+# Arquivos de sistema
+.DS_Store
+Thumbs.db
+*.log
+
+# Arquivos grandes
+*.zip
+*.psd
+sinais.zip
+banner_template.psd
+icon_template.psd
