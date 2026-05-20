@@ -4,8 +4,21 @@ const cors = require('cors');
 const fs = require('fs');
 
 const app = express();
-// Load port from process.env.PORT, site-config.json, or default to 3303
+// Load port from process.env.PORT, port.json, site-config.json, or default to 3303
 let PORT = process.env.PORT;
+if (!PORT) {
+  try {
+    const portPath = path.join(__dirname, 'port.json');
+    if (fs.existsSync(portPath)) {
+      const portCfg = JSON.parse(fs.readFileSync(portPath, 'utf8'));
+      if (portCfg.port) {
+        PORT = portCfg.port;
+      }
+    }
+  } catch (e) {
+    console.error('Error reading port.json:', e);
+  }
+}
 if (!PORT) {
   try {
     const cfgPath = path.join(__dirname, 'site-config.json');
@@ -16,7 +29,7 @@ if (!PORT) {
       }
     }
   } catch (e) {
-    console.error('Error reading port from site-config.json:', e);
+    console.error('Error reading site-config.json:', e);
   }
 }
 if (!PORT) {
