@@ -611,10 +611,7 @@ app.post('/api/admin/games/bulk-update', requireAuth, (req, res) => {
 const siteConfigFile = path.join(__dirname, 'site-config.json');
 
 function readSiteConfig() {
-  if (fs.existsSync(siteConfigFile)) {
-    return JSON.parse(fs.readFileSync(siteConfigFile, 'utf8'));
-  }
-  return {
+  let config = {
     siteName: 'Slot',
     favicon: '/assets/favicon.png',
     themeColor: '#d4007a',
@@ -630,6 +627,26 @@ function readSiteConfig() {
     whatsapp: { label: 'WhatsApp', link: '', color: '#25d366' },
     instagram: { label: 'Instagram', link: '', color: '#e1306c' }
   };
+
+  if (fs.existsSync(siteConfigFile)) {
+    try {
+      const parsed = JSON.parse(fs.readFileSync(siteConfigFile, 'utf8'));
+      config = { ...config, ...parsed };
+    } catch(e) {}
+  }
+
+  // Merge port from port.json if exists
+  try {
+    const portPath = path.join(__dirname, 'port.json');
+    if (fs.existsSync(portPath)) {
+      const portCfg = JSON.parse(fs.readFileSync(portPath, 'utf8'));
+      if (portCfg.port) {
+        config.port = portCfg.port;
+      }
+    }
+  } catch(e) {}
+
+  return config;
 }
 
 function writeSiteConfig(data) {
@@ -681,6 +698,13 @@ app.put('/api/admin/site-config', requireAuth, (req, res) => {
       if (current.port !== newPortVal) {
         current.port = newPortVal;
         portChanged = true;
+
+        // Write port directly to port.json for external editing/access
+        try {
+          fs.writeFileSync(path.join(__dirname, 'port.json'), JSON.stringify({ port: newPortVal }, null, 2), 'utf8');
+        } catch (e) {
+          console.error('Error writing port.json:', e);
+        }
       }
     }
 

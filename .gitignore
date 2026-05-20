@@ -42,3 +42,6 @@ Thumbs.db
 sinais.zip
 banner_template.psd
 icon_template.psd
+
+# Porta HTTP do servidor de cada instância
+port.json

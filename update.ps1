@@ -53,7 +53,8 @@ Write-Host ""
 $UserFiles = @(
     "site-config.json",
     "credentials.json",
-    "platforms.json"
+    "platforms.json",
+    "port.json"
 )
 
 $UserDirs = @(

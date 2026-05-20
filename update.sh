@@ -73,6 +73,7 @@ USER_FILES=(
     "site-config.json"
     "credentials.json"
     "platforms.json"
+    "port.json"
 )
 
 USER_DIRS=(
