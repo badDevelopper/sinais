@@ -1,8 +1,8 @@
 # ============================================================
-#  UPDATE.PS1 — Atualização segura do site via GitHub (PowerShell)
+#  UPDATE.PS1 - Atualizacao segura do site via GitHub (PowerShell)
 #  
-#  Atualiza SOMENTE o código (HTML, CSS, JS, server, etc.)
-#  PRESERVA todos os dados do usuário:
+#  Atualiza SOMENTE o codigo (HTML, CSS, JS, server, etc.)
+#  PRESERVA todos os dados do usuario:
 #    - site-config.json (cores, nome, redes sociais, banners)
 #    - credentials.json (login admin)
 #    - platforms.json (plataformas cadastradas)
@@ -15,21 +15,41 @@
 $ErrorActionPreference = "Stop"
 
 Write-Host "============================================" -ForegroundColor Cyan
-Write-Host "   🔄 ATUALIZADOR DO SITE (WINDOWS/POWERSHELL)" -ForegroundColor Cyan
+Write-Host "   ATUALIZADOR DO SITE (WINDOWS/POWERSHELL)" -ForegroundColor Cyan
 Write-Host "============================================" -ForegroundColor Cyan
 Write-Host ""
 
-# 1. Verificar se é um repo Git
+# 1. Verificar se e um repo Git
 if (-not (Test-Path ".git")) {
-    Write-Host "❌ Este diretório não é um repositório Git." -ForegroundColor Red
-    Write-Host "➤ Execute primeiro no terminal:" -ForegroundColor Yellow
+    Write-Host "[ERRO] Este diretorio nao e um repositorio Git." -ForegroundColor Red
+    Write-Host "-> Execute primeiro no terminal:" -ForegroundColor Yellow
     Write-Host "   git init"
     Write-Host "   git remote add origin <URL_DO_SEU_REPO>"
     Write-Host "   git pull origin main"
     exit
 }
 
-# 2. Definir arquivos e pastas para preservar
+# 1.5 Verificar se arquivos sensiveis estao sendo rastreados
+Write-Host "[INFO] Verificando seguranca do repositorio..." -ForegroundColor Yellow
+
+$SensitiveFiles = @("credentials.json", "platforms.json", "site-config.json")
+$TrackedSensitiveFiles = @()
+
+foreach ($file in $SensitiveFiles) {
+    $isTracked = & "C:\Program Files\Git\cmd\git.exe" ls-files --error-unmatch $file 2>$null
+    if ($isTracked) {
+        $TrackedSensitiveFiles += $file
+        Write-Host "   [AVISO] $file esta sendo rastreado pelo Git!" -ForegroundColor Yellow
+        Write-Host "      Remova do git com: git rm --cached $file" -ForegroundColor DarkYellow
+    }
+}
+
+if ($TrackedSensitiveFiles.Count -eq 0) {
+    Write-Host "   [OK] Arquivos sensiveis protegidos pelo .gitignore" -ForegroundColor Green
+}
+Write-Host ""
+
+# 2. Definir arquivos e pastas para preservar (baseado no .gitignore)
 $UserFiles = @(
     "site-config.json",
     "credentials.json",
@@ -38,90 +58,100 @@ $UserFiles = @(
 
 $UserDirs = @(
     "assets/games",
+    "assets/navbar",
     "downloaded",
     "scrapper/export",
     "scrapper/cards"
 )
 
-# 3. Criar diretório de backup temporário
+# Padroes de imagens do usuario
+$UserImagePatterns = @(
+    "assets/profile-photo*",
+    "assets/banner-*",
+    "assets/favicon.png",
+    "assets/2favicon.png"
+)
+
+# 3. Criar diretorio de backup temporario
 $Timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
 $BackupDir = Join-Path $env:TEMP "fp-site-backup-$Timestamp"
 New-Item -ItemType Directory -Path $BackupDir -Force | Out-Null
 
-Write-Host "📦 Fazendo backup dos dados do usuário..." -ForegroundColor Yellow
+Write-Host "[BACKUP] Fazendo backup dos dados do usuario..." -ForegroundColor Yellow
 
 # Backup dos arquivos JSON
 foreach ($file in $UserFiles) {
     if (Test-Path $file) {
         Copy-Item -Path $file -Destination $BackupDir -Force
-        Write-Host "   ✅ $file"
+        Write-Host "   [OK] $file"
     }
 }
 
-# Backup dos diretórios
+# Backup dos diretorios
 foreach ($dir in $UserDirs) {
     if (Test-Path $dir) {
         $dest = Join-Path $BackupDir $dir
         New-Item -ItemType Directory -Path $dest -Force | Out-Null
         Copy-Item -Path "$dir\*" -Destination $dest -Recurse -Force -ErrorAction SilentlyContinue
-        Write-Host "   ✅ $dir/"
+        Write-Host "   [OK] $dir/"
     }
 }
 
-# Backup das imagens de upload do usuário na pasta assets
+# Backup das imagens de upload do usuario (usando padroes glob)
 if (Test-Path "assets") {
     $assetsDest = Join-Path $BackupDir "assets"
     New-Item -ItemType Directory -Path $assetsDest -Force | Out-Null
     
-    # Copiar favicons, profile photo e banners customizados
-    Get-ChildItem -Path "assets" -Filter "*favicon.png" | Copy-Item -Destination $assetsDest -Force
-    Get-ChildItem -Path "assets" -Filter "profile-photo.*" | Copy-Item -Destination $assetsDest -Force
-    Get-ChildItem -Path "assets" -Filter "banner-*" | Copy-Item -Destination $assetsDest -Force
-    Write-Host "   ✅ Imagens personalizadas (profile, banners, favicon)"
+    foreach ($pattern in $UserImagePatterns) {
+        Get-Item -Path $pattern -ErrorAction SilentlyContinue | ForEach-Object {
+            Copy-Item -Path $_.FullName -Destination $assetsDest -Force
+            Write-Host "   [OK] $($_.Name)"
+        }
+    }
 }
 
-Write-Host "✅ Backup temporário salvo em: $BackupDir" -ForegroundColor Green
+Write-Host "[OK] Backup temporario salvo em: $BackupDir" -ForegroundColor Green
 Write-Host ""
 
-# 4. Puxar atualizações do GitHub
-Write-Host "⬇️ Puxando atualizações do GitHub..." -ForegroundColor Yellow
+# 4. Puxar atualizacoes do GitHub
+Write-Host "[GIT] Puxando atualizacoes do GitHub..." -ForegroundColor Yellow
 
 # Obter branch atual
-$Branch = (git rev-parse --abbrev-ref HEAD).Trim()
+$Branch = (& "C:\Program Files\Git\cmd\git.exe" rev-parse --abbrev-ref HEAD).Trim()
 Write-Host "   Branch atual: $Branch" -ForegroundColor Cyan
 
 # Guardar commit antigo
-$OldCommit = (git rev-parse HEAD).Trim()
+$OldCommit = (& "C:\Program Files\Git\cmd\git.exe" rev-parse HEAD).Trim()
 
 # Executar fetch e reset hard para a origem
-git fetch origin $Branch
-git reset --hard "origin/$Branch"
+& "C:\Program Files\Git\cmd\git.exe" fetch origin $Branch
+& "C:\Program Files\Git\cmd\git.exe" reset --hard "origin/$Branch"
 
-$NewCommit = (git rev-parse HEAD).Trim()
+$NewCommit = (& "C:\Program Files\Git\cmd\git.exe" rev-parse HEAD).Trim()
 
 if ($OldCommit -eq $NewCommit) {
-    Write-Host "✅ Código já está atualizado! Nenhuma mudança." -ForegroundColor Green
+    Write-Host "[OK] Codigo ja esta atualizado! Nenhuma mudanca." -ForegroundColor Green
 } else {
-    Write-Host "✅ Código atualizado com sucesso!" -ForegroundColor Green
-    Write-Host "   $($OldCommit.Substring(0,8)) → $($NewCommit.Substring(0,8))"
+    Write-Host "[OK] Codigo atualizado com sucesso!" -ForegroundColor Green
+    Write-Host "   $($OldCommit.Substring(0,8)) -> $($NewCommit.Substring(0,8))"
     Write-Host "   Arquivos alterados:" -ForegroundColor Cyan
-    git diff --name-only $OldCommit $NewCommit
+    & "C:\Program Files\Git\cmd\git.exe" diff --name-only $OldCommit $NewCommit
 }
 Write-Host ""
 
-# 5. Restaurar dados do usuário
-Write-Host "🔄 Restaurando dados do usuário..." -ForegroundColor Yellow
+# 5. Restaurar dados do usuario
+Write-Host "[RESTAURA] Restaurando dados do usuario..." -ForegroundColor Yellow
 
 # Restaurar arquivos JSON
 foreach ($file in $UserFiles) {
     $backupFile = Join-Path $BackupDir $file
     if (Test-Path $backupFile) {
         Copy-Item -Path $backupFile -Destination "." -Force
-        Write-Host "   ✅ $file"
+        Write-Host "   [OK] $file"
     }
 }
 
-# Restaurar diretórios
+# Restaurar diretorios
 foreach ($dir in $UserDirs) {
     $backupSubDir = Join-Path $BackupDir $dir
     if (Test-Path $backupSubDir) {
@@ -129,43 +159,46 @@ foreach ($dir in $UserDirs) {
             New-Item -ItemType Directory -Path $dir -Force | Out-Null
         }
         Copy-Item -Path "$backupSubDir\*" -Destination $dir -Recurse -Force -ErrorAction SilentlyContinue
-        Write-Host "   ✅ $dir/"
+        Write-Host "   [OK] $dir/"
     }
 }
 
-# Restaurar imagens de upload do usuário na pasta assets
+# Restaurar imagens de upload do usuario
 $backupAssets = Join-Path $BackupDir "assets"
 if (Test-Path $backupAssets) {
-    Get-ChildItem -Path $backupAssets | ForEach-Object {
+    if (-not (Test-Path "assets")) {
+        New-Item -ItemType Directory -Path "assets" -Force | Out-Null
+    }
+    Get-ChildItem -Path $backupAssets -ErrorAction SilentlyContinue | ForEach-Object {
         Copy-Item -Path $_.FullName -Destination "assets" -Force
-        Write-Host "   ✅ assets/$($_.Name)"
+        Write-Host "   [OK] assets/$($_.Name)"
     }
 }
 
-Write-Host "✅ Dados do usuário restaurados com sucesso!" -ForegroundColor Green
+Write-Host "[OK] Dados do usuario restaurados com sucesso!" -ForegroundColor Green
 Write-Host ""
 
-# 6. Reinstalar dependências se o package.json mudou
+# 6. Reinstalar dependencias se o package.json mudou
 if ($OldCommit -ne $NewCommit) {
-    $changedFiles = git diff --name-only $OldCommit $NewCommit
+    $changedFiles = & "C:\Program Files\Git\cmd\git.exe" diff --name-only $OldCommit $NewCommit
     if ($changedFiles -contains "package.json") {
-        Write-Host "📦 package.json mudou, reinstalando dependências..." -ForegroundColor Yellow
+        Write-Host "[INFO] package.json mudou, reinstalando dependencias..." -ForegroundColor Yellow
         npm install --production
-        Write-Host "   ✅ Dependências de produção atualizadas."
+        Write-Host "   [OK] Dependencias de producao atualizadas."
     }
     
     if ($changedFiles -contains "scrapper/package.json" -and (Test-Path "scrapper")) {
-        Write-Host "📦 scrapper/package.json mudou, reinstalando dependências do scrapper..." -ForegroundColor Yellow
+        Write-Host "[INFO] scrapper/package.json mudou, reinstalando dependencias do scrapper..." -ForegroundColor Yellow
         Push-Location scrapper
         npm install --production
         Pop-Location
-        Write-Host "   ✅ Dependências do scrapper atualizadas."
+        Write-Host "   [OK] Dependencias do scrapper atualizadas."
     }
 }
 
 Write-Host ""
 Write-Host "============================================" -ForegroundColor Cyan
-Write-Host "   ✅ ATUALIZAÇÃO CONCLUÍDA COM SUCESSO!" -ForegroundColor Green
+Write-Host "   ATUALIZACAO CONCLUIDA COM SUCESSO!" -ForegroundColor Green
 Write-Host "============================================" -ForegroundColor Cyan
-Write-Host "   Backup temporário mantido em: $BackupDir"
+Write-Host "   Backup temporario mantido em: $BackupDir"
 Write-Host ""

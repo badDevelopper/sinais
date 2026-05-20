@@ -1,0 +1,62 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  border: none;
+  box-sizing: border-box;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--theme-bg, #1a0011);
+  background-image:
+    radial-gradient(ellipse at 50% 0%, var(--theme-glow1, rgba(180, 0, 100, 0.85)) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 80%, var(--theme-glow2, rgba(120, 0, 70, 0.6)) 0%, transparent 50%),
+    radial-gradient(ellipse at 20% 100%, var(--theme-glow3, rgba(100, 0, 60, 0.5)) 0%, transparent 50%),
+    url(/assets/fundo-pc.png);
+  background-blend-mode: screen, screen, screen, multiply;
+  background-position: center;
+  background-size: cover;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Hide scrollbar globally like reference */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--theme, #ff007f) 50%, transparent);
+  border-radius: 10px;
+}
+
+img {
+  user-drag: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+::selection {
+  background: var(--theme, #ff007f);
+  color: #fff;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}

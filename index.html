@@ -485,62 +485,71 @@
                     };
                 }
 
-                // Generates inline SVG path for pointed sparkline chart with spikes based on min, pad, max values
+                // Generates inline SVG path for pointed sparkline chart with sharp spikes based on min, pad, max values
                 function generateSparklineSVG(gId, themeColor, baseRtp, minVal, padVal, maxVal) {
                     const numPoints = 18; 
                     const width = 174;
                     const height = 46;
                     const stepX = width / (numPoints - 1);
                     
-                    // Simple LCG or sine-based pseudo-random generator
-                    function pseudoRandom(seed) {
-                        const x = Math.sin(seed) * 10000;
-                        return x - Math.floor(x);
-                    }
-                    
-                    // Helper to scale progress percentage to pixel height (10-38 range)
+                    // Helper to scale progress percentage to pixel height (6-40 range)
                     function scale(val, fallback) {
-                        const finalVal = (val !== undefined && val !== null && val > 0) ? Number(val) : fallback;
-                        return 10 + (finalVal / 100) * 28;
+                        const finalVal = (val !== undefined && val !== null && val >= 0) ? Number(val) : fallback;
+                        // Map 0-100% to height range 8 to 40
+                        return 8 + (finalVal / 100) * 32;
                     }
                     
-                    const minH = scale(minVal, 40);
-                    const padH = scale(padVal, 50);
-                    const maxH = scale(maxVal, 65);
+                    const minH = scale(minVal, 20);
+                    const padH = scale(padVal, 28);
+                    const maxH = scale(maxVal, 40);
+                    
+                    // Determine dynamic, game-specific peak positions to ensure each graph looks completely unique!
+                    // min peak in the first third (indices 2 to 5)
+                    const posMin = 2 + (gId % 4);
+                    // pad peak in the middle third (indices 7 to 10)
+                    const posPad = 7 + ((gId + 2) % 4);
+                    // max peak in the final third (indices 12 to 15)
+                    const posMax = 12 + ((gId + 5) % 4);
                     
                     const points = [];
                     for (let i = 0; i < numPoints; i++) {
-                        let val = 12;
+                        let val = 8; // default baseline valley
                         
                         // Deterministic high-frequency zig-zag noise
-                        const seed = gId * 5.1 + i * 7.3;
-                        const zig = (i % 2 === 0 ? 3.5 : -3.5) + Math.sin(seed) * 1.5;
+                        const seed = gId * 3.7 + i * 5.9;
+                        const noise = (Math.sin(seed) * 3); // subtle noise
                         
-                        if (i === 11) {
-                            val = maxH; // Major spike based on maxVal
-                        } else if (i === 10 || i === 12) {
-                            val = Math.max(8, minH - 4); // Sharp shoulder/drop next to the major spike
-                        } else if (i === 3) {
-                            val = minH; // First smaller peak based on minVal
-                        } else if (i === 15) {
-                            val = ((minH + maxH) / 2) + zig; // Second peak based on average of min & max
-                        } else if (i === 17) {
-                            val = padH; // Last point based on standard (pad) value
+                        if (i === posMin) {
+                            val = minH;
+                        } else if (i === posPad) {
+                            val = padH;
+                        } else if (i === posMax) {
+                            val = maxH;
+                        } else if (i === 0) {
+                            // Start value is a moderate level based on pad/min
+                            val = (minH + padH) / 2.5 + noise;
+                        } else if (i === numPoints - 1) {
+                            // End on a dynamic value near the last peak
+                            val = padH * 0.9 + noise;
                         } else {
-                            // Interpolate between regions with zig-zag noise
-                            if (i < 3) {
-                                val = padH - (3 - i) * 2.5 + zig;
-                            } else if (i < 10) {
-                                val = minH + zig;
-                            } else if (i < 15) {
-                                val = padH + zig;
+                            // Valley points (between peaks)
+                            // We drop low to create sharp, pointed, dramatic spikes!
+                            const distToMin = Math.abs(i - posMin);
+                            const distToPad = Math.abs(i - posPad);
+                            const distToMax = Math.abs(i - posMax);
+                            const minDist = Math.min(distToMin, distToPad, distToMax);
+                            
+                            if (minDist === 1) {
+                                // Right next to a peak, drop significantly to make it "pointy"
+                                val = 8 + noise;
                             } else {
-                                val = padH - (17 - i) * 1.5 + zig;
+                                // Standard valley floor
+                                val = 6 + Math.abs(noise);
                             }
                         }
                         
-                        // Clamp to stay within chart container boundaries (between 6 and 42 px)
-                        val = Math.max(6, Math.min(42, val));
+                        // Clamp to stay within chart container boundaries (between 5 and 42 px)
+                        val = Math.max(5, Math.min(42, val));
                         points.push(val);
                     }
                     

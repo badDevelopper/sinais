@@ -1,0 +1,2 @@
+# Force bash script to always use LF line endings
+update.sh text eol=lf
