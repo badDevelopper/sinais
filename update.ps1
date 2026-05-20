@@ -74,8 +74,8 @@ $UserImagePatterns = @(
 )
 
 # 3. Criar diretorio de backup temporario
-$Timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
-$BackupDir = Join-Path $env:TEMP "fp-site-backup-$Timestamp"
+$BackupDir = Join-Path $PSScriptRoot ".update_backup_tmp"
+if (Test-Path $BackupDir) { Remove-Item -Path $BackupDir -Recurse -Force | Out-Null }
 New-Item -ItemType Directory -Path $BackupDir -Force | Out-Null
 
 Write-Host "[BACKUP] Fazendo backup dos dados do usuario..." -ForegroundColor Yellow
@@ -177,6 +177,7 @@ if (Test-Path $backupAssets) {
 }
 
 Write-Host "[OK] Dados do usuario restaurados com sucesso!" -ForegroundColor Green
+if (Test-Path $BackupDir) { Remove-Item -Path $BackupDir -Recurse -Force | Out-Null }
 Write-Host ""
 
 # 6. Reinstalar dependencias se o package.json mudou
@@ -201,5 +202,4 @@ Write-Host ""
 Write-Host "============================================" -ForegroundColor Cyan
 Write-Host "   ATUALIZACAO CONCLUIDA COM SUCESSO!" -ForegroundColor Green
 Write-Host "============================================" -ForegroundColor Cyan
-Write-Host "   Backup temporario mantido em: $BackupDir"
 Write-Host ""

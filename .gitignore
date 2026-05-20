@@ -45,3 +45,6 @@ icon_template.psd
 
 # Porta HTTP do servidor de cada instância
 port.json
+
+# Diretorios temporarios de atualizacao
+.update_backup_tmp/

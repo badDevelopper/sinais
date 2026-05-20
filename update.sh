@@ -93,7 +93,8 @@ USER_IMAGES=(
 )
 
 # 3. Criar diretorio de backup temporario
-BACKUP_DIR="/tmp/fp-site-backup-$(date +%Y%m%d_%H%M%S)"
+BACKUP_DIR="./.update_backup_tmp"
+rm -rf "$BACKUP_DIR"
 mkdir -p "$BACKUP_DIR"
 
 echo -e "${YELLOW}[BACKUP] Fazendo backup dos dados do usuario...${NC}"
@@ -190,6 +191,7 @@ if [ -d "$BACKUP_DIR/assets" ]; then
 fi
 
 echo -e "${GREEN}[OK] Dados do usuario restaurados com sucesso!${NC}"
+rm -rf "$BACKUP_DIR"
 echo ""
 
 # 6. Reinstalar dependencias se o package.json mudou
@@ -233,6 +235,4 @@ echo ""
 echo -e "${CYAN}============================================${NC}"
 echo -e "${GREEN}   ATUALIZACAO CONCLUIDA COM SUCESSO!${NC}"
 echo -e "${CYAN}============================================${NC}"
-echo -e "   Backup mantido em: $BACKUP_DIR"
-echo -e "   Para remover backup: rm -rf $BACKUP_DIR"
 echo ""
