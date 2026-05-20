@@ -426,6 +426,68 @@
                 }
                 window.toggleFav = toggleFav;
 
+                // Generates a super-bright neon color from any dark/light database color
+                function getNeonColor(color) {
+                    if (!color) return '#d4007a';
+                    color = color.trim();
+                    let r = 212, g = 0, b = 122; // default vibrant pink
+
+                    if (color.startsWith('rgb')) {
+                        const matches = color.match(/\d+/g);
+                        if (matches && matches.length >= 3) {
+                            r = parseInt(matches[0]);
+                            g = parseInt(matches[1]);
+                            b = parseInt(matches[2]);
+                        }
+                    } else if (color.startsWith('#')) {
+                        let hex = color.substring(1);
+                        if (hex.length === 3) {
+                            hex = hex.split('').map(x => x + x).join('');
+                        }
+                        if (hex.length === 6) {
+                            r = parseInt(hex.substring(0, 2), 16);
+                            g = parseInt(hex.substring(2, 4), 16);
+                            b = parseInt(hex.substring(4, 6), 16);
+                        }
+                    } else {
+                        return color;
+                    }
+
+                    // Convert RGB to HSL
+                    let rNorm = r / 255;
+                    let gNorm = g / 255;
+                    let bNorm = b / 255;
+                    let max = Math.max(rNorm, gNorm, bNorm);
+                    let min = Math.min(rNorm, gNorm, bNorm);
+                    let h, s, l = (max + min) / 2;
+
+                    if (max === min) {
+                        h = s = 0;
+                    } else {
+                        let d = max - min;
+                        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                        switch (max) {
+                            case rNorm: h = (gNorm - bNorm) / d + (gNorm < bNorm ? 6 : 0); break;
+                            case gNorm: h = (bNorm - rNorm) / d + 2; break;
+                            case bNorm: h = (rNorm - gNorm) / d + 4; break;
+                        }
+                        h /= 6;
+                    }
+
+                    h = Math.round(h * 360);
+                    s = 100; // Force 100% saturation for neon look
+                    
+                    // Boost dark colors to high brightness
+                    if (l < 0.45) {
+                        l = 0.55;
+                    } else if (l > 0.7) {
+                        l = 0.6;
+                    }
+                    l = Math.round(l * 100);
+
+                    return `hsl(${h}, ${s}%, ${l}%)`;
+                }
+
                 // Seeded random / deterministic value generator based on game properties
                 function getDeterministicValues(g) {
                     const seed = g.id || 1;
@@ -461,19 +523,19 @@
                     const betSeed = (seed * 13) % 7;
                     const bets = {
                         bns: {
-                            min: (2.40 + (betSeed * 0.80)).toFixed(2),
-                            pad: (20.40 + (betSeed * 2.10)).toFixed(2),
-                            max: (152.00 + (betSeed * 12.00)).toFixed(2)
+                            min: (2.40 + (betSeed * 0.80)).toFixed(2).replace('.', ','),
+                            pad: (20.40 + (betSeed * 2.10)).toFixed(2).replace('.', ','),
+                            max: (152.00 + (betSeed * 12.00)).toFixed(2).replace('.', ',')
                         },
                         cnx: {
-                            min: (2.60 + (betSeed * 0.60)).toFixed(2),
-                            pad: (20.60 + (betSeed * 1.80)).toFixed(2),
-                            max: (153.00 + (betSeed * 8.00)).toFixed(2)
+                            min: (2.60 + (betSeed * 0.60)).toFixed(2).replace('.', ','),
+                            pad: (20.60 + (betSeed * 1.80)).toFixed(2).replace('.', ','),
+                            max: (153.00 + (betSeed * 8.00)).toFixed(2).replace('.', ',')
                         },
                         ext: {
-                            min: (3.40 + (betSeed * 0.90)).toFixed(2),
-                            pad: (21.40 + (betSeed * 2.50)).toFixed(2),
-                            max: (152.00 + (betSeed * 15.00)).toFixed(2)
+                            min: (3.40 + (betSeed * 0.90)).toFixed(2).replace('.', ','),
+                            pad: (21.40 + (betSeed * 2.50)).toFixed(2).replace('.', ','),
+                            max: (152.00 + (betSeed * 15.00)).toFixed(2).replace('.', ',')
                         }
                     };
                     
@@ -596,6 +658,7 @@
                     const grid = document.getElementById('game-grid');
                     grid.innerHTML = games.map(g => {
                         const d = getDeterministicValues(g);
+                        const neonColor = getNeonColor(g.cor);
                         
                         // Provider label & class
                         let provLabel = g.provider ? g.provider.toUpperCase() : 'GAME';
@@ -624,12 +687,12 @@
                             : `window.open('${g.link}','_blank')`;
 
                         // Button colors
-                        const isLight = (g.cor.includes('255, 215, 0') || g.cor.includes('#ffd') || g.cor.includes('#ffeb') || g.cor.includes('yellow') || g.cor.includes('#eab308'));
+                        const isLight = (neonColor.includes('255, 215, 0') || neonColor.includes('#ffd') || neonColor.includes('#ffeb') || neonColor.includes('yellow') || neonColor.includes('#eab308') || neonColor.includes('80%, 90%') || neonColor.includes('70%, 80%'));
                         const btnTextColor = isLight ? '#000' : '#fff';
 
                         return `
-                        <div class="gcard" style="--gcard-color: ${g.cor}; --btn-bg: ${g.cor}; --btn-color: ${btnTextColor}">
-                            <!-- Header tags -->
+                        <div class="gcard" style="--gcard-color: ${neonColor}; --btn-bg: ${neonColor}; --btn-color: ${btnTextColor}">
+                             <!-- Header tags -->
                             <div class="gcard-header-tags">
                                 <span class="gcard-provider-tag ${provClass}">${provLabel}</span>
                                 <span class="gcard-mode-badge ${modeClass}">${modeLabel}</span>
@@ -649,46 +712,46 @@
                                 <!-- RTP & Variação Histórica -->
                                 <div class="rtp-historico-row">
                                     <div class="rtp-hist-left">
-                                        <div class="rtp-label" style="color: ${g.cor}">RTP HISTÓRICO</div>
+                                        <div class="rtp-label" style="color: ${neonColor}">RTP HISTÓRICO</div>
                                         <div class="hist-change ${d.changeClass}">
                                             ${d.changeIcon} ${d.changeText}
                                         </div>
                                     </div>
-                                    <div class="rtp-value" style="color: ${g.cor}; text-shadow: 0 0 10px ${g.cor}, 0 0 20px ${g.cor}">${d.rtp.toFixed(2)}%</div>
+                                    <div class="rtp-value" style="color: ${neonColor}; text-shadow: 0 0 10px ${neonColor}, 0 0 20px ${neonColor}">${d.rtp.toFixed(2)}%</div>
                                 </div>
                                 
                                 <!-- Gráfico Sparkline -->
                                 <div class="gcard-chart-container">
-                                    ${generateSparklineSVG(g.id, g.cor, d.baseRtp, g.min, g.padrao, g.max)}
+                                    ${generateSparklineSVG(g.id, neonColor, d.baseRtp, g.min, g.padrao, g.max)}
                                 </div>
                                 
                                 <!-- Volatilidade -->
                                 <div class="gcard-volat-row">
-                                    <span style="color: ${g.cor}">VOLAT.</span>
+                                    <span style="color: ${neonColor}">VOLAT.</span>
                                     <span class="volat-val" style="color: ${d.volatColor}">${d.volatText}</span>
                                 </div>
                                 
                                 <!-- Distribuição e Progresso -->
                                 <div class="gcard-dist-row">
-                                    <span style="color: ${g.cor}">Distrib.:</span>
-                                    <span class="dist-val" style="color: ${g.cor}; text-shadow: 0 0 6px ${g.cor}">${Math.floor(d.rtp)}%</span>
+                                    <span style="color: ${neonColor}">Distrib.:</span>
+                                    <span class="dist-val" style="color: ${neonColor}; text-shadow: 0 0 6px ${neonColor}">${Math.floor(d.rtp)}%</span>
                                 </div>
                                 
                                 <div class="gcard-progress-bars">
                                     <div class="progress-bar-row">
-                                        <span class="progress-label" style="color:${g.cor}">Mín:</span>
-                                        <div class="progress-outer"><div class="progress-inner" style="width:${g.min}%; background:${g.cor}"></div></div>
-                                        <span class="progress-val" style="color:${g.cor}">${g.min}%</span>
+                                        <span class="progress-label" style="color:${neonColor}">Mín:</span>
+                                        <div class="progress-outer"><div class="progress-inner" style="width:${g.min}%; background:${neonColor}"></div></div>
+                                        <span class="progress-val" style="color:${neonColor}">${g.min}%</span>
                                     </div>
                                     <div class="progress-bar-row">
-                                        <span class="progress-label" style="color:${g.cor}">Pad:</span>
-                                        <div class="progress-outer"><div class="progress-inner" style="width:${g.padrao}%; background:${g.cor}"></div></div>
-                                        <span class="progress-val" style="color:${g.cor}">${g.padrao}%</span>
+                                        <span class="progress-label" style="color:${neonColor}">Pad:</span>
+                                        <div class="progress-outer"><div class="progress-inner" style="width:${g.padrao}%; background:${neonColor}"></div></div>
+                                        <span class="progress-val" style="color:${neonColor}">${g.padrao}%</span>
                                     </div>
                                     <div class="progress-bar-row">
-                                        <span class="progress-label" style="color:${g.cor}">Máx:</span>
-                                        <div class="progress-outer"><div class="progress-inner" style="width:${g.max}%; background:${g.cor}"></div></div>
-                                        <span class="progress-val" style="color:${g.cor}">${g.max}%</span>
+                                        <span class="progress-label" style="color:${neonColor}">Máx:</span>
+                                        <div class="progress-outer"><div class="progress-inner" style="width:${g.max}%; background:${neonColor}"></div></div>
+                                        <span class="progress-val" style="color:${neonColor}">${g.max}%</span>
                                     </div>
                                 </div>
                                 
