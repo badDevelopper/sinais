@@ -490,19 +490,60 @@
                     return `hsl(${h}, ${s}%, ${l}%)`;
                 }
 
-                // Helper to check if a color is light for button contrast
+                // Helper to check if a color is light for button contrast using YIQ algorithm
                 function isColorLight(color) {
-                    if (color.startsWith('hsl')) {
+                    if (!color) return false;
+                    color = color.trim().toLowerCase();
+                    let r = 0, g = 0, b = 0;
+                    
+                    if (color.startsWith('#')) {
+                        let hex = color.substring(1);
+                        if (hex.length === 3) {
+                            hex = hex.split('').map(x => x + x).join('');
+                        }
+                        if (hex.length === 6) {
+                            r = parseInt(hex.substring(0, 2), 16);
+                            g = parseInt(hex.substring(2, 4), 16);
+                            b = parseInt(hex.substring(4, 6), 16);
+                        }
+                    } else if (color.startsWith('rgb')) {
                         const matches = color.match(/\d+/g);
                         if (matches && matches.length >= 3) {
-                            const h = parseInt(matches[0]);
-                            const s = parseInt(matches[1]);
-                            const l = parseInt(matches[2]);
-                            if (h >= 40 && h <= 70) return true; // yellow/gold
-                            if (h >= 75 && h <= 150 && l > 45) return true; // light green
+                            r = parseInt(matches[0]);
+                            g = parseInt(matches[1]);
+                            b = parseInt(matches[2]);
                         }
+                    } else if (color.startsWith('hsl')) {
+                        const matches = color.match(/\d+/g);
+                        if (matches && matches.length >= 3) {
+                            let h = parseInt(matches[0]) / 360;
+                            let s = parseInt(matches[1]) / 100;
+                            let l = parseInt(matches[2]) / 100;
+                            
+                            if (s === 0) {
+                                r = g = b = l * 255;
+                            } else {
+                                const hue2rgb = (p, q, t) => {
+                                    if (t < 0) t += 1;
+                                    if (t > 1) t -= 1;
+                                    if (t < 1/6) return p + (q - p) * 6 * t;
+                                    if (t < 1/2) return q;
+                                    if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+                                    return p;
+                                };
+                                const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+                                const p = 2 * l - q;
+                                r = hue2rgb(p, q, h + 1/3) * 255;
+                                g = hue2rgb(p, q, h) * 255;
+                                b = hue2rgb(p, q, h - 1/3) * 255;
+                            }
+                        }
+                    } else {
+                        return false;
                     }
-                    return false;
+                    
+                    const yiq = (r * 299 + g * 587 + b * 114) / 1000;
+                    return yiq >= 128;
                 }
 
                 // Seeded random / deterministic value generator based on game properties
@@ -510,38 +551,32 @@
                     const seed = g.id || 1;
                     const decimals = (seed * 17) % 100;
                     
-                    // Determine the game status: Alta, Média, Média-Baixa, Baixa
+                    // Determine the game status: Alta, Média, Baixa
                     let status = 'Alta';
                     if (idx < 3) {
                         status = 'Alta';
                     } else {
-                        const statusChoice = (seed * 11 + idx * 7) % 4;
+                        const statusChoice = (seed * 11 + idx * 7) % 3;
                         if (statusChoice === 0) status = 'Alta';
                         else if (statusChoice === 1) status = 'Média';
-                        else if (statusChoice === 2) status = 'Média-Baixa';
                         else status = 'Baixa';
                     }
                     
                     let rtpVal, changeNum;
                     
                     if (status === 'Alta') {
-                        // High RTP: 94.20% to 99.90%
-                        rtpVal = 94.2 + (seed % 5) + (decimals / 100) * 0.7;
+                        // High RTP: 94.20% to 99.90% (always >= 90%)
+                        rtpVal = 90.0 + (seed % 5) + 4.2 + (decimals / 100) * 0.7;
                         // Mostly positive changes (+0.10% to +1.80%)
                         changeNum = 0.10 + ((seed * 23) % 170) / 100;
                     } else if (status === 'Média') {
-                        // Medium RTP: 78.50% to 88.90%
-                        rtpVal = 78.5 + (seed % 9) + (decimals / 100) * 1.4;
+                        // Medium RTP: 80.00% to 88.90% (always >= 80% and < 90%)
+                        rtpVal = 80.0 + (seed % 9) + (decimals / 100) * 0.9;
                         // Moderate changes (-0.80% to +0.80%)
                         changeNum = ((seed * 23) % 160 - 80) / 100;
-                    } else if (status === 'Média-Baixa') {
-                        // Medium-Low RTP: 62.00% to 74.50%
-                        rtpVal = 62.0 + (seed % 11) + (decimals / 100) * 1.5;
-                        // Mostly negative changes (-1.90% to -0.10%)
-                        changeNum = -1.90 + ((seed * 23) % 180) / 100;
                     } else {
-                        // Low RTP: 45.00% to 58.50%
-                        rtpVal = 45.0 + (seed % 12) + (decimals / 100) * 1.5;
+                        // Low RTP: 45.00% to 79.90% (always < 80%)
+                        rtpVal = 45.0 + (seed % 34) + (decimals / 100) * 0.9;
                         // Strongly negative changes (-3.80% to -1.20%)
                         changeNum = -3.80 + ((seed * 23) % 260) / 100;
                     }
@@ -574,7 +609,7 @@
                     const baseRtp = (rtpVal - 1.5 - ((seed * 3) % 20) / 10).toFixed(1);
 
                     // Suggested bets: scale values down slightly for lower RTP states to be realistic
-                    const betMultiplier = status === 'Alta' ? 1.0 : status === 'Média' ? 0.7 : status === 'Média-Baixa' ? 0.5 : 0.3;
+                    const betMultiplier = status === 'Alta' ? 1.0 : status === 'Média' ? 0.75 : 0.45;
                     const betSeed = (seed * 13) % 7;
                     const bets = {
                         bns: {
@@ -595,6 +630,7 @@
                     };
                     
                     return {
+                        status: status,
                         rtp: rtpVal,
                         changeText,
                         changeClass,
@@ -707,7 +743,12 @@
                     const grid = document.getElementById('game-grid');
                     grid.innerHTML = games.map((g, idx) => {
                         const d = getDeterministicValues(g, idx);
-                        const neonColor = getNeonColor(g.cor);
+                        let neonColor = '#ff3366'; // Default Baixa (Red)
+                        if (d.status === 'Alta') {
+                            neonColor = '#00ff66'; // Alta (Green)
+                        } else if (d.status === 'Média') {
+                            neonColor = '#ffcc00'; // Média (Yellow)
+                        }
                         
                         // Provider label & class
                         let provLabel = g.provider ? g.provider.toUpperCase() : 'GAME';
