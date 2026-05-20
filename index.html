@@ -569,7 +569,7 @@
                 }
 
                 // Generates inline SVG path for pointed sparkline chart with sharp spikes based on min, pad, max values
-                function generateSparklineSVG(gId, themeColor, baseRtp, minVal, padVal, maxVal) {
+                function generateSparklineSVG(gId, themeColor, baseRtp, minVal, padVal, maxVal, currentRtp) {
                     const numPoints = 32; 
                     const width = 174;
                     const height = 46;
@@ -584,17 +584,25 @@
                     
                     const minH = scale(minVal, 20);
                     const padH = scale(padVal, 28);
-                    const maxH = scale(maxVal, 38);
+                    
+                    // Map current RTP (e.g. 94.59) to high height range 36 to 42 px (always near the top!)
+                    const clampedRtp = Math.max(93.0, Math.min(100.0, Number(currentRtp) || 95.0));
+                    const finalH = 36 + ((clampedRtp - 93.0) / 7.0) * 6;
                     
                     const points = [];
                     for (let i = 0; i < numPoints; i++) {
                         // Deterministic pseudo-random seed based on game ID and index
                         const seed = (gId * 17.3 + i * 29.7);
                         
+                        // Deterministic wave variance modifiers based on game ID to simulate beautiful variations!
+                        const freqMult = 1.0 + ((gId % 5) - 2) * 0.08; // Varies wave speed per game
+                        const ampMult = 0.8 + ((gId % 3) * 0.2); // Varies wave heights per game
+                        const phaseShift = (gId * 1.7) % 6.28; // Shifts waves horizontally per game
+                        
                         // 1. Base wave using multiple sine frequencies for organic wave feel (bem movimentado!)
-                        const wave1 = Math.sin(i * 0.4 + gId) * 6;
-                        const wave2 = Math.cos(i * 0.9 - gId * 1.5) * 3;
-                        const wave3 = Math.sin(i * 1.8 + gId * 3) * 1.5;
+                        const wave1 = Math.sin(i * 0.4 * freqMult + phaseShift) * 6 * ampMult;
+                        const wave2 = Math.cos(i * 0.9 * freqMult - phaseShift) * 3 * ampMult;
+                        const wave3 = Math.sin(i * 1.8 * freqMult + phaseShift * 2) * 1.5 * ampMult;
                         
                         // Valley/baseline floor centered around a dynamic middle
                         let val = 16 + wave1 + wave2 + wave3;
@@ -603,8 +611,7 @@
                         const jitter = (Math.sin(seed) * 1.2);
                         val += jitter;
                         
-                        // 3. Inject deterministic spikes to represent min, pad, and max
-                        // We place a spike at index ~8 (Min), index ~18 (Pad), and make it peak at the end
+                        // 3. Inject deterministic spikes to represent min and pad
                         if (i === 8 || i === 9) {
                             val = Math.max(val, minH + (Math.sin(seed) * 2));
                         }
@@ -612,12 +619,10 @@
                             val = Math.max(val, padH + (Math.sin(seed) * 2));
                         }
                         
-                        // 4. Make the line rise dynamically towards the end to reach the absolute MAXIMUM height!
+                        // 4. Smoothly transition the last few points up to finalH (RTP actual value, always up high!)
                         if (i >= numPoints - 4) {
-                            // Smoothly transition the last few points up to maxH
                             const progress = (i - (numPoints - 4)) / 3; // 0 to 1
-                            const targetHeight = maxH;
-                            val = val * (1 - progress) + targetHeight * progress;
+                            val = val * (1 - progress) + finalH * progress;
                         }
                         
                         // Clamp to stay within chart container boundaries (between 4 and 42 px)
@@ -728,7 +733,7 @@
                                 
                                 <!-- Gráfico Sparkline -->
                                 <div class="gcard-chart-container">
-                                    ${generateSparklineSVG(g.id, neonColor, d.baseRtp, g.min, g.padrao, g.max)}
+                                    ${generateSparklineSVG(g.id, neonColor, d.baseRtp, g.min, g.padrao, g.max, d.rtp)}
                                 </div>
                                 
                                 <!-- Volatilidade -->
