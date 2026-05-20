@@ -457,15 +457,15 @@
                     // Base line for chart (proportional to display RTP)
                     const baseRtp = (rtpVal - 1.5 - ((seed * 3) % 20) / 10).toFixed(1);
 
-                    // Suggested bets: each row (DHS, CSX, EXT) has different values per column (MÍN, PAD, MÁX)
+                    // Suggested bets: each row (BNS, CNX, EXT) has different values per column (MÍN, PAD, MÁX)
                     const betSeed = (seed * 13) % 7;
                     const bets = {
-                        dhs: {
+                        bns: {
                             min: (2.40 + (betSeed * 0.80)).toFixed(2),
                             pad: (20.40 + (betSeed * 2.10)).toFixed(2),
                             max: (152.00 + (betSeed * 12.00)).toFixed(2)
                         },
-                        csx: {
+                        cnx: {
                             min: (2.60 + (betSeed * 0.60)).toFixed(2),
                             pad: (20.60 + (betSeed * 1.80)).toFixed(2),
                             max: (153.00 + (betSeed * 8.00)).toFixed(2)
@@ -695,36 +695,29 @@
                                 <!-- Apostas Sugeridas -->
                                 <div class="suggested-bets-container">
                                     <div class="suggested-bets-title">Apostas Sugeridas</div>
-                                    <table class="suggested-bets-table">
-                                        <thead>
-                                            <tr>
-                                                <th></th>
-                                                <th>MÍN</th>
-                                                <th>PAD</th>
-                                                <th>MÁX</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>DHS</td>
-                                                <td>${d.bets.dhs.min}</td>
-                                                <td>${d.bets.dhs.pad}</td>
-                                                <td>${d.bets.dhs.max}</td>
-                                            </tr>
-                                            <tr>
-                                                <td>CSX</td>
-                                                <td>${d.bets.csx.min}</td>
-                                                <td>${d.bets.csx.pad}</td>
-                                                <td>${d.bets.csx.max}</td>
-                                            </tr>
-                                            <tr>
-                                                <td>EXT</td>
-                                                <td>${d.bets.ext.min}</td>
-                                                <td>${d.bets.ext.pad}</td>
-                                                <td>${d.bets.ext.max}</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                                    <div class="suggested-bets-grid">
+                                        <!-- MÍN Column -->
+                                        <div class="bet-column">
+                                            <div class="bet-col-header">MÍN</div>
+                                            <div class="bet-row"><span class="bet-type">BNS</span><span class="bet-amount">${d.bets.bns.min}</span></div>
+                                            <div class="bet-row"><span class="bet-type">CNX</span><span class="bet-amount">${d.bets.cnx.min}</span></div>
+                                            <div class="bet-row"><span class="bet-type">EXT</span><span class="bet-amount">${d.bets.ext.min}</span></div>
+                                        </div>
+                                        <!-- PAD Column -->
+                                        <div class="bet-column">
+                                            <div class="bet-col-header">PAD</div>
+                                            <div class="bet-row"><span class="bet-type">BNS</span><span class="bet-amount">${d.bets.bns.pad}</span></div>
+                                            <div class="bet-row"><span class="bet-type">CNX</span><span class="bet-amount">${d.bets.cnx.pad}</span></div>
+                                            <div class="bet-row"><span class="bet-type">EXT</span><span class="bet-amount">${d.bets.ext.pad}</span></div>
+                                        </div>
+                                        <!-- MÁX Column -->
+                                        <div class="bet-column">
+                                            <div class="bet-col-header">MÁX</div>
+                                            <div class="bet-row"><span class="bet-type">BNS</span><span class="bet-amount">${d.bets.bns.max}</span></div>
+                                            <div class="bet-row"><span class="bet-type">CNX</span><span class="bet-amount">${d.bets.cnx.max}</span></div>
+                                            <div class="bet-row"><span class="bet-type">EXT</span><span class="bet-amount">${d.bets.ext.max}</span></div>
+                                        </div>
+                                    </div>
                                 </div>
                                 
                                 <!-- Footer / Button -->

@@ -660,7 +660,7 @@
   text-shadow: 0 0 4px var(--gcard-color, transparent);
 }
 
-/* Suggested bets — table layout matching reference */
+/* Suggested bets — 3-column layout matching reference */
 .suggested-bets-container {
   background: rgba(0, 0, 0, 0.5);
   border-radius: 8px;
@@ -679,45 +679,54 @@
   text-shadow: 0 0 6px var(--gcard-color, #eab308);
 }
 
-.suggested-bets-table {
-  width: 100%;
-  border-collapse: collapse;
-  text-align: center;
-  font-family: 'Inter', sans-serif;
+.suggested-bets-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0;
 }
 
-.suggested-bets-table thead th {
+.bet-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 0 4px;
+}
+
+.bet-column:not(:last-child) {
+  border-right: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.bet-col-header {
   font-size: 8px;
   font-weight: 900;
-  color: #fff;
+  color: var(--gcard-color, #d4007a);
+  text-align: center;
   text-transform: uppercase;
-  padding: 3px 2px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  padding-bottom: 2px;
+  margin-bottom: 2px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  text-shadow: 0 0 4px var(--gcard-color, transparent);
 }
 
-.suggested-bets-table thead th:first-child {
-  text-align: left;
-  color: #9ca3af;
+.bet-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 7px;
+  font-family: 'Inter', sans-serif;
+  padding: 0.5px 0;
 }
 
-.suggested-bets-table tbody td {
-  font-size: 7.5px;
+.bet-type {
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.9);
-  padding: 2.5px 2px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-}
-
-.suggested-bets-table tbody td:first-child {
-  text-align: left;
   color: #9ca3af;
-  font-weight: 800;
+  font-size: 6.5px;
 }
 
-.suggested-bets-table tbody td:not(:first-child) {
+.bet-amount {
   font-weight: 800;
-  color: var(--gcard-color, #fff);
-  text-shadow: 0 0 3px var(--gcard-color, transparent);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 7px;
 }
 
 /* Card footer buttons */
