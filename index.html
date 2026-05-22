@@ -1030,6 +1030,14 @@
                 // ── REAL-TIME ANALYSIS SCANNER (EVERY 5 SECONDS) ───────────────
                 // Perfectly simulates live machine learning analytical scanning!
                 
+                function isElementInViewport(el) {
+                    if (!el) return false;
+                    const rect = el.getBoundingClientRect();
+                    const windowHeight = (window.innerHeight || document.documentElement.clientHeight);
+                    // Check if any part of the card is inside the vertical viewport
+                    return rect.top < windowHeight && rect.bottom > 0;
+                }
+
                 function simulateLiveScanner() {
                     // 1. Tick minor RTP drifts on all games for high-fidelity scanning atmosphere
                     Object.keys(liveGamesStateMap).forEach(id => {
@@ -1049,12 +1057,21 @@
                     });
 
                     // 2. Select 1 to 2 games in the currently viewed category to alert flash & transition status
-                    const visibleGameIds = filteredGames.map(g => g.id);
-                    if (visibleGameIds.length > 0) {
+                    // Filter only the games whose cards are currently visible in the viewport
+                    const viewportGames = filteredGames.filter(g => {
+                        const el = document.querySelector(`.gcard[data-id="${g.id}"]`);
+                        return el && isElementInViewport(el);
+                    });
+
+                    // Prioritize updating games currently visible in viewport so the user sees live animations
+                    const gamesToSelectFrom = viewportGames.length > 0 ? viewportGames : filteredGames;
+                    const selectFromIds = gamesToSelectFrom.map(g => g.id);
+
+                    if (selectFromIds.length > 0) {
                         const alertCount = Math.floor(Math.random() * 2) + 1; // 1 or 2 games
                         const updatedGamesThisTick = [];
                         for (let i = 0; i < alertCount; i++) {
-                            const randomId = visibleGameIds[Math.floor(Math.random() * visibleGameIds.length)];
+                            const randomId = selectFromIds[Math.floor(Math.random() * selectFromIds.length)];
                             const game = liveGamesStateMap[randomId];
                             if (game && !updatedGamesThisTick.includes(game.id)) {
                                 updatedGamesThisTick.push(game.id);
@@ -1165,10 +1182,12 @@
                                     changeSpan.innerHTML = `${game.changeIcon} ${game.changeText}`;
                                 }
 
-                                // Restart the alert blink / zoom animation
-                                cardEl.classList.remove('live-alert-flash');
-                                void cardEl.offsetWidth; // Trigger reflow to restart animation
-                                cardEl.classList.add('live-alert-flash');
+                                // Only run the flash/zoom animation if the card is actually inside the viewport!
+                                if (isElementInViewport(cardEl)) {
+                                    cardEl.classList.remove('live-alert-flash');
+                                    void cardEl.offsetWidth; // Trigger reflow to restart animation
+                                    cardEl.classList.add('live-alert-flash');
+                                }
                             }
                         });
 
