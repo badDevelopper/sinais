@@ -969,17 +969,44 @@
    ================================================ */
 @keyframes liveAlertFlash {
   0% {
-    box-shadow: 0 0 35px var(--gcard-color), 0 0 70px var(--gcard-color);
+    transform: scale(1);
+    box-shadow: 0 0 18px color-mix(in srgb, var(--gcard-color) 50%, transparent);
+    border-color: var(--gcard-color);
+  }
+  15% {
+    transform: scale(1.05);
+    box-shadow: 0 0 45px var(--gcard-color), 0 0 90px var(--gcard-color);
+    border-color: #ffffff;
+    filter: brightness(1.25);
+  }
+  30% {
+    transform: scale(1.01);
+    box-shadow: 0 0 20px color-mix(in srgb, var(--gcard-color) 60%, transparent);
+    border-color: var(--gcard-color);
+    filter: brightness(1);
+  }
+  45% {
     transform: scale(1.04);
+    box-shadow: 0 0 35px var(--gcard-color), 0 0 70px var(--gcard-color);
+    border-color: #ffffff;
+    filter: brightness(1.2);
+  }
+  60% {
+    transform: scale(1.01);
+    box-shadow: 0 0 20px color-mix(in srgb, var(--gcard-color) 60%, transparent);
+    border-color: var(--gcard-color);
+    filter: brightness(1);
   }
   100% {
+    transform: scale(1);
     box-shadow: 0 0 18px color-mix(in srgb, var(--gcard-color) 50%, transparent), 
                 0 0 40px color-mix(in srgb, var(--gcard-color) 25%, transparent), 
                 0 8px 25px rgba(0, 0, 0, 0.7);
-    transform: scale(1);
+    border-color: var(--gcard-color);
   }
 }
 
 .gcard.live-alert-flash {
-  animation: liveAlertFlash 1.5s ease-out;
+  animation: liveAlertFlash 1.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+  z-index: 10;
 }
