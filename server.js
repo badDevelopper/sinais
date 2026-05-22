@@ -637,8 +637,8 @@ function readSiteConfig() {
     profilePhoto: '/assets/favicon.png',
     displayName: 'GRUPO Slot',
     username: '@noellyalcantara12',
-    whatsapp: { label: 'WhatsApp', link: '', color: '#25d366' },
-    instagram: { label: 'Instagram', link: '', color: '#e1306c' },
+    whatsapp: { enabled: true, label: 'WhatsApp', link: '', color: '#25d366' },
+    instagram: { enabled: true, label: 'Instagram', link: '', color: '#e1306c' },
     facebook: { enabled: false, label: 'Facebook', link: '', color: '#1877f2' },
     telegram: { enabled: false, label: 'Telegram', link: '', color: '#2ca5e0' }
   };
@@ -697,11 +697,15 @@ app.put('/api/admin/site-config', requireAuth, (req, res) => {
     if (displayName !== undefined) current.displayName = displayName;
     if (username !== undefined) current.username = username;
     if (whatsapp) {
+      if (!current.whatsapp) current.whatsapp = { enabled: true, label: 'WhatsApp', link: '', color: '#25d366' };
+      if (whatsapp.enabled !== undefined) current.whatsapp.enabled = whatsapp.enabled;
       if (whatsapp.label !== undefined) current.whatsapp.label = whatsapp.label;
       if (whatsapp.link !== undefined) current.whatsapp.link = whatsapp.link;
       if (whatsapp.color !== undefined) current.whatsapp.color = whatsapp.color;
     }
     if (instagram) {
+      if (!current.instagram) current.instagram = { enabled: true, label: 'Instagram', link: '', color: '#e1306c' };
+      if (instagram.enabled !== undefined) current.instagram.enabled = instagram.enabled;
       if (instagram.label !== undefined) current.instagram.label = instagram.label;
       if (instagram.link !== undefined) current.instagram.link = instagram.link;
       if (instagram.color !== undefined) current.instagram.color = instagram.color;

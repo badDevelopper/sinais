@@ -1708,61 +1708,81 @@
                         <div class="se-divider"></div>
 
                         <!-- WhatsApp -->
-                        <div class="se-sub-title"><i class="fa-brands fa-whatsapp" style="color:#25d366"></i> Botão
-                            WhatsApp</div>
-                        <div class="se-row">
-                            <div class="se-field">
-                                <label>Texto do Botão</label>
-                                <input type="text" id="se-wa-label" placeholder="Ex: WhatsApp">
-                            </div>
-                            <div class="se-field">
-                                <label>Cor do Botão</label>
-                                <div class="se-color-row">
-                                    <input type="color" id="se-wa-color" value="#25d366">
-                                    <input type="text" id="se-wa-color-text" placeholder="#25d366">
-                                </div>
-                                <div class="se-presets-row">
-                                    <button type="button" class="preset-btn" style="--preset-color: #25d366;" onclick="applyPresetColor('se-wa-color', 'se-wa-color-text', '#25d366')" title="WhatsApp Verde"></button>
-                                    <button type="button" class="preset-btn" style="--preset-color: #00ffcc;" onclick="applyPresetColor('se-wa-color', 'se-wa-color-text', '#00ffcc')" title="Verde Neon"></button>
-                                    <button type="button" class="preset-btn" style="--preset-color: #00e5ff;" onclick="applyPresetColor('se-wa-color', 'se-wa-color-text', '#00e5ff')" title="Ciano Neon"></button>
-                                    <button type="button" class="preset-btn" style="--preset-color: #ffffff;" onclick="applyPresetColor('se-wa-color', 'se-wa-color-text', '#ffffff')" title="Branco"></button>
-                                    <button type="button" class="preset-btn" style="--preset-color: #ff007f;" onclick="applyPresetColor('se-wa-color', 'se-wa-color-text', '#ff007f')" title="Rosa Neon"></button>
-                                </div>
+                        <div class="se-sub-title"><i class="fa-brands fa-whatsapp" style="color:#25d366"></i> Botão WhatsApp</div>
+                        <div class="se-row" style="align-items:center; margin-bottom:8px">
+                            <div class="se-field" style="flex:0 0 auto">
+                                <label>Ativar Botão</label>
+                                <label class="social-toggle">
+                                    <input type="checkbox" id="se-wa-enabled" checked>
+                                    <span class="social-toggle-slider"></span>
+                                </label>
                             </div>
                         </div>
-                        <div class="se-field">
-                            <label>Link do WhatsApp</label>
-                            <input type="url" id="se-wa-link" placeholder="https://chat.whatsapp.com/...">
+                        <div id="se-wa-fields">
+                            <div class="se-row">
+                                <div class="se-field">
+                                    <label>Texto do Botão</label>
+                                    <input type="text" id="se-wa-label" placeholder="Ex: WhatsApp">
+                                </div>
+                                <div class="se-field">
+                                    <label>Cor do Botão</label>
+                                    <div class="se-color-row">
+                                        <input type="color" id="se-wa-color" value="#25d366">
+                                        <input type="text" id="se-wa-color-text" placeholder="#25d366">
+                                    </div>
+                                    <div class="se-presets-row">
+                                        <button type="button" class="preset-btn" style="--preset-color: #25d366;" onclick="applyPresetColor('se-wa-color', 'se-wa-color-text', '#25d366')" title="WhatsApp Verde"></button>
+                                        <button type="button" class="preset-btn" style="--preset-color: #00ffcc;" onclick="applyPresetColor('se-wa-color', 'se-wa-color-text', '#00ffcc')" title="Verde Neon"></button>
+                                        <button type="button" class="preset-btn" style="--preset-color: #00e5ff;" onclick="applyPresetColor('se-wa-color', 'se-wa-color-text', '#00e5ff')" title="Ciano Neon"></button>
+                                        <button type="button" class="preset-btn" style="--preset-color: #ffffff;" onclick="applyPresetColor('se-wa-color', 'se-wa-color-text', '#ffffff')" title="Branco"></button>
+                                        <button type="button" class="preset-btn" style="--preset-color: #ff007f;" onclick="applyPresetColor('se-wa-color', 'se-wa-color-text', '#ff007f')" title="Rosa Neon"></button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="se-field">
+                                <label>Link do WhatsApp</label>
+                                <input type="url" id="se-wa-link" placeholder="https://chat.whatsapp.com/...">
+                            </div>
                         </div>
 
                         <div class="se-divider"></div>
 
                         <!-- Instagram -->
-                        <div class="se-sub-title"><i class="fa-brands fa-instagram" style="color:#e1306c"></i> Botão
-                            Instagram</div>
-                        <div class="se-row">
-                            <div class="se-field">
-                                <label>Texto do Botão</label>
-                                <input type="text" id="se-ig-label" placeholder="Ex: Instagram">
-                            </div>
-                            <div class="se-field">
-                                <label>Cor do Botão</label>
-                                <div class="se-color-row">
-                                    <input type="color" id="se-ig-color" value="#e1306c">
-                                    <input type="text" id="se-ig-color-text" placeholder="#e1306c">
-                                </div>
-                                <div class="se-presets-row">
-                                    <button type="button" class="preset-btn" style="--preset-color: #e1306c;" onclick="applyPresetColor('se-ig-color', 'se-ig-color-text', '#e1306c')" title="Instagram Rosa"></button>
-                                    <button type="button" class="preset-btn" style="--preset-color: #a200ff;" onclick="applyPresetColor('se-ig-color', 'se-ig-color-text', '#a200ff')" title="Roxo Neon"></button>
-                                    <button type="button" class="preset-btn" style="--preset-color: #ff007f;" onclick="applyPresetColor('se-ig-color', 'se-ig-color-text', '#ff007f')" title="Rosa Neon"></button>
-                                    <button type="button" class="preset-btn" style="--preset-color: #ffffff;" onclick="applyPresetColor('se-ig-color', 'se-ig-color-text', '#ffffff')" title="Branco"></button>
-                                    <button type="button" class="preset-btn" style="--preset-color: #ffd700;" onclick="applyPresetColor('se-ig-color', 'se-ig-color-text', '#ffd700')" title="Ouro Neon"></button>
-                                </div>
+                        <div class="se-sub-title"><i class="fa-brands fa-instagram" style="color:#e1306c"></i> Botão Instagram</div>
+                        <div class="se-row" style="align-items:center; margin-bottom:8px">
+                            <div class="se-field" style="flex:0 0 auto">
+                                <label>Ativar Botão</label>
+                                <label class="social-toggle">
+                                    <input type="checkbox" id="se-ig-enabled" checked>
+                                    <span class="social-toggle-slider"></span>
+                                </label>
                             </div>
                         </div>
-                        <div class="se-field">
-                            <label>Link do Instagram</label>
-                            <input type="url" id="se-ig-link" placeholder="https://www.instagram.com/...">
+                        <div id="se-ig-fields">
+                            <div class="se-row">
+                                <div class="se-field">
+                                    <label>Texto do Botão</label>
+                                    <input type="text" id="se-ig-label" placeholder="Ex: Instagram">
+                                </div>
+                                <div class="se-field">
+                                    <label>Cor do Botão</label>
+                                    <div class="se-color-row">
+                                        <input type="color" id="se-ig-color" value="#e1306c">
+                                        <input type="text" id="se-ig-color-text" placeholder="#e1306c">
+                                    </div>
+                                    <div class="se-presets-row">
+                                        <button type="button" class="preset-btn" style="--preset-color: #e1306c;" onclick="applyPresetColor('se-ig-color', 'se-ig-color-text', '#e1306c')" title="Instagram Rosa"></button>
+                                        <button type="button" class="preset-btn" style="--preset-color: #a200ff;" onclick="applyPresetColor('se-ig-color', 'se-ig-color-text', '#a200ff')" title="Roxo Neon"></button>
+                                        <button type="button" class="preset-btn" style="--preset-color: #ff007f;" onclick="applyPresetColor('se-ig-color', 'se-ig-color-text', '#ff007f')" title="Rosa Neon"></button>
+                                        <button type="button" class="preset-btn" style="--preset-color: #ffffff;" onclick="applyPresetColor('se-ig-color', 'se-ig-color-text', '#ffffff')" title="Branco"></button>
+                                        <button type="button" class="preset-btn" style="--preset-color: #ffd700;" onclick="applyPresetColor('se-ig-color', 'se-ig-color-text', '#ffd700')" title="Ouro Neon"></button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="se-field">
+                                <label>Link do Instagram</label>
+                                <input type="url" id="se-ig-link" placeholder="https://www.instagram.com/...">
+                            </div>
                         </div>
 
                         <div class="se-divider"></div>
@@ -2683,6 +2703,9 @@
             document.getElementById('se-prev-user2').textContent = cfg.username || '';
 
             // WhatsApp
+            const waEnabled = cfg.whatsapp?.enabled !== false;
+            document.getElementById('se-wa-enabled').checked = waEnabled;
+            document.getElementById('se-wa-fields').style.display = waEnabled ? '' : 'none';
             document.getElementById('se-wa-label').value = cfg.whatsapp?.label || 'WhatsApp';
             document.getElementById('se-wa-link').value = cfg.whatsapp?.link || '';
             document.getElementById('se-wa-color').value = cfg.whatsapp?.color || '#25d366';
@@ -2693,8 +2716,13 @@
             document.getElementById('se-prev-wa').innerHTML = `<i class="fa-brands fa-whatsapp"></i> ${waLabel}`;
             document.getElementById('se-prev-wa2').style.background = waColor;
             document.getElementById('se-prev-wa2').innerHTML = `<i class="fa-brands fa-whatsapp"></i> ${waLabel}`;
+            document.getElementById('se-prev-wa').style.display = waEnabled ? '' : 'none';
+            document.getElementById('se-prev-wa2').style.display = waEnabled ? '' : 'none';
 
             // Instagram
+            const igEnabled = cfg.instagram?.enabled !== false;
+            document.getElementById('se-ig-enabled').checked = igEnabled;
+            document.getElementById('se-ig-fields').style.display = igEnabled ? '' : 'none';
             document.getElementById('se-ig-label').value = cfg.instagram?.label || 'Instagram';
             document.getElementById('se-ig-link').value = cfg.instagram?.link || '';
             document.getElementById('se-ig-color').value = cfg.instagram?.color || '#e1306c';
@@ -2705,6 +2733,8 @@
             document.getElementById('se-prev-ig').innerHTML = `<i class="fa-brands fa-instagram"></i> ${igLabel}`;
             document.getElementById('se-prev-ig2').style.background = igColor;
             document.getElementById('se-prev-ig2').innerHTML = `<i class="fa-brands fa-instagram"></i> ${igLabel}`;
+            document.getElementById('se-prev-ig').style.display = igEnabled ? '' : 'none';
+            document.getElementById('se-prev-ig2').style.display = igEnabled ? '' : 'none';
 
             // Facebook
             const fbEnabled = !!(cfg.facebook?.enabled);
@@ -2926,6 +2956,13 @@
                 updateFooterPreview(document.getElementById('se-footer-bg-color').value, v);
             });
 
+            // WhatsApp toggle
+            document.getElementById('se-wa-enabled').addEventListener('change', (e) => {
+                const on = e.target.checked;
+                document.getElementById('se-wa-fields').style.display = on ? '' : 'none';
+                document.getElementById('se-prev-wa').style.display = on ? '' : 'none';
+                document.getElementById('se-prev-wa2').style.display = on ? '' : 'none';
+            });
             // WhatsApp color sync
             document.getElementById('se-wa-color').addEventListener('input', (e) => {
                 document.getElementById('se-wa-color-text').value = e.target.value;
@@ -2945,6 +2982,13 @@
                 document.getElementById('se-prev-wa2').innerHTML = html;
             });
 
+            // Instagram toggle
+            document.getElementById('se-ig-enabled').addEventListener('change', (e) => {
+                const on = e.target.checked;
+                document.getElementById('se-ig-fields').style.display = on ? '' : 'none';
+                document.getElementById('se-prev-ig').style.display = on ? '' : 'none';
+                document.getElementById('se-prev-ig2').style.display = on ? '' : 'none';
+            });
             // Instagram color sync
             document.getElementById('se-ig-color').addEventListener('input', (e) => {
                 document.getElementById('se-ig-color-text').value = e.target.value;
@@ -3107,6 +3151,7 @@
                 displayName: document.getElementById('se-display-name').value.trim(),
                 username: document.getElementById('se-username').value.trim(),
                 whatsapp: {
+                    enabled: document.getElementById('se-wa-enabled').checked,
                     label: document.getElementById('se-wa-label').value.trim(),
                     link: document.getElementById('se-wa-link').value.trim(),
                     color: document.getElementById('se-wa-color').value,
@@ -3115,6 +3160,7 @@
                 footerBgColor: document.getElementById('se-footer-bg-color').value,
                 footerTextColor: document.getElementById('se-footer-text-color').value,
                 instagram: {
+                    enabled: document.getElementById('se-ig-enabled').checked,
                     label: document.getElementById('se-ig-label').value.trim(),
                     link: document.getElementById('se-ig-link').value.trim(),
                     color: document.getElementById('se-ig-color').value,

@@ -295,10 +295,10 @@
                     <span class="social-sub" id="social-sub">...</span>
                 </div>
                 <div class="social-buttons" id="social-buttons">
-                    <button class="social-btn social-btn-whatsapp" id="social-btn-wa">
+                    <button class="social-btn social-btn-whatsapp" id="social-btn-wa" style="display:none">
                         <i class="fa-brands fa-whatsapp"></i> WhatsApp
                     </button>
-                    <button class="social-btn social-btn-instagram" id="social-btn-ig">
+                    <button class="social-btn social-btn-instagram" id="social-btn-ig" style="display:none">
                         <i class="fa-brands fa-instagram"></i> Instagram
                     </button>
                     <button class="social-btn" id="social-btn-fb" style="display:none; background:#1877f2">
@@ -321,14 +321,24 @@
                     document.getElementById('social-sub').textContent = cfg.username || '';
 
                     const waBtn = document.getElementById('social-btn-wa');
-                    waBtn.innerHTML = `<i class="fa-brands fa-whatsapp"></i> ${cfg.whatsapp?.label || 'WhatsApp'}`;
-                    waBtn.style.background = cfg.whatsapp?.color || '#25d366';
-                    waBtn.onclick = (e) => { e.stopPropagation(); window.open(cfg.whatsapp?.link || '#', '_blank'); };
+                    if (cfg.whatsapp?.enabled !== false) {
+                        waBtn.innerHTML = `<i class="fa-brands fa-whatsapp"></i> ${cfg.whatsapp?.label || 'WhatsApp'}`;
+                        waBtn.style.background = cfg.whatsapp?.color || '#25d366';
+                        waBtn.style.display = '';
+                        waBtn.onclick = (e) => { e.stopPropagation(); window.open(cfg.whatsapp?.link || '#', '_blank'); };
+                    } else {
+                        waBtn.style.display = 'none';
+                    }
 
                     const igBtn = document.getElementById('social-btn-ig');
-                    igBtn.innerHTML = `<i class="fa-brands fa-instagram"></i> ${cfg.instagram?.label || 'Instagram'}`;
-                    igBtn.style.background = cfg.instagram?.color || '#e1306c';
-                    igBtn.onclick = (e) => { e.stopPropagation(); window.open(cfg.instagram?.link || '#', '_blank'); };
+                    if (cfg.instagram?.enabled !== false) {
+                        igBtn.innerHTML = `<i class="fa-brands fa-instagram"></i> ${cfg.instagram?.label || 'Instagram'}`;
+                        igBtn.style.background = cfg.instagram?.color || '#e1306c';
+                        igBtn.style.display = '';
+                        igBtn.onclick = (e) => { e.stopPropagation(); window.open(cfg.instagram?.link || '#', '_blank'); };
+                    } else {
+                        igBtn.style.display = 'none';
+                    }
 
                     // Facebook (only show if enabled)
                     const fbBtn = document.getElementById('social-btn-fb');
