@@ -85,6 +85,28 @@
             background: linear-gradient(135deg, #6366f1, #4338ca);
         }
 
+        .signal-row-icon.analise {
+            background: linear-gradient(135deg, #0d9488, #0f766e);
+        }
+
+        .status-alta {
+            color: #00ff66 !important;
+            font-weight: 900 !important;
+            text-shadow: 0 0 8px rgba(0, 255, 102, 0.6);
+        }
+
+        .status-estavel {
+            color: #ffcc00 !important;
+            font-weight: 900 !important;
+            text-shadow: 0 0 8px rgba(255, 204, 0, 0.6);
+        }
+
+        .status-baixa {
+            color: #ff0055 !important;
+            font-weight: 900 !important;
+            text-shadow: 0 0 8px rgba(255, 0, 85, 0.6);
+        }
+
         .signal-row-label {
             font-family: 'Inter', sans-serif;
             font-weight: 800;
@@ -261,7 +283,7 @@
             return Math.abs(h);
         }
 
-        // Generate values: NORMAL = 3-10X, TURBO = 2-7X, JOGUE ATÉ = now + 5min
+        // Generate values: NORMAL = 3-10X, TURBO = 2-7X, JOGUE ATÉ = now + 5min, and ANÁLISE
         function generateValues() {
             const seed = Date.now();
             const normal = (hashStr(slug + 'normal' + seed) % 8) + 3; // 3-10
@@ -270,7 +292,23 @@
             now.setMinutes(now.getMinutes() + 5);
             const jogueAte = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
 
-            return { normal: `${normal}X`, turbo: `${turbo}X`, jogueAte };
+            // Proportions: 3% Baixa, 20% Estável, 77% Alta
+            const roll = (hashStr(slug + 'status' + seed) % 100);
+            let statusLabel = 'ESTÁVEL (RTP Regular)';
+            let statusClass = 'status-estavel';
+            
+            if (roll < 3) {
+                statusLabel = 'BAIXA (RTP Instável)';
+                statusClass = 'status-baixa';
+            } else if (roll < 23) {
+                statusLabel = 'ESTÁVEL (RTP Regular)';
+                statusClass = 'status-estavel';
+            } else {
+                statusLabel = 'ALTA (RTP Excelente)';
+                statusClass = 'status-alta';
+            }
+
+            return { normal: `${normal}X`, turbo: `${turbo}X`, jogueAte, statusLabel, statusClass };
         }
 
         function renderCard(game, state, values) {
@@ -280,17 +318,22 @@
             let normalVal = '--';
             let turboVal = '--';
             let jogueVal = '--';
+            let analiseVal = '--';
             let valClass = '';
+            let analiseClass = '';
 
             if (state === 'loading') {
                 normalVal = '<div class="spinner-sm"></div>';
                 turboVal = '<div class="spinner-sm"></div>';
                 jogueVal = '<div class="spinner-sm"></div>';
+                analiseVal = '<div class="spinner-sm"></div>';
             } else if ((state === 'done' || state === 'cooldown') && values) {
                 normalVal = values.normal;
                 turboVal = values.turbo;
                 jogueVal = values.jogueAte;
+                analiseVal = values.statusLabel;
                 valClass = 'loaded';
+                analiseClass = values.statusClass;
             }
 
             let btnHtml = '';
@@ -327,6 +370,11 @@
                         <div class="signal-row-icon jogue"><i class="fa-regular fa-clock"></i></div>
                         <span class="signal-row-label">JOGUE ATÉ:</span>
                         <span class="signal-row-value ${valClass}">${jogueVal}</span>
+                    </div>
+                    <div class="signal-row">
+                        <div class="signal-row-icon analise"><i class="fa-solid fa-chart-simple"></i></div>
+                        <span class="signal-row-label">ANÁLISE:</span>
+                        <span class="signal-row-value ${analiseClass || valClass}">${analiseVal}</span>
                     </div>
                     ${btnHtml}
                 </div>

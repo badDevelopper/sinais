@@ -1,0 +1,12 @@
+{
+  "name": "card-image-scraper",
+  "version": "1.0.0",
+  "description": "Scraper para capturar imagens de cards do grupofpsinais.com",
+  "main": "scraper.js",
+  "scripts": {
+    "start": "node scraper.js"
+  },
+  "dependencies": {
+    "puppeteer": "^23.0.0"
+  }
+}

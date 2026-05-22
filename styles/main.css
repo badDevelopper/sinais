@@ -963,3 +963,23 @@
     font-size: 14px;
   }
 }
+
+/* ================================================
+   LIVE ANALYSIS ALERT FLASH
+   ================================================ */
+@keyframes liveAlertFlash {
+  0% {
+    box-shadow: 0 0 35px var(--gcard-color), 0 0 70px var(--gcard-color);
+    transform: scale(1.04);
+  }
+  100% {
+    box-shadow: 0 0 18px color-mix(in srgb, var(--gcard-color) 50%, transparent), 
+                0 0 40px color-mix(in srgb, var(--gcard-color) 25%, transparent), 
+                0 8px 25px rgba(0, 0, 0, 0.7);
+    transform: scale(1);
+  }
+}
+
+.gcard.live-alert-flash {
+  animation: liveAlertFlash 1.5s ease-out;
+}

@@ -46,7 +46,6 @@
             <a href="/pp-games" class="nav-link" data-provider="pp">
                 <img src="/assets/navbar/pragmatic.png" alt="Pragmatic" class="nav-btn-img">
             </a>
-
             <a href="#" class="nav-link" target="_blank">
                 <img src="/assets/navbar/jogue-agora.png" alt="Jogue Agora" class="nav-btn-img">
             </a>
@@ -407,118 +406,60 @@
 
         <script>
             document.addEventListener("DOMContentLoaded", () => {
-                let masterGamesList = []; // Holds all raw game objects from API
-                let liveGamesStateMap = {}; // Maps game ID -> dynamic live state
-                let allGames = []; // Currently active provider's games (from state map)
-                let filteredGames = []; // Currently filtered/searched games (to be rendered)
-                let currentProvider = 'pg';
+                let allGames = [], filteredGames = [], currentProvider = 'pg';
                 let favorites = JSON.parse(localStorage.getItem('fp_fav') || '[]');
 
                 Notiflix.Loading.standard();
 
-                // ── HELPER FUNCTIONS ──────────────────────────────────────────
+                async function fetchGames() {
+                    try {
+                        const [resGames, resPlats] = await Promise.all([
+                            fetch('/api/games'),
+                            fetch('/api/platforms')
+                        ]);
+                        const games = await resGames.json();
+                        const platforms = await resPlats.json();
 
-                // Seeded random / deterministic value generator based on game properties and a 30-minute rotation
-                function calculateGameValues(g, idx, statusOverride) {
-                    const seed = g.id || 1;
-                    const decimals = (seed * 17) % 100;
-                    const period30Min = Math.floor(Date.now() / 1800000);
-                    
-                    // Determine the game status: Alta, Média, Baixa. Randomizes every 30 minutes!
-                    let status = statusOverride;
-                    if (!status) {
-                        const top3Names = siteConfigData?.top3Games || [];
-                        const isPinned = top3Names.some(name => name && name.toLowerCase().trim() === g.nome.toLowerCase().trim());
-                        if (isPinned) {
-                            status = 'Alta';
-                        } else {
-                            // Proportions: 3% Baixa, 20% Média (Estável), 77% Alta
-                            const statusChoice = (seed * 17 + idx * 13 + period30Min * 7) % 100;
-                            if (statusChoice < 3) status = 'Baixa';
-                            else if (statusChoice < 23) status = 'Média';
-                            else status = 'Alta';
-                        }
+                        Notiflix.Loading.remove();
+                        allGames = games.filter(g => g.provider === currentProvider);
+                        filteredGames = [...allGames];
+                        renderGames(filteredGames);
+                        renderPlatforms(platforms);
+                        Notiflix.Notify.success('Jogos disponíveis');
+                    } catch (e) {
+                        Notiflix.Loading.remove();
+                        Notiflix.Notify.failure('Erro ao carregar jogos.');
                     }
-                    
-                    let rtpVal, changeNum;
-                    
-                    if (status === 'Alta') {
-                        // High RTP: 94.20% to 99.90% (always >= 90%)
-                        rtpVal = 90.0 + (seed % 5) + 4.2 + (decimals / 100) * 0.7;
-                        // Mostly positive changes (+0.10% to +1.80%)
-                        changeNum = 0.10 + ((seed * 23) % 170) / 100;
-                    } else if (status === 'Média') {
-                        // Medium RTP: 80.00% to 88.90% (always >= 80% and < 90%)
-                        rtpVal = 80.0 + (seed % 9) + (decimals / 100) * 0.9;
-                        // Moderate changes (-0.80% to +0.80%)
-                        changeNum = ((seed * 23) % 160 - 80) / 100;
-                    } else {
-                        // Low RTP: 45.00% to 79.90% (always < 80%)
-                        rtpVal = 45.0 + (seed % 34) + (decimals / 100) * 0.9;
-                        // Strongly negative changes (-3.80% to -1.20%)
-                        changeNum = -3.80 + ((seed * 23) % 260) / 100;
-                    }
-                    
-                    const isPositive = changeNum >= 0;
-                    const changeText = (isPositive ? '+' : '') + changeNum.toFixed(2) + '%';
-                    const changeClass = isPositive ? 'change-up' : 'change-down';
-                    const changeIcon = isPositive ? '▲' : '▼';
-                    
-                    // Volatility
-                    const volatilities = ['Baixa', 'Média', 'Média-Alta', 'Alta'];
-                    let volatIdx;
-                    if (status === 'Alta') {
-                        volatIdx = (seed * 7) % 3 + 1; // Média, Média-Alta, Alta
-                    } else if (status === 'Baixa') {
-                        volatIdx = 0; // Baixa
-                    } else {
-                        volatIdx = (seed * 7) % 3; // Baixa, Média, Média-Alta
-                    }
-                    const volatText = volatilities[volatIdx];
-                    const volatColors = {
-                        'Baixa': '#00ffcc',
-                        'Média': '#fbbf24',
-                        'Média-Alta': '#f97316',
-                        'Alta': '#ef4444'
-                    };
-                    const volatColor = volatColors[volatText];
-                    
-                    // Base line for chart (proportional to display RTP)
-                    const baseRtp = (rtpVal - 1.5 - ((seed * 3) % 20) / 10).toFixed(1);
-
-                    // Suggested bets: scale values down slightly for lower RTP states to be realistic
-                    const betMultiplier = status === 'Alta' ? 1.0 : status === 'Média' ? 0.75 : 0.45;
-                    const betSeed = (seed * 13) % 7;
-                    const bets = {
-                        bns: {
-                            min: ( (2.40 + (betSeed * 0.80)) * betMultiplier ).toFixed(2).replace('.', ','),
-                            pad: ( (20.40 + (betSeed * 2.10)) * betMultiplier ).toFixed(2).replace('.', ','),
-                            max: ( (152.00 + (betSeed * 12.00)) * betMultiplier ).toFixed(2).replace('.', ',')
-                        },
-                        cnx: {
-                            min: ( (2.60 + (betSeed * 0.60)) * betMultiplier ).toFixed(2).replace('.', ','),
-                            pad: ( (20.60 + (betSeed * 1.80)) * betMultiplier ).toFixed(2).replace('.', ','),
-                            max: ( (153.00 + (betSeed * 8.00)) * betMultiplier ).toFixed(2).replace('.', ',')
-                        },
-                        ext: {
-                            min: ( (3.40 + (betSeed * 0.90)) * betMultiplier ).toFixed(2).replace('.', ','),
-                            pad: ( (21.40 + (betSeed * 2.50)) * betMultiplier ).toFixed(2).replace('.', ','),
-                            max: ( (152.00 + (betSeed * 15.00)) * betMultiplier ).toFixed(2).replace('.', ',')
-                        }
-                    };
-                    
-                    return {
-                        status: status,
-                        rtp: rtpVal,
-                        changeText,
-                        changeClass,
-                        changeIcon,
-                        volatText,
-                        volatColor,
-                        baseRtp,
-                        bets
-                    };
                 }
+
+                function renderPlatforms(platforms) {
+                    const row = document.getElementById('platforms-row');
+                    if (platforms.length === 0) {
+                        row.innerHTML = '<span style="color:#cbd5e1;font-size:12px">Nenhuma plataforma cadastrada.</span>';
+                        return;
+                    }
+
+                    row.innerHTML = platforms.map(g => `
+                        <a href="${g.link}" target="_blank" class="plat-list-item">
+                            <span class="plat-list-name">${g.nome}</span>
+                            <span class="plat-list-url">${g.link}</span>
+                        </a>
+                    `).join('');
+                }
+
+                function getBarColor(v) {
+                    return v <= 35 ? '#ef4444' : v <= 65 ? '#eab308' : '#22c55e';
+                }
+
+                function isFav(id) { return favorites.includes(id); }
+                function toggleFav(id, ev) {
+                    ev.stopPropagation();
+                    ev.preventDefault();
+                    favorites = isFav(id) ? favorites.filter(f => f !== id) : [...favorites, id];
+                    localStorage.setItem('fp_fav', JSON.stringify(favorites));
+                    renderGames(filteredGames);
+                }
+                window.toggleFav = toggleFav;
 
                 // Generates a super-bright neon color from any dark/light database color
                 function getNeonColor(color) {
@@ -640,6 +581,103 @@
                     return yiq >= 128;
                 }
 
+                // Seeded random / deterministic value generator based on game properties
+                function getDeterministicValues(g, idx) {
+                    const seed = g.id || 1;
+                    const decimals = (seed * 17) % 100;
+                    
+                    // Determine the game status: Alta, Média, Baixa
+                    let status = 'Alta';
+                    if (idx < 3) {
+                        status = 'Alta';
+                    } else {
+                        // Better distribution: 40% Alta, 50% Média, 10% Baixa
+                        const statusChoice = (seed * 11 + idx * 7) % 10;
+                        if (statusChoice < 4) status = 'Alta';
+                        else if (statusChoice < 9) status = 'Média';
+                        else status = 'Baixa';
+                    }
+                    
+                    let rtpVal, changeNum;
+                    
+                    if (status === 'Alta') {
+                        // High RTP: 94.20% to 99.90% (always >= 90%)
+                        rtpVal = 90.0 + (seed % 5) + 4.2 + (decimals / 100) * 0.7;
+                        // Mostly positive changes (+0.10% to +1.80%)
+                        changeNum = 0.10 + ((seed * 23) % 170) / 100;
+                    } else if (status === 'Média') {
+                        // Medium RTP: 80.00% to 88.90% (always >= 80% and < 90%)
+                        rtpVal = 80.0 + (seed % 9) + (decimals / 100) * 0.9;
+                        // Moderate changes (-0.80% to +0.80%)
+                        changeNum = ((seed * 23) % 160 - 80) / 100;
+                    } else {
+                        // Low RTP: 45.00% to 79.90% (always < 80%)
+                        rtpVal = 45.0 + (seed % 34) + (decimals / 100) * 0.9;
+                        // Strongly negative changes (-3.80% to -1.20%)
+                        changeNum = -3.80 + ((seed * 23) % 260) / 100;
+                    }
+                    
+                    const isPositive = changeNum >= 0;
+                    const changeText = (isPositive ? '+' : '') + changeNum.toFixed(2) + '%';
+                    const changeClass = isPositive ? 'change-up' : 'change-down';
+                    const changeIcon = isPositive ? '▲' : '▼';
+                    
+                    // Volatility
+                    const volatilities = ['Baixa', 'Média', 'Média-Alta', 'Alta'];
+                    let volatIdx;
+                    if (status === 'Alta') {
+                        volatIdx = (seed * 7) % 3 + 1; // Média, Média-Alta, Alta
+                    } else if (status === 'Baixa') {
+                        volatIdx = 0; // Baixa
+                    } else {
+                        volatIdx = (seed * 7) % 3; // Baixa, Média, Média-Alta
+                    }
+                    const volatText = volatilities[volatIdx];
+                    const volatColors = {
+                        'Baixa': '#00ffcc',
+                        'Média': '#fbbf24',
+                        'Média-Alta': '#f97316',
+                        'Alta': '#ef4444'
+                    };
+                    const volatColor = volatColors[volatText];
+                    
+                    // Base line for chart (proportional to display RTP)
+                    const baseRtp = (rtpVal - 1.5 - ((seed * 3) % 20) / 10).toFixed(1);
+
+                    // Suggested bets: scale values down slightly for lower RTP states to be realistic
+                    const betMultiplier = status === 'Alta' ? 1.0 : status === 'Média' ? 0.75 : 0.45;
+                    const betSeed = (seed * 13) % 7;
+                    const bets = {
+                        bns: {
+                            min: ( (2.40 + (betSeed * 0.80)) * betMultiplier ).toFixed(2).replace('.', ','),
+                            pad: ( (20.40 + (betSeed * 2.10)) * betMultiplier ).toFixed(2).replace('.', ','),
+                            max: ( (152.00 + (betSeed * 12.00)) * betMultiplier ).toFixed(2).replace('.', ',')
+                        },
+                        cnx: {
+                            min: ( (2.60 + (betSeed * 0.60)) * betMultiplier ).toFixed(2).replace('.', ','),
+                            pad: ( (20.60 + (betSeed * 1.80)) * betMultiplier ).toFixed(2).replace('.', ','),
+                            max: ( (153.00 + (betSeed * 8.00)) * betMultiplier ).toFixed(2).replace('.', ',')
+                        },
+                        ext: {
+                            min: ( (3.40 + (betSeed * 0.90)) * betMultiplier ).toFixed(2).replace('.', ','),
+                            pad: ( (21.40 + (betSeed * 2.50)) * betMultiplier ).toFixed(2).replace('.', ','),
+                            max: ( (152.00 + (betSeed * 15.00)) * betMultiplier ).toFixed(2).replace('.', ',')
+                        }
+                    };
+                    
+                    return {
+                        status: status,
+                        rtp: rtpVal,
+                        changeText,
+                        changeClass,
+                        changeIcon,
+                        volatText,
+                        volatColor,
+                        baseRtp,
+                        bets
+                    };
+                }
+
                 // Generates inline SVG path for pointed sparkline chart with sharp spikes based on min, pad, max values
                 function generateSparklineSVG(gId, themeColor, baseRtp, minVal, padVal, maxVal, currentRtp) {
                     const numPoints = 32; 
@@ -647,52 +685,57 @@
                     const height = 46;
                     const stepX = width / (numPoints - 1);
                     
+                    // Helper to scale progress percentage to pixel height (8-38 range)
                     function scale(val, fallback) {
                         const finalVal = (val !== undefined && val !== null && val >= 0) ? Number(val) : fallback;
+                        // Map 0-100% to height range 8 to 38
                         return 8 + (finalVal / 100) * 30;
                     }
                     
                     const minH = scale(minVal, 20);
                     const padH = scale(padVal, 28);
-                    const maxH = scale(maxVal, 35);
+                    
+                    // Map current RTP (e.g. 45.0 to 100.0) to height range 6 to 42 px (matching low/medium/high states)
                     const clampedRtp = Math.max(45.0, Math.min(100.0, Number(currentRtp) || 95.0));
                     const finalH = 6 + ((clampedRtp - 45.0) / 55.0) * 36;
                     
-                    const periodSeed = Math.floor(Date.now() / 300000);
-                    
                     const points = [];
                     for (let i = 0; i < numPoints; i++) {
-                        const seed = (gId * 17.3 + i * 29.7 + periodSeed * 13.7);
-                        const freqMult = 1.0 + (((gId + periodSeed) % 5) - 2) * 0.08;
-                        const ampMult = 0.8 + (((gId + periodSeed * 7) % 3) * 0.2);
+                        // Deterministic pseudo-random seed based on game ID and index
+                        const seed = (gId * 17.3 + i * 29.7);
                         
-                        // Dynamic organic drift (breathing effect) to ensure the chart is "always slightly different"
-                        const liveDrift = Math.sin((Date.now() / 4000) + (gId * 0.6)) * 0.45;
-                        const phaseShift = ((gId * 1.7) + (periodSeed * 0.9) + liveDrift) % 6.28;
+                        // Deterministic wave variance modifiers based on game ID to simulate beautiful variations!
+                        const freqMult = 1.0 + ((gId % 5) - 2) * 0.08; // Varies wave speed per game
+                        const ampMult = 0.8 + ((gId % 3) * 0.2); // Varies wave heights per game
+                        const phaseShift = (gId * 1.7) % 6.28; // Shifts waves horizontally per game
                         
+                        // 1. Base wave using multiple sine frequencies for organic wave feel (bem movimentado!)
                         const wave1 = Math.sin(i * 0.4 * freqMult + phaseShift) * 6 * ampMult;
                         const wave2 = Math.cos(i * 0.9 * freqMult - phaseShift) * 3 * ampMult;
                         const wave3 = Math.sin(i * 1.8 * freqMult + phaseShift * 2) * 1.5 * ampMult;
                         
+                        // Valley/baseline floor centered around a dynamic middle
                         let val = 16 + wave1 + wave2 + wave3;
+                        
+                        // 2. Add realistic micro-jitter (high frequency noise)
                         const jitter = (Math.sin(seed) * 1.2);
                         val += jitter;
                         
+                        // 3. Inject deterministic spikes to represent min and pad
                         if (i === 8 || i === 9) {
                             val = Math.max(val, minH + (Math.sin(seed) * 2));
                         }
                         if (i === 18 || i === 19) {
                             val = Math.max(val, padH + (Math.sin(seed) * 2));
                         }
-                        if (i === 26 || i === 27) {
-                            val = Math.max(val, maxH + (Math.sin(seed) * 2));
-                        }
                         
+                        // 4. Smoothly transition the last few points up to finalH (RTP actual value, always up high!)
                         if (i >= numPoints - 4) {
-                            const progress = (i - (numPoints - 4)) / 3;
+                            const progress = (i - (numPoints - 4)) / 3; // 0 to 1
                             val = val * (1 - progress) + finalH * progress;
                         }
                         
+                        // Clamp to stay within chart container boundaries (between 4 and 42 px)
                         val = Math.max(4, Math.min(42, val));
                         points.push(val);
                     }
@@ -704,7 +747,10 @@
                         pathD += ` L ${x},${y}`;
                     }
                     
+                    // Fill path
                     const fillD = `${pathD} L ${width},${height} L 0,${height} Z`;
+                    
+                    // Base dash line vertical level (approx. 14px from bottom)
                     const baseLineY = height - 14;
                     
                     return `
@@ -715,88 +761,32 @@
                                 <stop offset="100%" stop-color="${themeColor}" stop-opacity="0.0" />
                             </linearGradient>
                         </defs>
+                        <!-- Base Dash Line -->
                         <line x1="0" y1="${baseLineY}" x2="${width}" y2="${baseLineY}" stroke="${themeColor}" stroke-dasharray="2,3" stroke-width="0.8" opacity="0.6" />
+                        <!-- Base Text -->
                         <text x="${width/2}" y="${baseLineY + 9}" fill="${themeColor}" font-size="7" font-family="'Inter', sans-serif" font-weight="900" text-anchor="middle" opacity="0.75">BASE ${baseRtp}%</text>
+                        <!-- Fill area under curve -->
                         <path d="${fillD}" fill="url(#grad-${gId})" />
+                        <!-- Bold neon trend line -->
                         <path d="${pathD}" fill="none" stroke="${themeColor}" stroke-width="2" stroke-linejoin="miter" stroke-linecap="square" />
+                        <!-- Final Indicator Dot (Glowing white center + neon outer matching Giza / Ganesha) -->
                         <circle cx="${width}" cy="${height - points[numPoints - 1]}" r="4.5" fill="#ffffff" stroke="${themeColor}" stroke-width="1.8" style="filter: drop-shadow(0 0 4px ${themeColor});" />
                     </svg>
                     `;
                 }
 
-                // ── CORE DATA FETCHING & POPULATION ───────────────────────────
-
-                async function fetchGames() {
-                    try {
-                        const [resGames, resPlats] = await Promise.all([
-                            fetch('/api/games'),
-                            fetch('/api/platforms')
-                        ]);
-                        masterGamesList = await resGames.json();
-                        const platforms = await resPlats.json();
-
-                        // Populate live state tracker for all games
-                        liveGamesStateMap = {};
-                        masterGamesList.forEach((g, idx) => {
-                            const liveVals = calculateGameValues(g, idx);
-                            liveGamesStateMap[g.id] = {
-                                ...g,
-                                ...liveVals,
-                                updatedThisTick: false
-                            };
-                        });
-
-                        Notiflix.Loading.remove();
-                        
-                        // Set current provider & render initial state
-                        updateActiveProviderList();
-                        renderPlatforms(platforms);
-                        
-                        Notiflix.Notify.success('Scanner de análise sincronizado');
-                    } catch (e) {
-                        Notiflix.Loading.remove();
-                        Notiflix.Notify.failure('Erro ao conectar scanner.');
-                    }
-                }
-
-                function updateActiveProviderList() {
-                    // Pull full dynamic values from in-memory state tracker
-                    allGames = masterGamesList
-                        .filter(g => g.provider === currentProvider)
-                        .map(g => liveGamesStateMap[g.id]);
-                        
-                    applyFilter(document.querySelector('.ftab.active')?.dataset?.filter || 'all', false);
-                }
-
-                function renderPlatforms(platforms) {
-                    const row = document.getElementById('platforms-row');
-                    if (platforms.length === 0) {
-                        row.innerHTML = '<span style="color:#cbd5e1;font-size:12px">Nenhuma plataforma cadastrada.</span>';
-                        return;
-                    }
-
-                    row.innerHTML = platforms.map(g => `
-                        <a href="${g.link}" target="_blank" class="plat-list-item">
-                            <span class="plat-list-name">${g.nome}</span>
-                            <span class="plat-list-url">${g.link}</span>
-                        </a>
-                    `).join('');
-                }
-
                 function renderGames(games) {
                     const grid = document.getElementById('game-grid');
-                    grid.innerHTML = games.map((gRef) => {
-                        // Retrieve latest real-time scan state
-                        const g = liveGamesStateMap[gRef.id];
-                        if (!g) return '';
-
-                        let neonColor = '#ff3366'; // Baixa (Red)
-                        if (g.status === 'Alta') {
+                    grid.innerHTML = games.map((g, idx) => {
+                        const d = getDeterministicValues(g, idx);
+                        let neonColor = '#ff3366'; // Default Baixa (Red)
+                        if (d.status === 'Alta') {
                             neonColor = '#00ff66'; // Alta (Green)
-                        } else if (g.status === 'Média') {
+                        } else if (d.status === 'Média') {
                             neonColor = '#ffcc00'; // Média (Yellow)
                         }
                         
+                        // Provider label & class
                         let provLabel = g.provider ? g.provider.toUpperCase() : 'GAME';
                         let provClass = 'prov-pg';
                         if (g.provider === 'pg') { provLabel = 'PG SOFT'; provClass = 'prov-pg'; }
@@ -804,6 +794,7 @@
                         else if (g.provider === 'wg') { provLabel = 'WG GAMES'; provClass = 'prov-wg'; }
                         else if (g.provider === 'tada') { provLabel = 'TADA GAMES'; provClass = 'prov-tada'; }
                         
+                        // Mode label, class, icon
                         let modeLabel = '⚡ NORMAL';
                         let modeClass = 'mode-normal';
                         if (g.id % 3 === 1) {
@@ -814,57 +805,62 @@
                             modeClass = 'mode-turbo';
                         }
                         
+                        // Button Text & Action
                         const isSinalGame = ["Fortune Rabbit", "Fortune Tiger", "Fortune Ox", "Fortune Mouse", "Fortune Dragon"].includes(g.nome);
+                        const btnText = isSinalGame ? '▶ GERAR SINAL' : '▶ JOGAR AGORA';
+                        const btnAction = isSinalGame 
+                            ? `window.location.href='/gerar-sinais/${g.nome.toLowerCase().replace(/ /g, '-')}'`
+                            : `window.open('${g.link}','_blank')`;
+
+                        // Button colors
                         const btnTextColor = isColorLight(neonColor) ? '#000' : '#fff';
-                        const alertClass = g.updatedThisTick ? 'live-alert-flash' : '';
 
                         return `
-                        <div class="gcard ${alertClass}" style="--gcard-color: ${neonColor}; --btn-bg: ${neonColor}; --btn-color: ${btnTextColor}">
+                        <div class="gcard" style="--gcard-color: ${neonColor}; --btn-bg: ${neonColor}; --btn-color: ${btnTextColor}">
+                             <!-- Header tags -->
                             <div class="gcard-header-tags">
                                 <span class="gcard-provider-tag ${provClass}">${provLabel}</span>
                                 <span class="gcard-mode-badge ${modeClass}">${modeLabel}</span>
                             </div>
                             
+                            <!-- Banner -->
                             <a href="${g.link}" target="_blank" class="gcard-banner">
                                 <img src="${g.banner}" alt="${g.nome}" onerror="this.onerror=null;this.style.background='linear-gradient(135deg,#1a1a2e,#16213e)';this.style.minHeight='100px';">
                             </a>
                             
                             <div class="gcard-body">
+                                <!-- Centered Title -->
                                 <div class="gcard-title-row">
                                     <span class="gcard-name">${g.nome}</span>
                                 </div>
                                 
+                                <!-- RTP & Variação Histórica -->
                                 <div class="rtp-historico-row">
                                     <div class="rtp-hist-left">
-                                        <span class="rtp-label">RTP SCAN</span>
+                                        <span class="rtp-label">RTP</span>
                                         <div class="hist-change-row">
                                             <span class="hist-label">HISTÓRICO</span>
-                                            <span class="hist-change ${g.changeClass}">${g.changeIcon} ${g.changeText}</span>
+                                            <span class="hist-change ${d.changeClass}">${d.changeIcon} ${d.changeText}</span>
                                         </div>
                                     </div>
-                                    <div class="rtp-value" style="color: ${neonColor}; text-shadow: 0 0 10px ${neonColor}, 0 0 20px ${neonColor}">${g.rtp.toFixed(2)}%</div>
+                                    <div class="rtp-value" style="color: ${neonColor}; text-shadow: 0 0 10px ${neonColor}, 0 0 20px ${neonColor}">${d.rtp.toFixed(2)}%</div>
                                 </div>
                                 
+                                <!-- Gráfico Sparkline -->
                                 <div class="gcard-chart-container">
-                                    ${generateSparklineSVG(g.id, neonColor, g.baseRtp, g.min, g.padrao, g.max, g.rtp)}
+                                    ${generateSparklineSVG(g.id, neonColor, d.baseRtp, g.min, g.padrao, g.max, d.rtp)}
                                 </div>
                                 
+                                <!-- Volatilidade -->
                                 <div class="gcard-volat-row">
-                                    <span>VOLATILIDADE</span>
-                                    <span class="volat-val" style="color: ${g.volatColor}">${g.volatText}</span>
+                                    <span>VOLAT.</span>
+                                    <span class="volat-val" style="color: ${d.volatColor}">${d.volatText}</span>
                                 </div>
                                 
-                                <div class="gcard-volat-row" style="margin-top: 1px;">
-                                    <span>ANÁLISE LIVE</span>
-                                    <span class="volat-val" style="color: ${neonColor}; font-weight:900; text-shadow: 0 0 6px ${neonColor}">
-                                        <i class="fa-solid ${g.status === 'Alta' ? 'fa-arrow-trend-up' : g.status === 'Baixa' ? 'fa-arrow-trend-down' : 'fa-equals'}"></i> 
-                                        ${g.status === 'Média' ? 'ESTÁVEL' : g.status.toUpperCase()}
-                                    </span>
-                                </div>
-                                
+                                <!-- Distribuição e Progresso -->
                                 <div class="gcard-dist-row">
-                                    <span>DISTRIBUIÇÃO</span>
-                                    <span class="dist-val" style="color: ${neonColor}; text-shadow: 0 0 6px ${neonColor}">${Math.floor(g.rtp)}%</span>
+                                    <span>Distrib.:</span>
+                                    <span class="dist-val" style="color: ${neonColor}; text-shadow: 0 0 6px ${neonColor}">${Math.floor(d.rtp)}%</span>
                                 </div>
                                 
                                 <div class="gcard-progress-bars">
@@ -885,33 +881,38 @@
                                     </div>
                                 </div>
                                 
+                                <!-- Apostas Sugeridas -->
                                 <div class="suggested-bets-container">
-                                    <div class="suggested-bets-title">Apostas Recomendadas</div>
+                                    <div class="suggested-bets-title">Apostas Sugeridas</div>
                                     <div class="suggested-bets-grid">
+                                        <!-- MÍN Column -->
                                         <div class="bet-column">
                                             <div class="bet-col-header">MÍN</div>
-                                            <div class="bet-row"><span class="bet-type">BNS</span><span class="bet-amount">${g.bets.bns.min}</span></div>
-                                            <div class="bet-row"><span class="bet-type">CNX</span><span class="bet-amount">${g.bets.cnx.min}</span></div>
-                                            <div class="bet-row"><span class="bet-type">EXT</span><span class="bet-amount">${g.bets.ext.min}</span></div>
+                                            <div class="bet-row"><span class="bet-type">BNS</span><span class="bet-amount">${d.bets.bns.min}</span></div>
+                                            <div class="bet-row"><span class="bet-type">CNX</span><span class="bet-amount">${d.bets.cnx.min}</span></div>
+                                            <div class="bet-row"><span class="bet-type">EXT</span><span class="bet-amount">${d.bets.ext.min}</span></div>
                                         </div>
+                                        <!-- PAD Column -->
                                         <div class="bet-column">
                                             <div class="bet-col-header">PAD</div>
-                                            <div class="bet-row"><span class="bet-type">BNS</span><span class="bet-amount">${g.bets.bns.pad}</span></div>
-                                            <div class="bet-row"><span class="bet-type">CNX</span><span class="bet-amount">${g.bets.cnx.pad}</span></div>
-                                            <div class="bet-row"><span class="bet-type">EXT</span><span class="bet-amount">${g.bets.ext.pad}</span></div>
+                                            <div class="bet-row"><span class="bet-type">BNS</span><span class="bet-amount">${d.bets.bns.pad}</span></div>
+                                            <div class="bet-row"><span class="bet-type">CNX</span><span class="bet-amount">${d.bets.cnx.pad}</span></div>
+                                            <div class="bet-row"><span class="bet-type">EXT</span><span class="bet-amount">${d.bets.ext.pad}</span></div>
                                         </div>
+                                        <!-- MÁX Column -->
                                         <div class="bet-column">
                                             <div class="bet-col-header">MÁX</div>
-                                            <div class="bet-row"><span class="bet-type">BNS</span><span class="bet-amount">${g.bets.bns.max}</span></div>
-                                            <div class="bet-row"><span class="bet-type">CNX</span><span class="bet-amount">${g.bets.cnx.max}</span></div>
-                                            <div class="bet-row"><span class="bet-type">EXT</span><span class="bet-amount">${g.bets.ext.max}</span></div>
+                                            <div class="bet-row"><span class="bet-type">BNS</span><span class="bet-amount">${d.bets.bns.max}</span></div>
+                                            <div class="bet-row"><span class="bet-type">CNX</span><span class="bet-amount">${d.bets.cnx.max}</span></div>
+                                            <div class="bet-row"><span class="bet-type">EXT</span><span class="bet-amount">${d.bets.ext.max}</span></div>
                                         </div>
                                     </div>
                                 </div>
                                 
+                                <!-- Footer / Button -->
                                 <div class="gcard-footer">
-                                    <button class="gcard-action-btn" onclick="${isSinalGame ? `window.location.href='/gerar-sinais/${g.nome.toLowerCase().replace(/ /g, '-')}'` : `window.open('${g.link}', '_blank')`}">
-                                        ${isSinalGame ? '▶ GERAR SINAL' : `▶ ACESSAR ${siteConfigData?.siteName?.toUpperCase() || 'JOGAR'}`}
+                                    <button class="gcard-action-btn" onclick="window.open('${g.link}', '_blank')">
+                                        ▶ ACESSAR ${siteConfigData?.siteName?.toUpperCase() || 'MESMOPG'}
                                     </button>
                                 </div>
                             </div>
@@ -920,67 +921,15 @@
                     }).join('');
                 }
 
-                function sortGamesByAnalysis(gamesList) {
-                    const top3Names = siteConfigData?.top3Games || [];
-                    
-                    const statusWeights = {
-                        'Alta': 3,
-                        'Média': 2,
-                        'Baixa': 1
-                    };
-                    return [...gamesList].sort((a, b) => {
-                        // Check if pinned in top3
-                        const indexA = top3Names.findIndex(name => name && name.toLowerCase().trim() === a.nome.toLowerCase().trim());
-                        const indexB = top3Names.findIndex(name => name && name.toLowerCase().trim() === b.nome.toLowerCase().trim());
-                        
-                        const isPinnedA = indexA !== -1;
-                        const isPinnedB = indexB !== -1;
-                        
-                        if (isPinnedA && isPinnedB) {
-                            return indexA - indexB; // Sort by their pin rank order (Top 1 first)
-                        }
-                        if (isPinnedA) return -1;
-                        if (isPinnedB) return 1;
-                        
-                        const weightA = statusWeights[a.status] || 0;
-                        const weightB = statusWeights[b.status] || 0;
-                        if (weightA !== weightB) {
-                            return weightB - weightA; // High status first
-                        }
-                        return b.rtp - a.rtp; // Higher RTP secondary sort
-                    });
-                }
-
-                function applyFilter(f, updateUiState = true) {
-                    if (updateUiState) {
-                        document.querySelectorAll('.ftab').forEach(b => b.classList.remove('active'));
-                        const ftabBtn = document.querySelector(`.ftab[data-filter="${f}"]`);
-                        if (ftabBtn) ftabBtn.classList.add('active');
-                    }
-                    
-                    // Filter using our dynamic dynamic states
-                    const providerGames = masterGamesList
-                        .filter(g => g.provider === currentProvider)
-                        .map(g => liveGamesStateMap[g.id]);
-
+                function applyFilter(f) {
+                    document.querySelectorAll('.ftab').forEach(b => b.classList.remove('active'));
+                    document.querySelector(`.ftab[data-filter="${f}"]`).classList.add('active');
                     switch (f) {
-                        case 'hot': 
-                            filteredGames = providerGames.filter(g => g.hot); 
-                            break;
-                        case 'new': 
-                            filteredGames = providerGames.filter(g => g.isNew); 
-                            break;
-                        case 'all': 
-                            filteredGames = [...providerGames]; 
-                            break;
-                        case 'fav': 
-                            filteredGames = providerGames.filter(g => favorites.includes(g.id)); 
-                            break;
-                        default:
-                            filteredGames = [...providerGames];
+                        case 'hot': filteredGames = allGames.filter(g => g.hot).sort((a, b) => b.rtp - a.rtp); break;
+                        case 'new': filteredGames = allGames.filter(g => g.isNew); break;
+                        case 'all': filteredGames = [...allGames]; break;
+                        case 'fav': filteredGames = allGames.filter(g => favorites.includes(g.id)); break;
                     }
-                    
-                    filteredGames = sortGamesByAnalysis(filteredGames);
                     renderGames(filteredGames);
                 }
 
@@ -990,22 +939,19 @@
 
                 document.getElementById('search-input').addEventListener('input', function () {
                     const q = this.value.toLowerCase();
-                    const providerGames = masterGamesList
-                        .filter(g => g.provider === currentProvider)
-                        .map(g => liveGamesStateMap[g.id]);
-                    filteredGames = providerGames.filter(g => g.nome.toLowerCase().includes(q));
-                    filteredGames = sortGamesByAnalysis(filteredGames);
+                    filteredGames = allGames.filter(g => g.nome.toLowerCase().includes(q));
                     renderGames(filteredGames);
                 });
 
-                // Provider switching (nav - 100% instant in-memory client side!)
+                // Provider switching (nav)
                 document.querySelectorAll('.nav-link[data-provider]').forEach(btn => {
                     btn.addEventListener('click', e => {
                         e.preventDefault();
                         document.querySelectorAll('.nav-link').forEach(b => b.classList.remove('active'));
                         btn.classList.add('active');
                         currentProvider = btn.dataset.provider;
-                        updateActiveProviderList();
+                        Notiflix.Loading.standard();
+                        fetchGames();
                     });
                 });
 
@@ -1024,108 +970,29 @@
                     if (activeBtn) activeBtn.classList.add('active');
                 }
 
-                // Initial load
                 fetchGames();
 
-                // ── REAL-TIME ANALYSIS SCANNER (EVERY 5 SECONDS) ───────────────
-                // Perfectly simulates live machine learning analytical scanning!
-                
-                function simulateLiveScanner() {
-                    // 1. Tick minor RTP drifts on all games for high-fidelity scanning atmosphere
-                    Object.keys(liveGamesStateMap).forEach(id => {
-                        const game = liveGamesStateMap[id];
-                        // Micro fluctuation of RTP: +/- 0.02%
-                        const rtpDelta = (Math.random() * 0.04 - 0.02);
-                        game.rtp = Math.max(40.0, Math.min(99.95, game.rtp + rtpDelta));
-                        
-                        // Fluctuating historical ticks
-                        const currentChange = parseFloat(game.changeText.replace('%', ''));
-                        const changeDelta = (Math.random() * 0.02 - 0.01);
-                        const newChange = currentChange + changeDelta;
-                        const isPositive = newChange >= 0;
-                        game.changeText = (isPositive ? '+' : '') + newChange.toFixed(2) + '%';
-                        game.changeClass = isPositive ? 'change-up' : 'change-down';
-                        game.changeIcon = isPositive ? '▲' : '▼';
-                    });
-
-                    // 2. Select 1 to 2 games in the currently viewed category to alert flash & transition status
-                    const visibleGameIds = filteredGames.map(g => g.id);
-                    if (visibleGameIds.length > 0) {
-                        const alertCount = Math.floor(Math.random() * 2) + 1; // 1 or 2 games
-                        for (let i = 0; i < alertCount; i++) {
-                            const randomId = visibleGameIds[Math.floor(Math.random() * visibleGameIds.length)];
-                            const game = liveGamesStateMap[randomId];
-                            if (game) {
-                                const top3Names = siteConfigData?.top3Games || [];
-                                const isPinned = top3Names.some(name => name && name.toLowerCase().trim() === game.nome.toLowerCase().trim());
-                                
-                                let newStatus = 'Alta';
-                                if (isPinned) {
-                                    newStatus = 'Alta';
-                                } else {
-                                    // Dynamic state transitions preserving: 3% Baixa, 20% Média, 77% Alta
-                                    const roll = Math.random();
-                                    if (game.status === 'Alta') {
-                                        if (roll < 0.85) newStatus = 'Alta'; // stay
-                                        else if (roll < 0.98) newStatus = 'Média';
-                                        else newStatus = 'Baixa';
-                                    } else if (game.status === 'Média') {
-                                        if (roll < 0.40) newStatus = 'Alta';
-                                        else if (roll < 0.95) newStatus = 'Média'; // stay
-                                        else newStatus = 'Baixa';
-                                    } else {
-                                        if (roll < 0.50) newStatus = 'Alta';
-                                        else if (roll < 0.95) newStatus = 'Média';
-                                        else newStatus = 'Baixa'; // stay
-                                    }
-                                }
-
-                                // Recalculate values under new status
-                                const idx = masterGamesList.findIndex(g => g.id === game.id);
-                                const newVals = calculateGameValues(game, idx, newStatus);
-                                
-                                Object.assign(game, newVals);
-                                game.updatedThisTick = true;
-                            }
-                        }
-                    }
-
-                    // Render visible games list with updated values
-                    renderGames(filteredGames);
-                    
-                    // Clear update triggers shortly after to reset animations
-                    setTimeout(() => {
-                        Object.keys(liveGamesStateMap).forEach(id => {
-                            liveGamesStateMap[id].updatedThisTick = false;
-                        });
-                    }, 1200);
-                }
-
-                // Scanner active interval (3000ms = 3s)
-                setInterval(simulateLiveScanner, 3000);
-
-                // ── Auto-refresh a cada 5 minutos (Sincronização Server-side) ──────
+                // ── Auto-refresh a cada 5 minutos ──────────────────────────────
+                // Sincronizado com o período do servidor (muda em múltiplos de 5min)
                 function scheduleNextRefresh() {
                     const now = Date.now();
-                    const msUntilNextPeriod = 300000 - (now % 300000);
+                    const msUntilNextPeriod = 300000 - (now % 300000); // tempo até a próxima virada
                     setTimeout(async () => {
                         try {
                             const [resGames] = await Promise.all([fetch('/api/games')]);
-                            const newRawGames = await resGames.json();
-                            
-                            // Keep in-memory status, but re-align base data safely
-                            newRawGames.forEach((g, idx) => {
-                                if (liveGamesStateMap[g.id]) {
-                                    liveGamesStateMap[g.id].min = g.min;
-                                    liveGamesStateMap[g.id].padrao = g.padrao;
-                                    liveGamesStateMap[g.id].max = g.max;
-                                    liveGamesStateMap[g.id].link = g.link;
-                                    liveGamesStateMap[g.id].banner = g.banner;
-                                }
-                            });
-                        } catch (e) {}
-                        scheduleNextRefresh();
-                    }, msUntilNextPeriod + 1000);
+                            const games = await resGames.json();
+                            const activeFilter = document.querySelector('.ftab.active')?.dataset?.filter || 'all';
+                            allGames = games.filter(g => g.provider === currentProvider);
+                            switch (activeFilter) {
+                                case 'hot': filteredGames = allGames.filter(g => g.hot).sort((a, b) => b.rtp - a.rtp); break;
+                                case 'new': filteredGames = allGames.filter(g => g.isNew); break;
+                                case 'fav': filteredGames = allGames.filter(g => favorites.includes(g.id)); break;
+                                default: filteredGames = [...allGames];
+                            }
+                            renderGames(filteredGames);
+                        } catch (e) { /* silencioso */ }
+                        scheduleNextRefresh(); // agenda o próximo
+                    }, msUntilNextPeriod + 500); // +500ms para garantir que o servidor já virou
                 }
                 scheduleNextRefresh();
             });

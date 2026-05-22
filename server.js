@@ -681,7 +681,7 @@ app.get('/api/admin/site-config', requireAuth, (req, res) => {
 // Update site config
 app.put('/api/admin/site-config', requireAuth, (req, res) => {
   try {
-    const { siteName, themeColor, cardColor, platformsColor, updateColor, bgColor, buttonColor, navbarBgColor, footerBgColor, footerTextColor, displayName, username, whatsapp, instagram, facebook, telegram, port } = req.body;
+    const { siteName, themeColor, cardColor, platformsColor, updateColor, bgColor, buttonColor, navbarBgColor, footerBgColor, footerTextColor, displayName, username, whatsapp, instagram, facebook, telegram, port, top3Games } = req.body;
     const current = readSiteConfig();
 
     if (siteName !== undefined) current.siteName = siteName;
@@ -696,6 +696,7 @@ app.put('/api/admin/site-config', requireAuth, (req, res) => {
     if (footerTextColor !== undefined) current.footerTextColor = footerTextColor;
     if (displayName !== undefined) current.displayName = displayName;
     if (username !== undefined) current.username = username;
+    if (top3Games !== undefined) current.top3Games = top3Games;
     if (whatsapp) {
       if (!current.whatsapp) current.whatsapp = { enabled: true, label: 'WhatsApp', link: '', color: '#25d366' };
       if (whatsapp.enabled !== undefined) current.whatsapp.enabled = whatsapp.enabled;

@@ -1480,7 +1480,7 @@
                                 <label>Nome do Site</label>
                                 <input type="text" id="se-site-name" placeholder="Ex: Slot">
                             </div>
-                            <div class="se-field">
+                            <div class="se-field" style="display: none;">
                                 <label>Porta HTTP do Servidor (Opcional)</label>
                                 <input type="number" id="se-server-port" placeholder="Ex: 3303" min="1" max="65535">
                             </div>
@@ -2061,8 +2061,248 @@
                     </div>
                 </div>
             </div>
+                    <!-- ═══════ SEÇÃO 9: TOP 3 JOGOS FIXADOS ═══════ -->
+            <div class="se-section sec-top3-games">
+                <style>
+                    .pinned-summary {
+                        display: grid;
+                        grid-template-columns: repeat(3, 1fr);
+                        gap: 16px;
+                        margin-bottom: 24px;
+                    }
+                    @media (max-width: 768px) {
+                        .pinned-summary {
+                            grid-template-columns: 1fr;
+                            gap: 12px;
+                        }
+                    }
+                    .pinned-slot-card {
+                        position: relative;
+                        display: flex;
+                        align-items: center;
+                        background: rgba(255, 255, 255, 0.02);
+                        border: 2px dashed rgba(255, 255, 255, 0.1);
+                        border-radius: 12px;
+                        padding: 12px;
+                        overflow: hidden;
+                        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    }
+                    .pinned-slot-card.active {
+                        background: rgba(236, 72, 153, 0.06);
+                        border: 2px solid #ec4899;
+                        cursor: pointer;
+                    }
+                    .pinned-slot-card.active:hover {
+                        transform: translateY(-2px);
+                        box-shadow: 0 4px 15px rgba(236, 72, 153, 0.2);
+                        border-color: #f472b6;
+                    }
+                    .pinned-slot-badge {
+                        background: #ec4899;
+                        color: #fff;
+                        font-size: 11px;
+                        font-weight: 800;
+                        width: 22px;
+                        height: 22px;
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        margin-right: 12px;
+                        box-shadow: 0 0 8px rgba(236, 72, 153, 0.4);
+                        flex-shrink: 0;
+                    }
+                    .pinned-slot-badge.empty {
+                        background: rgba(255, 255, 255, 0.08);
+                        box-shadow: none;
+                        color: #64748b;
+                    }
+                    .pinned-slot-banner {
+                        width: 55px;
+                        height: 38px;
+                        background-size: cover;
+                        background-position: center;
+                        background-repeat: no-repeat;
+                        border-radius: 6px;
+                        margin-right: 12px;
+                        border: 1px solid rgba(255, 255, 255, 0.1);
+                        flex-shrink: 0;
+                        background-color: #1a1a2e;
+                    }
+                    .pinned-slot-info {
+                        flex-grow: 1;
+                        min-width: 0;
+                    }
+                    .pinned-slot-title {
+                        font-size: 13px;
+                        font-weight: 700;
+                        color: #f8fafc;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                    }
+                    .pinned-slot-subtitle {
+                        font-size: 10px;
+                        color: #94a3b8;
+                        font-weight: 500;
+                        margin-top: 1px;
+                    }
+                    .pinned-slot-remove {
+                        color: #94a3b8;
+                        font-size: 14px;
+                        transition: color 0.2s;
+                        margin-left: 8px;
+                        flex-shrink: 0;
+                    }
+                    .pinned-slot-card.active:hover .pinned-slot-remove {
+                        color: #f43f5e;
+                    }
+                    
+                    /* Selection Grid styling */
+                    .pin-games-grid {
+                        display: grid;
+                        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+                        gap: 12px;
+                        max-height: 380px;
+                        overflow-y: auto;
+                        padding: 8px;
+                        border-radius: 8px;
+                        background: rgba(0, 0, 0, 0.2);
+                        border: 1px solid rgba(255, 255, 255, 0.08);
+                    }
+                    .admin-game-select-card {
+                        position: relative;
+                        background: #0f172a;
+                        border: 2px solid rgba(255, 255, 255, 0.06);
+                        border-radius: 10px;
+                        overflow: hidden;
+                        cursor: pointer;
+                        transition: all 0.25s ease;
+                        display: flex;
+                        flex-direction: column;
+                        height: 120px;
+                    }
+                    .admin-game-select-card:hover {
+                        transform: translateY(-2px);
+                        border-color: rgba(255, 255, 255, 0.2);
+                        box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+                    }
+                    .admin-game-select-card.pinned {
+                        border-color: #ec4899;
+                        box-shadow: 0 0 10px rgba(236, 72, 153, 0.3);
+                        background: rgba(236, 72, 153, 0.04);
+                    }
+                    .admin-game-select-card-banner {
+                        width: 100%;
+                        height: 70px;
+                        background-size: cover;
+                        background-position: center;
+                        background-repeat: no-repeat;
+                        position: relative;
+                        background-color: #1a1a2e;
+                    }
+                    .admin-game-select-card-body {
+                        padding: 6px;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: center;
+                        align-items: center;
+                        text-align: center;
+                        flex-grow: 1;
+                        min-height: 0;
+                    }
+                    .admin-game-select-card-title {
+                        font-size: 11px;
+                        font-weight: 700;
+                        color: #f1f5f9;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        width: 100%;
+                    }
+                    .admin-game-select-card-badge {
+                        position: absolute;
+                        top: 6px;
+                        right: 6px;
+                        background: #ec4899;
+                        color: #fff;
+                        font-size: 10px;
+                        font-weight: 800;
+                        width: 18px;
+                        height: 18px;
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        box-shadow: 0 0 6px rgba(236, 72, 153, 0.8);
+                        z-index: 2;
+                    }
+                    .admin-game-select-card-provider {
+                        position: absolute;
+                        top: 6px;
+                        left: 6px;
+                        background: rgba(15, 23, 42, 0.85);
+                        color: #94a3b8;
+                        font-size: 7px;
+                        font-weight: 700;
+                        padding: 1px 4px;
+                        border-radius: 3px;
+                        text-transform: uppercase;
+                    }
+                    #pin-search-input:focus {
+                        border-color: #ec4899 !important;
+                        box-shadow: 0 0 8px rgba(236, 72, 153, 0.2);
+                    }
+                </style>
+                <div class="se-section-header" onclick="toggleSection(this)">
+                    <div class="se-section-icon"><i class="fa-solid fa-thumbtack" style="color:#fbbf24"></i></div>
+                    <div>
+                        <div class="se-section-title">Fixar Jogos no Top 3</div>
+                        <div class="se-section-desc">Selecione até 3 jogos da própria plataforma para fixar no topo com gráficos ativos</div>
+                    </div>
+                    <i class="fa-solid fa-chevron-down se-chevron"></i>
+                </div>
+                <div class="se-section-body">
+                    <div class="se-section-content">
+                        <p style="font-size: 13px; color: #94a3b8; margin-bottom: 15px; line-height: 1.6;">
+                            Selecione até 3 jogos abaixo clicando nos cards. Os jogos fixados aparecerão no topo do site com status <strong>Alta</strong> e gráficos ativos, ignorando as rotações randômicas.
+                        </p>
+                        
+                        <!-- Hidden inputs to preserve standard saving mechanism -->
+                        <div style="display: none;">
+                            <input type="text" id="se-top1-game" placeholder="Ex: Fortune Tiger">
+                            <input type="text" id="se-top2-game" placeholder="Ex: Fortune Rabbit">
+                            <input type="text" id="se-top3-game" placeholder="Ex: Fortune Ox">
+                        </div>
 
-            <!-- ═══════ SEÇÃO 9: ATUALIZAÇÃO DO SISTEMA ═══════ -->
+                        <!-- Visual Pinned Slots (Top 1, 2, 3) -->
+                        <div style="margin-top:12px; font-size:12px; color:#94a3b8; font-weight:600; margin-bottom:12px">
+                            <i class="fa-solid fa-star" style="color: #ec4899;"></i> JOGOS FIXADOS ATUALMENTE:
+                        </div>
+                        <div id="pinned-summary" class="pinned-summary">
+                            <!-- Populated dynamically -->
+                        </div>
+
+                        <!-- Search Box for Game Selector -->
+                        <div style="margin-top:20px; margin-bottom:15px;">
+                            <label style="font-size:11px; font-weight:600; color:#94a3b8; margin-bottom:8px; display:block; text-transform: uppercase; letter-spacing: 0.5px;">Selecione os jogos na lista abaixo:</label>
+                            <div style="position:relative;">
+                                <input type="text" id="pin-search-input" placeholder="🔍 Buscar jogo da plataforma por nome..." style="width:100%; padding:11px 16px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(0,0,0,0.2); color:#fff; font-size:13px; outline:none; transition: border-color 0.2s;">
+                            </div>
+                        </div>
+
+                        <!-- Grid container for all games -->
+                        <div id="pin-games-grid" class="pin-games-grid">
+                            <div style="grid-column: 1/-1; padding: 40px 20px; text-align: center; color: #64748b; font-size: 13px;">
+                                <i class="fa-solid fa-spinner fa-spin" style="font-size: 24px; margin-bottom: 12px; display: block; color: #ec4899;"></i>
+                                Carregando a lista completa de jogos da plataforma...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══════ SEÇÃO 10: ATUALIZAÇÃO DO SISTEMA ═══════ -->
             <div class="se-section sec-system-update">
                 <div class="se-section-header" onclick="toggleSection(this)">
                     <div class="se-section-icon"><i class="fa-solid fa-arrows-rotate"></i></div>
@@ -2105,6 +2345,10 @@
     <script>
         // ===== AUTH STATE =====
         let authToken = sessionStorage.getItem('admin_token') || '';
+
+        // ===== TOP 3 VISUAL PINNING GAME SELECTOR GLOBAL STATE =====
+        let allPlatformGames = [];
+        let currentlyPinnedGames = [];
 
         // ===== APPLY ADMIN THEME FROM SITE CONFIG (public, no auth) =====
         (async function applyAdminTheme() {
@@ -2702,6 +2946,21 @@
             document.getElementById('se-prev-name2').textContent = cfg.displayName || '';
             document.getElementById('se-prev-user2').textContent = cfg.username || '';
 
+            // Top 3 Pinned Games
+            const topGames = cfg.top3Games || [];
+            document.getElementById('se-top1-game').value = topGames[0] || '';
+            document.getElementById('se-top2-game').value = topGames[1] || '';
+            document.getElementById('se-top3-game').value = topGames[2] || '';
+
+            // Sync visual pinning state
+            currentlyPinnedGames = topGames.filter(name => name && name.trim() !== '');
+            if (allPlatformGames.length === 0) {
+                loadAllPlatformGamesForPinning();
+            } else {
+                renderPinningGrid();
+                renderPinnedSummary();
+            }
+
             // WhatsApp
             const waEnabled = cfg.whatsapp?.enabled !== false;
             document.getElementById('se-wa-enabled').checked = waEnabled;
@@ -3176,7 +3435,12 @@
                     label: document.getElementById('se-tg-label').value.trim(),
                     link: document.getElementById('se-tg-link').value.trim(),
                     color: document.getElementById('se-tg-color').value,
-                }
+                },
+                top3Games: [
+                    document.getElementById('se-top1-game').value.trim(),
+                    document.getElementById('se-top2-game').value.trim(),
+                    document.getElementById('se-top3-game').value.trim()
+                ]
             };
 
             try {
@@ -3309,6 +3573,136 @@
             }
         }
         window.runSystemUpdate = runSystemUpdate;
+
+        // ===== TOP 3 VISUAL PINNING GAME SELECTOR =====
+        async function loadAllPlatformGamesForPinning() {
+            try {
+                const res = await fetch('/api/games');
+                if (res.ok) {
+                    allPlatformGames = await res.json();
+                    renderPinningGrid();
+                    renderPinnedSummary();
+                } else {
+                    const grid = document.getElementById('pin-games-grid');
+                    if (grid) {
+                        grid.innerHTML = '<div style="grid-column: 1/-1; padding: 30px; text-align: center; color: #f87171; font-size: 13px;"><i class="fa-solid fa-circle-xmark" style="font-size: 20px; margin-bottom: 8px; display: block;"></i>Erro ao obter resposta do servidor. Recarregue a página.</div>';
+                    }
+                }
+            } catch (e) {
+                console.error("Erro ao carregar jogos para fixação:", e);
+                const grid = document.getElementById('pin-games-grid');
+                if (grid) {
+                    grid.innerHTML = '<div style="grid-column: 1/-1; padding: 30px; text-align: center; color: #f87171; font-size: 13px;"><i class="fa-solid fa-circle-xmark" style="font-size: 20px; margin-bottom: 8px; display: block;"></i>Falha de rede ao carregar a lista de jogos. Recarregue a página.</div>';
+                }
+            }
+        }
+
+        function renderPinningGrid(filterText = '') {
+            const grid = document.getElementById('pin-games-grid');
+            if (!grid) return;
+
+            const searchVal = filterText.toLowerCase().trim();
+            const filtered = allPlatformGames.filter(g => g.nome.toLowerCase().includes(searchVal));
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '<div style="grid-column: 1/-1; padding: 30px; text-align: center; color: #64748b; font-size: 13px;"><i class="fa-solid fa-magnifying-glass" style="font-size: 20px; margin-bottom: 8px; display: block;"></i>Nenhum jogo encontrado com esse nome.</div>';
+                return;
+            }
+
+            grid.innerHTML = filtered.map(g => {
+                const pinIdx = currentlyPinnedGames.indexOf(g.nome);
+                const isPinned = pinIdx > -1;
+                const badgeHtml = isPinned ? `<div class="admin-game-select-card-badge">${pinIdx + 1}</div>` : '';
+                const cardClass = isPinned ? 'admin-game-select-card pinned' : 'admin-game-select-card';
+                const providerLabel = g.provider ? g.provider.toUpperCase() : 'GAME';
+
+                return `
+                    <div class="${cardClass}" onclick="togglePinGame('${escapeHtml(g.nome)}')">
+                        ${badgeHtml}
+                        <div class="admin-game-select-card-banner" style="background-image: url('${g.banner}');">
+                            <span class="admin-game-select-card-provider">${providerLabel}</span>
+                        </div>
+                        <div class="admin-game-select-card-body">
+                            <span class="admin-game-select-card-title" title="${escapeHtml(g.nome)}">${escapeHtml(g.nome)}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderPinnedSummary() {
+            const summaryContainer = document.getElementById('pinned-summary');
+            if (!summaryContainer) return;
+
+            let html = '';
+            for (let i = 0; i < 3; i++) {
+                const gameName = currentlyPinnedGames[i];
+                const rankNum = i + 1;
+
+                if (gameName) {
+                    const game = allPlatformGames.find(g => g.nome === gameName) || { nome: gameName, banner: '' };
+                    html += `
+                        <div class="pinned-slot-card active" onclick="togglePinGame('${escapeHtml(gameName)}')" title="Clique para desfixar">
+                            <div class="pinned-slot-badge">${rankNum}º</div>
+                            <div class="pinned-slot-banner" style="background-image: url('${game.banner || ''}');"></div>
+                            <div class="pinned-slot-info">
+                                <div class="pinned-slot-title">${escapeHtml(gameName)}</div>
+                                <div class="pinned-slot-subtitle">Top ${rankNum} Fixado</div>
+                            </div>
+                            <div class="pinned-slot-remove"><i class="fa-solid fa-xmark"></i></div>
+                        </div>
+                    `;
+                } else {
+                    html += `
+                        <div class="pinned-slot-card empty">
+                            <div class="pinned-slot-badge empty">${rankNum}º</div>
+                            <div class="pinned-slot-info">
+                                <div class="pinned-slot-title" style="color: #64748b;">Vazio</div>
+                                <div class="pinned-slot-subtitle">Escolha um card abaixo</div>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+
+            summaryContainer.innerHTML = html;
+        }
+
+        function togglePinGame(gameName) {
+            const pinIdx = currentlyPinnedGames.indexOf(gameName);
+            if (pinIdx > -1) {
+                currentlyPinnedGames.splice(pinIdx, 1);
+                showToast(`Removido do Top 3: ${gameName}`, 'success');
+            } else {
+                if (currentlyPinnedGames.length >= 3) {
+                    showToast("Limite de 3 jogos fixados atingido! Remova um antes de adicionar outro.", "error");
+                    return;
+                }
+                currentlyPinnedGames.push(gameName);
+                showToast(`Fixado no Top ${currentlyPinnedGames.length}: ${gameName}`, 'success');
+            }
+
+            // Sync values to hidden standard inputs
+            document.getElementById('se-top1-game').value = currentlyPinnedGames[0] || '';
+            document.getElementById('se-top2-game').value = currentlyPinnedGames[1] || '';
+            document.getElementById('se-top3-game').value = currentlyPinnedGames[2] || '';
+
+            renderPinningGrid(document.getElementById('pin-search-input').value);
+            renderPinnedSummary();
+        }
+
+        // Search input binding
+        document.addEventListener('DOMContentLoaded', () => {
+            const pinSearch = document.getElementById('pin-search-input');
+            if (pinSearch) {
+                pinSearch.addEventListener('input', function() {
+                    renderPinningGrid(this.value);
+                });
+            }
+        });
+
+        // Make functions globally available
+        window.togglePinGame = togglePinGame;
 
     </script>
 </body>
