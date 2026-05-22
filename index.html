@@ -301,6 +301,12 @@
                     <button class="social-btn social-btn-instagram" id="social-btn-ig">
                         <i class="fa-brands fa-instagram"></i> Instagram
                     </button>
+                    <button class="social-btn" id="social-btn-fb" style="display:none; background:#1877f2">
+                        <i class="fa-brands fa-facebook"></i> Facebook
+                    </button>
+                    <button class="social-btn" id="social-btn-tg" style="display:none; background:#2ca5e0">
+                        <i class="fa-brands fa-telegram"></i> Telegram
+                    </button>
                 </div>
             </div>
         </section>
@@ -323,6 +329,28 @@
                     igBtn.innerHTML = `<i class="fa-brands fa-instagram"></i> ${cfg.instagram?.label || 'Instagram'}`;
                     igBtn.style.background = cfg.instagram?.color || '#e1306c';
                     igBtn.onclick = (e) => { e.stopPropagation(); window.open(cfg.instagram?.link || '#', '_blank'); };
+
+                    // Facebook (only show if enabled)
+                    const fbBtn = document.getElementById('social-btn-fb');
+                    if (cfg.facebook?.enabled) {
+                        fbBtn.innerHTML = `<i class="fa-brands fa-facebook"></i> ${cfg.facebook?.label || 'Facebook'}`;
+                        fbBtn.style.background = cfg.facebook?.color || '#1877f2';
+                        fbBtn.style.display = '';
+                        fbBtn.onclick = (e) => { e.stopPropagation(); window.open(cfg.facebook?.link || '#', '_blank'); };
+                    } else {
+                        fbBtn.style.display = 'none';
+                    }
+
+                    // Telegram (only show if enabled)
+                    const tgBtn = document.getElementById('social-btn-tg');
+                    if (cfg.telegram?.enabled) {
+                        tgBtn.innerHTML = `<i class="fa-brands fa-telegram"></i> ${cfg.telegram?.label || 'Telegram'}`;
+                        tgBtn.style.background = cfg.telegram?.color || '#2ca5e0';
+                        tgBtn.style.display = '';
+                        tgBtn.onclick = (e) => { e.stopPropagation(); window.open(cfg.telegram?.link || '#', '_blank'); };
+                    } else {
+                        tgBtn.style.display = 'none';
+                    }
                 } catch (e) {
                     console.error('Erro ao carregar config social:', e);
                 }

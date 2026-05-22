@@ -1248,6 +1248,48 @@
             pointer-events: none;
         }
 
+        /* Social Toggle Switch */
+        .social-toggle {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 26px;
+            cursor: pointer;
+        }
+        .social-toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+            position: absolute;
+        }
+        .social-toggle-slider {
+            position: absolute;
+            inset: 0;
+            background: rgba(255,255,255,0.1);
+            border-radius: 26px;
+            border: 1px solid rgba(255,255,255,0.15);
+            transition: background 0.3s;
+        }
+        .social-toggle-slider::before {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #94a3b8;
+            top: 3px;
+            left: 3px;
+            transition: transform 0.3s, background 0.3s;
+        }
+        .social-toggle input:checked + .social-toggle-slider {
+            background: rgba(236, 72, 153, 0.3);
+            border-color: var(--admin-theme);
+        }
+        .social-toggle input:checked + .social-toggle-slider::before {
+            transform: translateX(22px);
+            background: var(--admin-theme);
+        }
+
         /* Preset color picker styles */
         .se-presets-row {
             display: flex;
@@ -1581,11 +1623,15 @@
                                 <span class="se-preview-name" id="se-prev-name">GRUPO Slot</span>
                                 <span class="se-preview-user" id="se-prev-user">@noellyalcantara12</span>
                             </div>
-                            <div class="se-preview-btns">
+                            <div class="se-preview-btns" id="se-prev-btns-1">
                                 <button class="se-preview-btn" id="se-prev-wa"><i class="fa-brands fa-whatsapp"></i>
                                     WhatsApp</button>
                                 <button class="se-preview-btn" id="se-prev-ig"><i class="fa-brands fa-instagram"></i>
                                     Instagram</button>
+                                <button class="se-preview-btn" id="se-prev-fb" style="display:none"><i class="fa-brands fa-facebook"></i>
+                                    Facebook</button>
+                                <button class="se-preview-btn" id="se-prev-tg" style="display:none"><i class="fa-brands fa-telegram"></i>
+                                    Telegram</button>
                             </div>
                         </div>
 
@@ -1647,11 +1693,15 @@
                                 <span class="se-preview-name" id="se-prev-name2">GRUPO Slot</span>
                                 <span class="se-preview-user" id="se-prev-user2">@noellyalcantara12</span>
                             </div>
-                            <div class="se-preview-btns">
+                            <div class="se-preview-btns" id="se-prev-btns-2">
                                 <button class="se-preview-btn" id="se-prev-wa2"><i class="fa-brands fa-whatsapp"></i>
                                     WhatsApp</button>
                                 <button class="se-preview-btn" id="se-prev-ig2"><i class="fa-brands fa-instagram"></i>
                                     Instagram</button>
+                                <button class="se-preview-btn" id="se-prev-fb2" style="display:none"><i class="fa-brands fa-facebook"></i>
+                                    Facebook</button>
+                                <button class="se-preview-btn" id="se-prev-tg2" style="display:none"><i class="fa-brands fa-telegram"></i>
+                                    Telegram</button>
                             </div>
                         </div>
 
@@ -1713,6 +1763,84 @@
                         <div class="se-field">
                             <label>Link do Instagram</label>
                             <input type="url" id="se-ig-link" placeholder="https://www.instagram.com/...">
+                        </div>
+
+                        <div class="se-divider"></div>
+
+                        <!-- Facebook -->
+                        <div class="se-sub-title"><i class="fa-brands fa-facebook" style="color:#1877f2"></i> Botão Facebook</div>
+                        <div class="se-row" style="align-items:center; margin-bottom:8px">
+                            <div class="se-field" style="flex:0 0 auto">
+                                <label>Ativar Botão</label>
+                                <label class="social-toggle">
+                                    <input type="checkbox" id="se-fb-enabled">
+                                    <span class="social-toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <div id="se-fb-fields" style="display:none">
+                            <div class="se-row">
+                                <div class="se-field">
+                                    <label>Texto do Botão</label>
+                                    <input type="text" id="se-fb-label" placeholder="Ex: Facebook">
+                                </div>
+                                <div class="se-field">
+                                    <label>Cor do Botão</label>
+                                    <div class="se-color-row">
+                                        <input type="color" id="se-fb-color" value="#1877f2">
+                                        <input type="text" id="se-fb-color-text" placeholder="#1877f2">
+                                    </div>
+                                    <div class="se-presets-row">
+                                        <button type="button" class="preset-btn" style="--preset-color: #1877f2;" onclick="applyPresetColor('se-fb-color', 'se-fb-color-text', '#1877f2')" title="Facebook Azul"></button>
+                                        <button type="button" class="preset-btn" style="--preset-color: #0a66c2;" onclick="applyPresetColor('se-fb-color', 'se-fb-color-text', '#0a66c2')" title="Azul Escuro"></button>
+                                        <button type="button" class="preset-btn" style="--preset-color: #00e5ff;" onclick="applyPresetColor('se-fb-color', 'se-fb-color-text', '#00e5ff')" title="Ciano Neon"></button>
+                                        <button type="button" class="preset-btn" style="--preset-color: #ff007f;" onclick="applyPresetColor('se-fb-color', 'se-fb-color-text', '#ff007f')" title="Rosa Neon"></button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="se-field">
+                                <label>Link do Facebook</label>
+                                <input type="url" id="se-fb-link" placeholder="https://www.facebook.com/...">
+                            </div>
+                        </div>
+
+                        <div class="se-divider"></div>
+
+                        <!-- Telegram -->
+                        <div class="se-sub-title"><i class="fa-brands fa-telegram" style="color:#2ca5e0"></i> Botão Telegram</div>
+                        <div class="se-row" style="align-items:center; margin-bottom:8px">
+                            <div class="se-field" style="flex:0 0 auto">
+                                <label>Ativar Botão</label>
+                                <label class="social-toggle">
+                                    <input type="checkbox" id="se-tg-enabled">
+                                    <span class="social-toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <div id="se-tg-fields" style="display:none">
+                            <div class="se-row">
+                                <div class="se-field">
+                                    <label>Texto do Botão</label>
+                                    <input type="text" id="se-tg-label" placeholder="Ex: Telegram">
+                                </div>
+                                <div class="se-field">
+                                    <label>Cor do Botão</label>
+                                    <div class="se-color-row">
+                                        <input type="color" id="se-tg-color" value="#2ca5e0">
+                                        <input type="text" id="se-tg-color-text" placeholder="#2ca5e0">
+                                    </div>
+                                    <div class="se-presets-row">
+                                        <button type="button" class="preset-btn" style="--preset-color: #2ca5e0;" onclick="applyPresetColor('se-tg-color', 'se-tg-color-text', '#2ca5e0')" title="Telegram Azul"></button>
+                                        <button type="button" class="preset-btn" style="--preset-color: #229ed9;" onclick="applyPresetColor('se-tg-color', 'se-tg-color-text', '#229ed9')" title="Azul Escuro"></button>
+                                        <button type="button" class="preset-btn" style="--preset-color: #00e5ff;" onclick="applyPresetColor('se-tg-color', 'se-tg-color-text', '#00e5ff')" title="Ciano Neon"></button>
+                                        <button type="button" class="preset-btn" style="--preset-color: #ff007f;" onclick="applyPresetColor('se-tg-color', 'se-tg-color-text', '#ff007f')" title="Rosa Neon"></button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="se-field">
+                                <label>Link do Telegram</label>
+                                <input type="url" id="se-tg-link" placeholder="https://t.me/...">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -2578,6 +2706,40 @@
             document.getElementById('se-prev-ig2').style.background = igColor;
             document.getElementById('se-prev-ig2').innerHTML = `<i class="fa-brands fa-instagram"></i> ${igLabel}`;
 
+            // Facebook
+            const fbEnabled = !!(cfg.facebook?.enabled);
+            document.getElementById('se-fb-enabled').checked = fbEnabled;
+            document.getElementById('se-fb-fields').style.display = fbEnabled ? '' : 'none';
+            document.getElementById('se-fb-label').value = cfg.facebook?.label || 'Facebook';
+            document.getElementById('se-fb-link').value = cfg.facebook?.link || '';
+            document.getElementById('se-fb-color').value = cfg.facebook?.color || '#1877f2';
+            document.getElementById('se-fb-color-text').value = cfg.facebook?.color || '#1877f2';
+            const fbColor = cfg.facebook?.color || '#1877f2';
+            const fbLabel = escapeHtml(cfg.facebook?.label || 'Facebook');
+            document.getElementById('se-prev-fb').style.background = fbColor;
+            document.getElementById('se-prev-fb').innerHTML = `<i class="fa-brands fa-facebook"></i> ${fbLabel}`;
+            document.getElementById('se-prev-fb2').style.background = fbColor;
+            document.getElementById('se-prev-fb2').innerHTML = `<i class="fa-brands fa-facebook"></i> ${fbLabel}`;
+            document.getElementById('se-prev-fb').style.display = fbEnabled ? '' : 'none';
+            document.getElementById('se-prev-fb2').style.display = fbEnabled ? '' : 'none';
+
+            // Telegram
+            const tgEnabled = !!(cfg.telegram?.enabled);
+            document.getElementById('se-tg-enabled').checked = tgEnabled;
+            document.getElementById('se-tg-fields').style.display = tgEnabled ? '' : 'none';
+            document.getElementById('se-tg-label').value = cfg.telegram?.label || 'Telegram';
+            document.getElementById('se-tg-link').value = cfg.telegram?.link || '';
+            document.getElementById('se-tg-color').value = cfg.telegram?.color || '#2ca5e0';
+            document.getElementById('se-tg-color-text').value = cfg.telegram?.color || '#2ca5e0';
+            const tgColor = cfg.telegram?.color || '#2ca5e0';
+            const tgLabel = escapeHtml(cfg.telegram?.label || 'Telegram');
+            document.getElementById('se-prev-tg').style.background = tgColor;
+            document.getElementById('se-prev-tg').innerHTML = `<i class="fa-brands fa-telegram"></i> ${tgLabel}`;
+            document.getElementById('se-prev-tg2').style.background = tgColor;
+            document.getElementById('se-prev-tg2').innerHTML = `<i class="fa-brands fa-telegram"></i> ${tgLabel}`;
+            document.getElementById('se-prev-tg').style.display = tgEnabled ? '' : 'none';
+            document.getElementById('se-prev-tg2').style.display = tgEnabled ? '' : 'none';
+
             // Apply card color to both previews
             const prevBg = `linear-gradient(135deg, ${cardColor}, ${adjustColorAdmin(cardColor, 20)})`;
             document.getElementById('se-preview').style.background = prevBg;
@@ -2801,6 +2963,58 @@
                 document.getElementById('se-prev-ig').innerHTML = html;
                 document.getElementById('se-prev-ig2').innerHTML = html;
             });
+
+            // Facebook toggle
+            document.getElementById('se-fb-enabled').addEventListener('change', (e) => {
+                const on = e.target.checked;
+                document.getElementById('se-fb-fields').style.display = on ? '' : 'none';
+                document.getElementById('se-prev-fb').style.display = on ? '' : 'none';
+                document.getElementById('se-prev-fb2').style.display = on ? '' : 'none';
+            });
+            // Facebook color sync
+            document.getElementById('se-fb-color').addEventListener('input', (e) => {
+                document.getElementById('se-fb-color-text').value = e.target.value;
+                document.getElementById('se-prev-fb').style.background = e.target.value;
+                document.getElementById('se-prev-fb2').style.background = e.target.value;
+            });
+            document.getElementById('se-fb-color-text').addEventListener('input', (e) => {
+                if (/^#[0-9A-Fa-f]{6}$/.test(e.target.value)) {
+                    document.getElementById('se-fb-color').value = e.target.value;
+                    document.getElementById('se-prev-fb').style.background = e.target.value;
+                    document.getElementById('se-prev-fb2').style.background = e.target.value;
+                }
+            });
+            document.getElementById('se-fb-label').addEventListener('input', (e) => {
+                const html = `<i class="fa-brands fa-facebook"></i> ${escapeHtml(e.target.value)}`;
+                document.getElementById('se-prev-fb').innerHTML = html;
+                document.getElementById('se-prev-fb2').innerHTML = html;
+            });
+
+            // Telegram toggle
+            document.getElementById('se-tg-enabled').addEventListener('change', (e) => {
+                const on = e.target.checked;
+                document.getElementById('se-tg-fields').style.display = on ? '' : 'none';
+                document.getElementById('se-prev-tg').style.display = on ? '' : 'none';
+                document.getElementById('se-prev-tg2').style.display = on ? '' : 'none';
+            });
+            // Telegram color sync
+            document.getElementById('se-tg-color').addEventListener('input', (e) => {
+                document.getElementById('se-tg-color-text').value = e.target.value;
+                document.getElementById('se-prev-tg').style.background = e.target.value;
+                document.getElementById('se-prev-tg2').style.background = e.target.value;
+            });
+            document.getElementById('se-tg-color-text').addEventListener('input', (e) => {
+                if (/^#[0-9A-Fa-f]{6}$/.test(e.target.value)) {
+                    document.getElementById('se-tg-color').value = e.target.value;
+                    document.getElementById('se-prev-tg').style.background = e.target.value;
+                    document.getElementById('se-prev-tg2').style.background = e.target.value;
+                }
+            });
+            document.getElementById('se-tg-label').addEventListener('input', (e) => {
+                const html = `<i class="fa-brands fa-telegram"></i> ${escapeHtml(e.target.value)}`;
+                document.getElementById('se-prev-tg').innerHTML = html;
+                document.getElementById('se-prev-tg2').innerHTML = html;
+            });
         }
         setupLivePreview();
 
@@ -2904,6 +3118,18 @@
                     label: document.getElementById('se-ig-label').value.trim(),
                     link: document.getElementById('se-ig-link').value.trim(),
                     color: document.getElementById('se-ig-color').value,
+                },
+                facebook: {
+                    enabled: document.getElementById('se-fb-enabled').checked,
+                    label: document.getElementById('se-fb-label').value.trim(),
+                    link: document.getElementById('se-fb-link').value.trim(),
+                    color: document.getElementById('se-fb-color').value,
+                },
+                telegram: {
+                    enabled: document.getElementById('se-tg-enabled').checked,
+                    label: document.getElementById('se-tg-label').value.trim(),
+                    link: document.getElementById('se-tg-link').value.trim(),
+                    color: document.getElementById('se-tg-color').value,
                 }
             };
 

@@ -638,7 +638,9 @@ function readSiteConfig() {
     displayName: 'GRUPO Slot',
     username: '@noellyalcantara12',
     whatsapp: { label: 'WhatsApp', link: '', color: '#25d366' },
-    instagram: { label: 'Instagram', link: '', color: '#e1306c' }
+    instagram: { label: 'Instagram', link: '', color: '#e1306c' },
+    facebook: { enabled: false, label: 'Facebook', link: '', color: '#1877f2' },
+    telegram: { enabled: false, label: 'Telegram', link: '', color: '#2ca5e0' }
   };
 
   if (fs.existsSync(siteConfigFile)) {
@@ -679,7 +681,7 @@ app.get('/api/admin/site-config', requireAuth, (req, res) => {
 // Update site config
 app.put('/api/admin/site-config', requireAuth, (req, res) => {
   try {
-    const { siteName, themeColor, cardColor, platformsColor, updateColor, bgColor, buttonColor, navbarBgColor, footerBgColor, footerTextColor, displayName, username, whatsapp, instagram, port } = req.body;
+    const { siteName, themeColor, cardColor, platformsColor, updateColor, bgColor, buttonColor, navbarBgColor, footerBgColor, footerTextColor, displayName, username, whatsapp, instagram, facebook, telegram, port } = req.body;
     const current = readSiteConfig();
 
     if (siteName !== undefined) current.siteName = siteName;
@@ -703,6 +705,20 @@ app.put('/api/admin/site-config', requireAuth, (req, res) => {
       if (instagram.label !== undefined) current.instagram.label = instagram.label;
       if (instagram.link !== undefined) current.instagram.link = instagram.link;
       if (instagram.color !== undefined) current.instagram.color = instagram.color;
+    }
+    if (facebook !== undefined) {
+      if (!current.facebook) current.facebook = { enabled: false, label: 'Facebook', link: '', color: '#1877f2' };
+      if (facebook.enabled !== undefined) current.facebook.enabled = facebook.enabled;
+      if (facebook.label !== undefined) current.facebook.label = facebook.label;
+      if (facebook.link !== undefined) current.facebook.link = facebook.link;
+      if (facebook.color !== undefined) current.facebook.color = facebook.color;
+    }
+    if (telegram !== undefined) {
+      if (!current.telegram) current.telegram = { enabled: false, label: 'Telegram', link: '', color: '#2ca5e0' };
+      if (telegram.enabled !== undefined) current.telegram.enabled = telegram.enabled;
+      if (telegram.label !== undefined) current.telegram.label = telegram.label;
+      if (telegram.link !== undefined) current.telegram.link = telegram.link;
+      if (telegram.color !== undefined) current.telegram.color = telegram.color;
     }
 
     let portChanged = false;
