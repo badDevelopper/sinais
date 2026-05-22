@@ -974,6 +974,30 @@
                 }
 
                 fetchGames();
+
+                // ── Auto-refresh a cada 5 minutos ──────────────────────────────
+                // Sincronizado com o período do servidor (muda em múltiplos de 5min)
+                function scheduleNextRefresh() {
+                    const now = Date.now();
+                    const msUntilNextPeriod = 300000 - (now % 300000); // tempo até a próxima virada
+                    setTimeout(async () => {
+                        try {
+                            const [resGames] = await Promise.all([fetch('/api/games')]);
+                            const games = await resGames.json();
+                            const activeFilter = document.querySelector('.ftab.active')?.dataset?.filter || 'all';
+                            allGames = games.filter(g => g.provider === currentProvider);
+                            switch (activeFilter) {
+                                case 'hot': filteredGames = allGames.filter(g => g.hot).sort((a, b) => b.rtp - a.rtp); break;
+                                case 'new': filteredGames = allGames.filter(g => g.isNew); break;
+                                case 'fav': filteredGames = allGames.filter(g => favorites.includes(g.id)); break;
+                                default: filteredGames = [...allGames];
+                            }
+                            renderGames(filteredGames);
+                        } catch (e) { /* silencioso */ }
+                        scheduleNextRefresh(); // agenda o próximo
+                    }, msUntilNextPeriod + 500); // +500ms para garantir que o servidor já virou
+                }
+                scheduleNextRefresh();
             });
         </script>
 
