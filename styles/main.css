@@ -100,10 +100,10 @@
   background: linear-gradient(135deg, var(--card-color, var(--theme-dark, #b8006e)), var(--card-color-dark, var(--theme-darker, #a30060)));
   border: 2px solid var(--theme-light, #ff3ea5);
   border-radius: 16px;
-  padding: 16px 20px;
+  padding: 14px 18px;
   display: flex;
-  align-items: center;
-  gap: 14px;
+  flex-direction: column;
+  gap: 12px;
   transition: all 0.3s;
 }
 
@@ -121,11 +121,18 @@
   flex-shrink: 0;
 }
 
+.social-top-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
 .social-info {
   display: flex;
   flex-direction: column;
   gap: 2px;
   min-width: 0;
+  flex: 1;
 }
 
 .social-name {
@@ -143,16 +150,16 @@
 
 .social-buttons {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
-  margin-left: auto;
-  flex-shrink: 0;
+  width: 100%;
 }
 
 .social-btn {
   color: #fff;
   font-weight: 700;
   font-size: 13px;
-  padding: 9px 18px;
+  padding: 9px 16px;
   border-radius: 10px;
   cursor: pointer;
   transition: all 0.3s;
@@ -161,6 +168,9 @@
   gap: 6px;
   border: none;
   white-space: nowrap;
+  flex: 1;
+  justify-content: center;
+  min-width: calc(50% - 4px);
 }
 
 .social-btn:hover {
