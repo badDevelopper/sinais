@@ -821,7 +821,7 @@
                         const alertClass = g.updatedThisTick ? 'live-alert-flash' : '';
 
                         return `
-                        <div class="gcard ${alertClass}" style="--gcard-color: ${neonColor}; --btn-bg: ${neonColor}; --btn-color: ${btnTextColor}">
+                        <div class="gcard ${alertClass}" data-id="${g.id}" style="--gcard-color: ${neonColor}; --btn-bg: ${neonColor}; --btn-color: ${btnTextColor}">
                             <div class="gcard-header-tags">
                                 <span class="gcard-provider-tag ${provClass}">${provLabel}</span>
                                 <span class="gcard-mode-badge ${modeClass}">${modeLabel}</span>
@@ -1032,6 +1032,14 @@
                 // ── REAL-TIME ANALYSIS SCANNER (EVERY 5 SECONDS) ───────────────
                 // Perfectly simulates live machine learning analytical scanning!
                 
+                function isElementInViewport(el) {
+                    if (!el) return false;
+                    const rect = el.getBoundingClientRect();
+                    const windowHeight = (window.innerHeight || document.documentElement.clientHeight);
+                    // Check if any part of the card is inside the vertical viewport
+                    return rect.top < windowHeight && rect.bottom > 0;
+                }
+
                 function simulateLiveScanner() {
                     // 1. Tick minor RTP drifts on all games for high-fidelity scanning atmosphere
                     Object.keys(liveGamesStateMap).forEach(id => {
@@ -1051,13 +1059,24 @@
                     });
 
                     // 2. Select 1 to 2 games in the currently viewed category to alert flash & transition status
-                    const visibleGameIds = filteredGames.map(g => g.id);
-                    if (visibleGameIds.length > 0) {
+                    // Filter only the games whose cards are currently visible in the viewport
+                    const viewportGames = filteredGames.filter(g => {
+                        const el = document.querySelector(`.gcard[data-id="${g.id}"]`);
+                        return el && isElementInViewport(el);
+                    });
+
+                    // Prioritize updating games currently visible in viewport so the user sees live animations
+                    const gamesToSelectFrom = viewportGames.length > 0 ? viewportGames : filteredGames;
+                    const selectFromIds = gamesToSelectFrom.map(g => g.id);
+
+                    if (selectFromIds.length > 0) {
                         const alertCount = Math.floor(Math.random() * 2) + 1; // 1 or 2 games
+                        const updatedGamesThisTick = [];
                         for (let i = 0; i < alertCount; i++) {
-                            const randomId = visibleGameIds[Math.floor(Math.random() * visibleGameIds.length)];
+                            const randomId = selectFromIds[Math.floor(Math.random() * selectFromIds.length)];
                             const game = liveGamesStateMap[randomId];
-                            if (game) {
+                            if (game && !updatedGamesThisTick.includes(game.id)) {
+                                updatedGamesThisTick.push(game.id);
                                 const top3Names = siteConfigData?.top3Games || [];
                                 const isPinned = top3Names.some(name => name && name.toLowerCase().trim() === game.nome.toLowerCase().trim());
                                 
@@ -1090,17 +1109,101 @@
                                 game.updatedThisTick = true;
                             }
                         }
-                    }
 
-                    // Render visible games list with updated values
-                    renderGames(filteredGames);
-                    
-                    // Clear update triggers shortly after to reset animations
-                    setTimeout(() => {
-                        Object.keys(liveGamesStateMap).forEach(id => {
-                            liveGamesStateMap[id].updatedThisTick = false;
+                        // Update DOM elements of modified games in-place for buttery smooth zoom and blink animations
+                        updatedGamesThisTick.forEach(id => {
+                            const game = liveGamesStateMap[id];
+                            const cardEl = document.querySelector(`.gcard[data-id="${id}"]`);
+                            if (cardEl && game) {
+                                let neonColor = '#ff3366'; // Baixa
+                                if (game.status === 'Alta') neonColor = '#00ff66';
+                                else if (game.status === 'Média') neonColor = '#ffcc00';
+                                
+                                const btnTextColor = isColorLight(neonColor) ? '#000' : '#fff';
+
+                                // Set style custom variables on card
+                                cardEl.style.setProperty('--gcard-color', neonColor);
+                                cardEl.style.setProperty('--btn-bg', neonColor);
+                                cardEl.style.setProperty('--btn-color', btnTextColor);
+
+                                // Update Analysis live status tag
+                                const analysisValEl = cardEl.querySelector('.gcard-volat-row:nth-of-type(2) .volat-val');
+                                if (analysisValEl) {
+                                    const iconHtml = `<i class="fa-solid ${game.status === 'Alta' ? 'fa-arrow-trend-up' : game.status === 'Baixa' ? 'fa-arrow-trend-down' : 'fa-equals'}"></i>`;
+                                    const statusText = game.status === 'Média' ? 'ESTÁVEL' : game.status.toUpperCase();
+                                    analysisValEl.style.color = neonColor;
+                                    analysisValEl.style.textShadow = `0 0 6px ${neonColor}`;
+                                    analysisValEl.innerHTML = `${iconHtml} ${statusText}`;
+                                }
+
+                                // Update RTP label value
+                                const rtpValEl = cardEl.querySelector('.rtp-value');
+                                if (rtpValEl) {
+                                    rtpValEl.style.color = neonColor;
+                                    rtpValEl.style.textShadow = `0 0 10px ${neonColor}, 0 0 20px ${neonColor}`;
+                                    rtpValEl.textContent = `${game.rtp.toFixed(2)}%`;
+                                }
+
+                                // Update Distribution value
+                                const distValEl = cardEl.querySelector('.gcard-dist-row .dist-val');
+                                if (distValEl) {
+                                    distValEl.style.color = neonColor;
+                                    distValEl.style.textShadow = `0 0 6px ${neonColor}`;
+                                    distValEl.textContent = `${Math.floor(game.rtp)}%`;
+                                }
+
+                                // Update Sparkline graphic
+                                const chartContainer = cardEl.querySelector('.gcard-chart-container');
+                                if (chartContainer) {
+                                    chartContainer.innerHTML = generateSparklineSVG(game.id, neonColor, game.baseRtp, game.min, game.padrao, game.max, game.rtp);
+                                }
+
+                                // Update Progress bars
+                                const progressRows = cardEl.querySelectorAll('.gcard-progress-bars .progress-bar-row');
+                                const metrics = ['min', 'padrao', 'max'];
+                                metrics.forEach((m, mIdx) => {
+                                    const row = progressRows[mIdx];
+                                    if (row) {
+                                        const innerBar = row.querySelector('.progress-inner');
+                                        const valSpan = row.querySelector('.progress-val');
+                                        if (innerBar) {
+                                            innerBar.style.width = `${game[m]}%`;
+                                            innerBar.style.background = neonColor;
+                                        }
+                                        if (valSpan) {
+                                            valSpan.style.color = neonColor;
+                                            valSpan.textContent = `${game[m]}%`;
+                                        }
+                                    }
+                                });
+
+                                // Update Change indicators
+                                const changeSpan = cardEl.querySelector('.hist-change');
+                                if (changeSpan) {
+                                    changeSpan.className = `hist-change ${game.changeClass}`;
+                                    changeSpan.innerHTML = `${game.changeIcon} ${game.changeText}`;
+                                }
+
+                                // Only run the flash/zoom animation if the card is actually inside the viewport!
+                                if (isElementInViewport(cardEl)) {
+                                    cardEl.classList.remove('live-alert-flash');
+                                    void cardEl.offsetWidth; // Trigger reflow to restart animation
+                                    cardEl.classList.add('live-alert-flash');
+                                }
+                            }
                         });
-                    }, 1200);
+
+                        // Clear update triggers shortly after to reset animations
+                        setTimeout(() => {
+                            updatedGamesThisTick.forEach(id => {
+                                liveGamesStateMap[id].updatedThisTick = false;
+                                const cardEl = document.querySelector(`.gcard[data-id="${id}"]`);
+                                if (cardEl) {
+                                    cardEl.classList.remove('live-alert-flash');
+                                }
+                            });
+                        }, 1500);
+                    }
                 }
 
                 // Scanner active interval (3000ms = 3s)
