@@ -287,7 +287,7 @@
         <!-- CONTATO WHATSAPP & INSTAGRAM -->
         <section class="insta-section">
             <div class="social-card" id="social-card">
-                <div class="social-top-row">
+                <div class="social-profile">
                     <img src="/assets/favicon.png" class="social-avatar" id="social-avatar" alt="JC">
                     <div class="social-info">
                         <span class="social-name" id="social-name">...</span>
@@ -445,18 +445,21 @@
                     let rtpVal, changeNum;
                     
                     if (status === 'Alta') {
-                        // High RTP: 94.20% to 99.90% (always >= 90%)
-                        rtpVal = 90.0 + (seed % 5) + 4.2 + (decimals / 100) * 0.7;
+                        // High RTP: > 75% (76.00% to 99.90%)
+                        rtpVal = 76.0 + (seed % 18) + (decimals / 100) * 5.9;
+                        if (rtpVal > 99.90) rtpVal = 99.90;
                         // Mostly positive changes (+0.10% to +1.80%)
                         changeNum = 0.10 + ((seed * 23) % 170) / 100;
                     } else if (status === 'Média') {
-                        // Medium RTP: 80.00% to 88.90% (always >= 80% and < 90%)
-                        rtpVal = 80.0 + (seed % 9) + (decimals / 100) * 0.9;
+                        // Medium RTP: 60% to 75% (60.00% to 75.00%)
+                        rtpVal = 60.0 + (seed % 12) + (decimals / 100) * 3.0;
+                        if (rtpVal > 75.00) rtpVal = 75.00;
                         // Moderate changes (-0.80% to +0.80%)
                         changeNum = ((seed * 23) % 160 - 80) / 100;
                     } else {
-                        // Low RTP: 45.00% to 79.90% (always < 80%)
-                        rtpVal = 45.0 + (seed % 34) + (decimals / 100) * 0.9;
+                        // Low RTP: < 60% (40.00% to 59.90%)
+                        rtpVal = 40.0 + (seed % 15) + (decimals / 100) * 4.9;
+                        if (rtpVal > 59.90) rtpVal = 59.90;
                         // Strongly negative changes (-3.80% to -1.20%)
                         changeNum = -3.80 + ((seed * 23) % 260) / 100;
                     }
@@ -792,11 +795,11 @@
                         const g = liveGamesStateMap[gRef.id];
                         if (!g) return '';
 
-                        let neonColor = '#ff3366'; // Baixa (Red)
-                        if (g.status === 'Alta') {
-                            neonColor = '#00ff66'; // Alta (Green)
-                        } else if (g.status === 'Média') {
-                            neonColor = '#ffcc00'; // Média (Yellow)
+                        let neonColor = '#ff3366'; // < 60% (Red)
+                        if (g.rtp > 75) {
+                            neonColor = '#00e5ff'; // > 75% (Cyan/Blue)
+                        } else if (g.rtp >= 60) {
+                            neonColor = '#ffcc00'; // 60% to 75% (Yellow)
                         }
                         
                         let provLabel = g.provider ? g.provider.toUpperCase() : 'GAME';
@@ -820,8 +823,15 @@
                         const btnTextColor = isColorLight(neonColor) ? '#000' : '#fff';
                         const alertClass = g.updatedThisTick ? 'live-alert-flash' : '';
 
+                        // Determine individual bar color based on percentage value
+                        const getSingleBarColor = (val) => {
+                            if (val < 50) return '#ff3366'; // Red (< 50%)
+                            if (val > 80) return '#00ff66'; // Green (> 80%)
+                            return '#ffcc00'; // Yellow (50% to 80%)
+                        };
+
                         return `
-                        <div class="gcard ${alertClass}" data-id="${g.id}" style="--gcard-color: ${neonColor}; --btn-bg: ${neonColor}; --btn-color: ${btnTextColor}">
+                        <div class="gcard ${alertClass}" style="--gcard-color: ${neonColor}; --btn-bg: ${neonColor}; --btn-color: ${btnTextColor}">
                             <div class="gcard-header-tags">
                                 <span class="gcard-provider-tag ${provClass}">${provLabel}</span>
                                 <span class="gcard-mode-badge ${modeClass}">${modeLabel}</span>
@@ -851,11 +861,6 @@
                                     ${generateSparklineSVG(g.id, neonColor, g.baseRtp, g.min, g.padrao, g.max, g.rtp)}
                                 </div>
                                 
-                                <div class="gcard-volat-row">
-                                    <span>VOLATILIDADE</span>
-                                    <span class="volat-val" style="color: ${g.volatColor}">${g.volatText}</span>
-                                </div>
-                                
                                 <div class="gcard-volat-row" style="margin-top: 1px;">
                                     <span>ANÁLISE LIVE</span>
                                     <span class="volat-val" style="color: ${neonColor}; font-weight:900; text-shadow: 0 0 6px ${neonColor}">
@@ -864,51 +869,28 @@
                                     </span>
                                 </div>
                                 
-                                <div class="gcard-dist-row">
-                                    <span>DISTRIBUIÇÃO</span>
-                                    <span class="dist-val" style="color: ${neonColor}; text-shadow: 0 0 6px ${neonColor}">${Math.floor(g.rtp)}%</span>
-                                </div>
-                                
                                 <div class="gcard-progress-bars">
                                     <div class="progress-bar-row">
                                         <span class="progress-label">Mín</span>
-                                        <div class="progress-outer"><div class="progress-inner" style="width:${g.min}%; background:#ff3366; box-shadow: 0 0 6px #ff3366, 0 0 12px #ff3366;"></div></div>
-                                        <span class="progress-val" style="color:#ff3366; text-shadow: 0 0 6px #ff3366, 0 0 12px #ff3366;">${g.min}%</span>
+                                        <div class="progress-outer"><div class="progress-inner" style="width:${g.min}%; background:${getSingleBarColor(g.min)}; box-shadow: 0 0 6px ${getSingleBarColor(g.min)};"></div></div>
+                                        <span class="progress-val" style="color:${getSingleBarColor(g.min)}; text-shadow: 0 0 6px ${getSingleBarColor(g.min)};">${g.min}%</span>
                                     </div>
                                     <div class="progress-bar-row">
                                         <span class="progress-label">Pad</span>
-                                        <div class="progress-outer"><div class="progress-inner" style="width:${g.padrao}%; background:#ffcc00; box-shadow: 0 0 6px #ffcc00, 0 0 12px #ffcc00;"></div></div>
-                                        <span class="progress-val" style="color:#ffcc00; text-shadow: 0 0 6px #ffcc00, 0 0 12px #ffcc00;">${g.padrao}%</span>
+                                        <div class="progress-outer"><div class="progress-inner" style="width:${g.padrao}%; background:${getSingleBarColor(g.padrao)}; box-shadow: 0 0 6px ${getSingleBarColor(g.padrao)};"></div></div>
+                                        <span class="progress-val" style="color:${getSingleBarColor(g.padrao)}; text-shadow: 0 0 6px ${getSingleBarColor(g.padrao)};">${g.padrao}%</span>
                                     </div>
                                     <div class="progress-bar-row">
                                         <span class="progress-label">Máx</span>
-                                        <div class="progress-outer"><div class="progress-inner" style="width:${g.max}%; background:#00ff66; box-shadow: 0 0 6px #00ff66, 0 0 12px #00ff66;"></div></div>
-                                        <span class="progress-val" style="color:#00ff66; text-shadow: 0 0 6px #00ff66, 0 0 12px #00ff66;">${g.max}%</span>
+                                        <div class="progress-outer"><div class="progress-inner" style="width:${g.max}%; background:${getSingleBarColor(g.max)}; box-shadow: 0 0 6px ${getSingleBarColor(g.max)};"></div></div>
+                                        <span class="progress-val" style="color:${getSingleBarColor(g.max)}; text-shadow: 0 0 6px ${getSingleBarColor(g.max)};">${g.max}%</span>
                                     </div>
                                 </div>
                                 
-                                <div class="suggested-bets-container">
-                                    <div class="suggested-bets-title">Apostas Recomendadas</div>
-                                    <div class="suggested-bets-grid">
-                                        <div class="bet-column">
-                                            <div class="bet-col-header">MÍN</div>
-                                            <div class="bet-row"><span class="bet-type">BNS</span><span class="bet-amount">${g.bets.bns.min}</span></div>
-                                            <div class="bet-row"><span class="bet-type">CNX</span><span class="bet-amount">${g.bets.cnx.min}</span></div>
-                                            <div class="bet-row"><span class="bet-type">EXT</span><span class="bet-amount">${g.bets.ext.min}</span></div>
-                                        </div>
-                                        <div class="bet-column">
-                                            <div class="bet-col-header">PAD</div>
-                                            <div class="bet-row"><span class="bet-type">BNS</span><span class="bet-amount">${g.bets.bns.pad}</span></div>
-                                            <div class="bet-row"><span class="bet-type">CNX</span><span class="bet-amount">${g.bets.cnx.pad}</span></div>
-                                            <div class="bet-row"><span class="bet-type">EXT</span><span class="bet-amount">${g.bets.ext.pad}</span></div>
-                                        </div>
-                                        <div class="bet-column">
-                                            <div class="bet-col-header">MÁX</div>
-                                            <div class="bet-row"><span class="bet-type">BNS</span><span class="bet-amount">${g.bets.bns.max}</span></div>
-                                            <div class="bet-row"><span class="bet-type">CNX</span><span class="bet-amount">${g.bets.cnx.max}</span></div>
-                                            <div class="bet-row"><span class="bet-type">EXT</span><span class="bet-amount">${g.bets.ext.max}</span></div>
-                                        </div>
-                                    </div>
+                                <div class="gcard-bet-box" style="background: rgba(0, 0, 0, 0.35); border: 1.2px solid rgba(255, 255, 255, 0.08); border-radius: 10px; padding: 10px; text-align: center; color: rgba(255, 255, 255, 0.9); font-size: 11.5px; font-weight: 700; line-height: 1.7; margin: 6px 0; box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.05), 0 4px 10px rgba(0, 0, 0, 0.3);">
+                                    <div>Mínima R$0,40 a R$2,40</div>
+                                    <div>Padrão R$2,50 a R$9,90</div>
+                                    <div>Máxima acima de R$10,00</div>
                                 </div>
                                 
                                 <div class="gcard-footer">
@@ -1032,14 +1014,6 @@
                 // ── REAL-TIME ANALYSIS SCANNER (EVERY 5 SECONDS) ───────────────
                 // Perfectly simulates live machine learning analytical scanning!
                 
-                function isElementInViewport(el) {
-                    if (!el) return false;
-                    const rect = el.getBoundingClientRect();
-                    const windowHeight = (window.innerHeight || document.documentElement.clientHeight);
-                    // Check if any part of the card is inside the vertical viewport
-                    return rect.top < windowHeight && rect.bottom > 0;
-                }
-
                 function simulateLiveScanner() {
                     // 1. Tick minor RTP drifts on all games for high-fidelity scanning atmosphere
                     Object.keys(liveGamesStateMap).forEach(id => {
@@ -1059,24 +1033,13 @@
                     });
 
                     // 2. Select 1 to 2 games in the currently viewed category to alert flash & transition status
-                    // Filter only the games whose cards are currently visible in the viewport
-                    const viewportGames = filteredGames.filter(g => {
-                        const el = document.querySelector(`.gcard[data-id="${g.id}"]`);
-                        return el && isElementInViewport(el);
-                    });
-
-                    // Prioritize updating games currently visible in viewport so the user sees live animations
-                    const gamesToSelectFrom = viewportGames.length > 0 ? viewportGames : filteredGames;
-                    const selectFromIds = gamesToSelectFrom.map(g => g.id);
-
-                    if (selectFromIds.length > 0) {
+                    const visibleGameIds = filteredGames.map(g => g.id);
+                    if (visibleGameIds.length > 0) {
                         const alertCount = Math.floor(Math.random() * 2) + 1; // 1 or 2 games
-                        const updatedGamesThisTick = [];
                         for (let i = 0; i < alertCount; i++) {
-                            const randomId = selectFromIds[Math.floor(Math.random() * selectFromIds.length)];
+                            const randomId = visibleGameIds[Math.floor(Math.random() * visibleGameIds.length)];
                             const game = liveGamesStateMap[randomId];
-                            if (game && !updatedGamesThisTick.includes(game.id)) {
-                                updatedGamesThisTick.push(game.id);
+                            if (game) {
                                 const top3Names = siteConfigData?.top3Games || [];
                                 const isPinned = top3Names.some(name => name && name.toLowerCase().trim() === game.nome.toLowerCase().trim());
                                 
@@ -1109,105 +1072,21 @@
                                 game.updatedThisTick = true;
                             }
                         }
-
-                        // Update DOM elements of modified games in-place for buttery smooth zoom and blink animations
-                        updatedGamesThisTick.forEach(id => {
-                            const game = liveGamesStateMap[id];
-                            const cardEl = document.querySelector(`.gcard[data-id="${id}"]`);
-                            if (cardEl && game) {
-                                let neonColor = '#ff3366'; // Baixa
-                                if (game.status === 'Alta') neonColor = '#00ff66';
-                                else if (game.status === 'Média') neonColor = '#ffcc00';
-                                
-                                const btnTextColor = isColorLight(neonColor) ? '#000' : '#fff';
-
-                                // Set style custom variables on card
-                                cardEl.style.setProperty('--gcard-color', neonColor);
-                                cardEl.style.setProperty('--btn-bg', neonColor);
-                                cardEl.style.setProperty('--btn-color', btnTextColor);
-
-                                // Update Analysis live status tag
-                                const analysisValEl = cardEl.querySelector('.gcard-volat-row:nth-of-type(2) .volat-val');
-                                if (analysisValEl) {
-                                    const iconHtml = `<i class="fa-solid ${game.status === 'Alta' ? 'fa-arrow-trend-up' : game.status === 'Baixa' ? 'fa-arrow-trend-down' : 'fa-equals'}"></i>`;
-                                    const statusText = game.status === 'Média' ? 'ESTÁVEL' : game.status.toUpperCase();
-                                    analysisValEl.style.color = neonColor;
-                                    analysisValEl.style.textShadow = `0 0 6px ${neonColor}`;
-                                    analysisValEl.innerHTML = `${iconHtml} ${statusText}`;
-                                }
-
-                                // Update RTP label value
-                                const rtpValEl = cardEl.querySelector('.rtp-value');
-                                if (rtpValEl) {
-                                    rtpValEl.style.color = neonColor;
-                                    rtpValEl.style.textShadow = `0 0 10px ${neonColor}, 0 0 20px ${neonColor}`;
-                                    rtpValEl.textContent = `${game.rtp.toFixed(2)}%`;
-                                }
-
-                                // Update Distribution value
-                                const distValEl = cardEl.querySelector('.gcard-dist-row .dist-val');
-                                if (distValEl) {
-                                    distValEl.style.color = neonColor;
-                                    distValEl.style.textShadow = `0 0 6px ${neonColor}`;
-                                    distValEl.textContent = `${Math.floor(game.rtp)}%`;
-                                }
-
-                                // Update Sparkline graphic
-                                const chartContainer = cardEl.querySelector('.gcard-chart-container');
-                                if (chartContainer) {
-                                    chartContainer.innerHTML = generateSparklineSVG(game.id, neonColor, game.baseRtp, game.min, game.padrao, game.max, game.rtp);
-                                }
-
-                                // Update Progress bars
-                                const progressRows = cardEl.querySelectorAll('.gcard-progress-bars .progress-bar-row');
-                                const metrics = ['min', 'padrao', 'max'];
-                                metrics.forEach((m, mIdx) => {
-                                    const row = progressRows[mIdx];
-                                    if (row) {
-                                        const innerBar = row.querySelector('.progress-inner');
-                                        const valSpan = row.querySelector('.progress-val');
-                                        if (innerBar) {
-                                            innerBar.style.width = `${game[m]}%`;
-                                            innerBar.style.background = neonColor;
-                                        }
-                                        if (valSpan) {
-                                            valSpan.style.color = neonColor;
-                                            valSpan.textContent = `${game[m]}%`;
-                                        }
-                                    }
-                                });
-
-                                // Update Change indicators
-                                const changeSpan = cardEl.querySelector('.hist-change');
-                                if (changeSpan) {
-                                    changeSpan.className = `hist-change ${game.changeClass}`;
-                                    changeSpan.innerHTML = `${game.changeIcon} ${game.changeText}`;
-                                }
-
-                                // Only run the flash/zoom animation if the card is actually inside the viewport!
-                                if (isElementInViewport(cardEl)) {
-                                    cardEl.classList.remove('live-alert-flash');
-                                    void cardEl.offsetWidth; // Trigger reflow to restart animation
-                                    cardEl.classList.add('live-alert-flash');
-                                }
-                            }
-                        });
-
-                        // Clear update triggers shortly after to reset animations
-                        setTimeout(() => {
-                            updatedGamesThisTick.forEach(id => {
-                                liveGamesStateMap[id].updatedThisTick = false;
-                                const cardEl = document.querySelector(`.gcard[data-id="${id}"]`);
-                                if (cardEl) {
-                                    cardEl.classList.remove('live-alert-flash');
-                                }
-                            });
-                        }, 1500);
                     }
+
+                    // Render visible games list with updated values
+                    renderGames(filteredGames);
+                    
+                    // Clear update triggers shortly after to reset animations
+                    setTimeout(() => {
+                        Object.keys(liveGamesStateMap).forEach(id => {
+                            liveGamesStateMap[id].updatedThisTick = false;
+                        });
+                    }, 1200);
                 }
 
-                // Scanner active interval (3000ms = 3s)
-                setInterval(simulateLiveScanner, 3000);
+                // Scanner active interval (5000ms = 5s)
+                setInterval(simulateLiveScanner, 5000);
 
                 // ── Auto-refresh a cada 5 minutos (Sincronização Server-side) ──────
                 function scheduleNextRefresh() {
@@ -1228,6 +1107,9 @@
                                     liveGamesStateMap[g.id].banner = g.banner;
                                 }
                             });
+                            
+                            // Immediately redraw active view with new server values
+                            updateActiveProviderList();
                         } catch (e) {}
                         scheduleNextRefresh();
                     }, msUntilNextPeriod + 1000);

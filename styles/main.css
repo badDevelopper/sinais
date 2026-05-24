@@ -100,16 +100,25 @@
   background: linear-gradient(135deg, var(--card-color, var(--theme-dark, #b8006e)), var(--card-color-dark, var(--theme-darker, #a30060)));
   border: 2px solid var(--theme-light, #ff3ea5);
   border-radius: 16px;
-  padding: 14px 18px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  align-items: center;
+  gap: 18px;
   transition: all 0.3s;
 }
 
 .social-card:hover {
   box-shadow: 0 0 25px color-mix(in srgb, var(--theme, #d4007a) 50%, transparent), 0 0 60px color-mix(in srgb, var(--theme, #d4007a) 20%, transparent);
   transform: translateY(-2px);
+}
+
+.social-profile {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  justify-content: center;
+  width: 100%;
 }
 
 .social-avatar {
@@ -121,18 +130,12 @@
   flex-shrink: 0;
 }
 
-.social-top-row {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
 .social-info {
   display: flex;
   flex-direction: column;
   gap: 2px;
   min-width: 0;
-  flex: 1;
+  text-align: left;
 }
 
 .social-name {
@@ -150,16 +153,28 @@
 
 .social-buttons {
   display: flex;
-  flex-wrap: wrap;
   gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
   width: 100%;
+}
+
+@media (max-width: 600px) {
+  .social-profile {
+    flex-direction: column;
+    text-align: center;
+    gap: 8px;
+  }
+  .social-info {
+    text-align: center;
+  }
 }
 
 .social-btn {
   color: #fff;
   font-weight: 700;
   font-size: 13px;
-  padding: 9px 16px;
+  padding: 9px 18px;
   border-radius: 10px;
   cursor: pointer;
   transition: all 0.3s;
@@ -168,9 +183,6 @@
   gap: 6px;
   border: none;
   white-space: nowrap;
-  flex: 1;
-  justify-content: center;
-  min-width: calc(50% - 4px);
 }
 
 .social-btn:hover {
@@ -973,36 +985,3 @@
     font-size: 14px;
   }
 }
-
-/* ================================================
-   LIVE ANALYSIS ALERT FLASH
-   ================================================ */
-@keyframes liveAlertFlash {
-  0% {
-    transform: scale(1);
-    box-shadow: 0 0 18px color-mix(in srgb, var(--gcard-color, #d4007a) 50%, transparent), 
-                0 0 40px color-mix(in srgb, var(--gcard-color, #d4007a) 25%, transparent);
-    border-color: var(--gcard-color);
-    filter: brightness(1);
-  }
-  35% {
-    transform: scale(1.025);
-    box-shadow: 0 0 28px color-mix(in srgb, var(--gcard-color, #d4007a) 75%, transparent), 
-                0 0 55px color-mix(in srgb, var(--gcard-color, #d4007a) 40%, transparent);
-    border-color: color-mix(in srgb, var(--gcard-color) 80%, #ffffff);
-    filter: brightness(1.08);
-  }
-  100% {
-    transform: scale(1);
-    box-shadow: 0 0 18px color-mix(in srgb, var(--gcard-color, #d4007a) 50%, transparent), 
-                0 0 40px color-mix(in srgb, var(--gcard-color, #d4007a) 25%, transparent), 
-                0 8px 25px rgba(0, 0, 0, 0.7);
-    border-color: var(--gcard-color);
-    filter: brightness(1);
-  }
-}
-
-.gcard.live-alert-flash {
-  animation: liveAlertFlash 1.6s cubic-bezier(0.25, 1, 0.5, 1);
-  z-index: 10;
-}
