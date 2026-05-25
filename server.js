@@ -661,6 +661,51 @@ function readSiteConfig() {
     }
   } catch(e) {}
 
+  // Migrate socialLinks dynamically for backward compatibility
+  if (!config.socialLinks) {
+    config.socialLinks = [];
+    if (config.whatsapp) {
+      config.socialLinks.push({
+        id: 'wa_default',
+        type: 'whatsapp',
+        label: config.whatsapp.label || 'WhatsApp',
+        link: config.whatsapp.link || '',
+        color: config.whatsapp.color || '#25d366',
+        enabled: config.whatsapp.enabled !== false
+      });
+    }
+    if (config.instagram) {
+      config.socialLinks.push({
+        id: 'ig_default',
+        type: 'instagram',
+        label: config.instagram.label || 'Instagram',
+        link: config.instagram.link || '',
+        color: config.instagram.color || '#e1306c',
+        enabled: config.instagram.enabled !== false
+      });
+    }
+    if (config.facebook) {
+      config.socialLinks.push({
+        id: 'fb_default',
+        type: 'facebook',
+        label: config.facebook.label || 'Facebook',
+        link: config.facebook.link || '',
+        color: config.facebook.color || '#1877f2',
+        enabled: !!config.facebook.enabled
+      });
+    }
+    if (config.telegram) {
+      config.socialLinks.push({
+        id: 'tg_default',
+        type: 'telegram',
+        label: config.telegram.label || 'Telegram',
+        link: config.telegram.link || '',
+        color: config.telegram.color || '#2ca5e0',
+        enabled: !!config.telegram.enabled
+      });
+    }
+  }
+
   return config;
 }
 
@@ -681,7 +726,7 @@ app.get('/api/admin/site-config', requireAuth, (req, res) => {
 // Update site config
 app.put('/api/admin/site-config', requireAuth, (req, res) => {
   try {
-    const { siteName, themeColor, cardColor, platformsColor, updateColor, bgColor, buttonColor, navbarBgColor, footerBgColor, footerTextColor, displayName, username, whatsapp, instagram, facebook, telegram, port, top3Games } = req.body;
+    const { siteName, themeColor, cardColor, platformsColor, updateColor, bgColor, buttonColor, navbarBgColor, footerBgColor, footerTextColor, displayName, username, whatsapp, instagram, facebook, telegram, port, top3Games, socialLinks } = req.body;
     const current = readSiteConfig();
 
     if (siteName !== undefined) current.siteName = siteName;
@@ -697,33 +742,74 @@ app.put('/api/admin/site-config', requireAuth, (req, res) => {
     if (displayName !== undefined) current.displayName = displayName;
     if (username !== undefined) current.username = username;
     if (top3Games !== undefined) current.top3Games = top3Games;
-    if (whatsapp) {
-      if (!current.whatsapp) current.whatsapp = { enabled: true, label: 'WhatsApp', link: '', color: '#25d366' };
-      if (whatsapp.enabled !== undefined) current.whatsapp.enabled = whatsapp.enabled;
-      if (whatsapp.label !== undefined) current.whatsapp.label = whatsapp.label;
-      if (whatsapp.link !== undefined) current.whatsapp.link = whatsapp.link;
-      if (whatsapp.color !== undefined) current.whatsapp.color = whatsapp.color;
-    }
-    if (instagram) {
-      if (!current.instagram) current.instagram = { enabled: true, label: 'Instagram', link: '', color: '#e1306c' };
-      if (instagram.enabled !== undefined) current.instagram.enabled = instagram.enabled;
-      if (instagram.label !== undefined) current.instagram.label = instagram.label;
-      if (instagram.link !== undefined) current.instagram.link = instagram.link;
-      if (instagram.color !== undefined) current.instagram.color = instagram.color;
-    }
-    if (facebook !== undefined) {
-      if (!current.facebook) current.facebook = { enabled: false, label: 'Facebook', link: '', color: '#1877f2' };
-      if (facebook.enabled !== undefined) current.facebook.enabled = facebook.enabled;
-      if (facebook.label !== undefined) current.facebook.label = facebook.label;
-      if (facebook.link !== undefined) current.facebook.link = facebook.link;
-      if (facebook.color !== undefined) current.facebook.color = facebook.color;
-    }
-    if (telegram !== undefined) {
-      if (!current.telegram) current.telegram = { enabled: false, label: 'Telegram', link: '', color: '#2ca5e0' };
-      if (telegram.enabled !== undefined) current.telegram.enabled = telegram.enabled;
-      if (telegram.label !== undefined) current.telegram.label = telegram.label;
-      if (telegram.link !== undefined) current.telegram.link = telegram.link;
-      if (telegram.color !== undefined) current.telegram.color = telegram.color;
+    
+    // Save socialLinks
+    if (socialLinks !== undefined) {
+      current.socialLinks = socialLinks;
+      
+      // Keep legacy fields in sync for backward compatibility (using first link of each type)
+      const firstWa = socialLinks.find(l => l.type === 'whatsapp');
+      const firstIg = socialLinks.find(l => l.type === 'instagram');
+      const firstFb = socialLinks.find(l => l.type === 'facebook');
+      const firstTg = socialLinks.find(l => l.type === 'telegram');
+      
+      current.whatsapp = {
+        enabled: firstWa ? firstWa.enabled : false,
+        label: firstWa ? firstWa.label : 'WhatsApp',
+        link: firstWa ? firstWa.link : '',
+        color: firstWa ? firstWa.color : '#25d366'
+      };
+      
+      current.instagram = {
+        enabled: firstIg ? firstIg.enabled : false,
+        label: firstIg ? firstIg.label : 'Instagram',
+        link: firstIg ? firstIg.link : '',
+        color: firstIg ? firstIg.color : '#e1306c'
+      };
+      
+      current.facebook = {
+        enabled: firstFb ? firstFb.enabled : false,
+        label: firstFb ? firstFb.label : 'Facebook',
+        link: firstFb ? firstFb.link : '',
+        color: firstFb ? firstFb.color : '#1877f2'
+      };
+      
+      current.telegram = {
+        enabled: firstTg ? firstTg.enabled : false,
+        label: firstTg ? firstTg.label : 'Telegram',
+        link: firstTg ? firstTg.link : '',
+        color: firstTg ? firstTg.color : '#2ca5e0'
+      };
+    } else {
+      // Legacy behavior fallback
+      if (whatsapp) {
+        if (!current.whatsapp) current.whatsapp = { enabled: true, label: 'WhatsApp', link: '', color: '#25d366' };
+        if (whatsapp.enabled !== undefined) current.whatsapp.enabled = whatsapp.enabled;
+        if (whatsapp.label !== undefined) current.whatsapp.label = whatsapp.label;
+        if (whatsapp.link !== undefined) current.whatsapp.link = whatsapp.link;
+        if (whatsapp.color !== undefined) current.whatsapp.color = whatsapp.color;
+      }
+      if (instagram) {
+        if (!current.instagram) current.instagram = { enabled: true, label: 'Instagram', link: '', color: '#e1306c' };
+        if (instagram.enabled !== undefined) current.instagram.enabled = instagram.enabled;
+        if (instagram.label !== undefined) current.instagram.label = instagram.label;
+        if (instagram.link !== undefined) current.instagram.link = instagram.link;
+        if (instagram.color !== undefined) current.instagram.color = instagram.color;
+      }
+      if (facebook !== undefined) {
+        if (!current.facebook) current.facebook = { enabled: false, label: 'Facebook', link: '', color: '#1877f2' };
+        if (facebook.enabled !== undefined) current.facebook.enabled = facebook.enabled;
+        if (facebook.label !== undefined) current.facebook.label = facebook.label;
+        if (facebook.link !== undefined) current.facebook.link = facebook.link;
+        if (facebook.color !== undefined) current.facebook.color = facebook.color;
+      }
+      if (telegram !== undefined) {
+        if (!current.telegram) current.telegram = { enabled: false, label: 'Telegram', link: '', color: '#2ca5e0' };
+        if (telegram.enabled !== undefined) current.telegram.enabled = telegram.enabled;
+        if (telegram.label !== undefined) current.telegram.label = telegram.label;
+        if (telegram.link !== undefined) current.telegram.link = telegram.link;
+        if (telegram.color !== undefined) current.telegram.color = telegram.color;
+      }
     }
 
     let portChanged = false;

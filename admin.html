@@ -264,6 +264,13 @@
             max-width: 1100px;
             margin: 0 auto;
             padding: 24px 16px 60px;
+            transition: max-width 0.3s ease;
+        }
+
+        .container:has(#site-editor.active) {
+            max-width: 100% !important;
+            padding-left: 40px;
+            padding-right: 40px;
         }
 
         /* ===== PROVIDER TABS ===== */
@@ -842,7 +849,7 @@
         }
 
         .se-section.open .se-section-body {
-            max-height: 2000px;
+            max-height: 10000px;
         }
 
         .se-section-content {
@@ -1707,160 +1714,20 @@
 
                         <div class="se-divider"></div>
 
-                        <!-- WhatsApp -->
-                        <div class="se-sub-title"><i class="fa-brands fa-whatsapp" style="color:#25d366"></i> Botão WhatsApp</div>
-                        <div class="se-row" style="align-items:center; margin-bottom:8px">
-                            <div class="se-field" style="flex:0 0 auto">
-                                <label>Ativar Botão</label>
-                                <label class="social-toggle">
-                                    <input type="checkbox" id="se-wa-enabled" checked>
-                                    <span class="social-toggle-slider"></span>
-                                </label>
-                            </div>
+                        <!-- Dynamic Social Links -->
+                        <div class="se-sub-title"><i class="fa-solid fa-share-nodes"></i> Links Sociais do Perfil</div>
+                        <p style="font-size:12px; color:#94a3b8; margin-top:-6px; margin-bottom:16px;">
+                            Adicione, edite ou remova links para WhatsApp, Instagram, Telegram, Facebook e mais. Você pode colocar quantos botões desejar!
+                        </p>
+                        
+                        <div id="se-social-links-container" style="display:flex; flex-direction:column; gap:16px;">
+                            <!-- Dynamic social link editors will be rendered here -->
                         </div>
-                        <div id="se-wa-fields">
-                            <div class="se-row">
-                                <div class="se-field">
-                                    <label>Texto do Botão</label>
-                                    <input type="text" id="se-wa-label" placeholder="Ex: WhatsApp">
-                                </div>
-                                <div class="se-field">
-                                    <label>Cor do Botão</label>
-                                    <div class="se-color-row">
-                                        <input type="color" id="se-wa-color" value="#25d366">
-                                        <input type="text" id="se-wa-color-text" placeholder="#25d366">
-                                    </div>
-                                    <div class="se-presets-row">
-                                        <button type="button" class="preset-btn" style="--preset-color: #25d366;" onclick="applyPresetColor('se-wa-color', 'se-wa-color-text', '#25d366')" title="WhatsApp Verde"></button>
-                                        <button type="button" class="preset-btn" style="--preset-color: #00ffcc;" onclick="applyPresetColor('se-wa-color', 'se-wa-color-text', '#00ffcc')" title="Verde Neon"></button>
-                                        <button type="button" class="preset-btn" style="--preset-color: #00e5ff;" onclick="applyPresetColor('se-wa-color', 'se-wa-color-text', '#00e5ff')" title="Ciano Neon"></button>
-                                        <button type="button" class="preset-btn" style="--preset-color: #ffffff;" onclick="applyPresetColor('se-wa-color', 'se-wa-color-text', '#ffffff')" title="Branco"></button>
-                                        <button type="button" class="preset-btn" style="--preset-color: #ff007f;" onclick="applyPresetColor('se-wa-color', 'se-wa-color-text', '#ff007f')" title="Rosa Neon"></button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="se-field">
-                                <label>Link do WhatsApp</label>
-                                <input type="url" id="se-wa-link" placeholder="https://chat.whatsapp.com/...">
-                            </div>
-                        </div>
-
-                        <div class="se-divider"></div>
-
-                        <!-- Instagram -->
-                        <div class="se-sub-title"><i class="fa-brands fa-instagram" style="color:#e1306c"></i> Botão Instagram</div>
-                        <div class="se-row" style="align-items:center; margin-bottom:8px">
-                            <div class="se-field" style="flex:0 0 auto">
-                                <label>Ativar Botão</label>
-                                <label class="social-toggle">
-                                    <input type="checkbox" id="se-ig-enabled" checked>
-                                    <span class="social-toggle-slider"></span>
-                                </label>
-                            </div>
-                        </div>
-                        <div id="se-ig-fields">
-                            <div class="se-row">
-                                <div class="se-field">
-                                    <label>Texto do Botão</label>
-                                    <input type="text" id="se-ig-label" placeholder="Ex: Instagram">
-                                </div>
-                                <div class="se-field">
-                                    <label>Cor do Botão</label>
-                                    <div class="se-color-row">
-                                        <input type="color" id="se-ig-color" value="#e1306c">
-                                        <input type="text" id="se-ig-color-text" placeholder="#e1306c">
-                                    </div>
-                                    <div class="se-presets-row">
-                                        <button type="button" class="preset-btn" style="--preset-color: #e1306c;" onclick="applyPresetColor('se-ig-color', 'se-ig-color-text', '#e1306c')" title="Instagram Rosa"></button>
-                                        <button type="button" class="preset-btn" style="--preset-color: #a200ff;" onclick="applyPresetColor('se-ig-color', 'se-ig-color-text', '#a200ff')" title="Roxo Neon"></button>
-                                        <button type="button" class="preset-btn" style="--preset-color: #ff007f;" onclick="applyPresetColor('se-ig-color', 'se-ig-color-text', '#ff007f')" title="Rosa Neon"></button>
-                                        <button type="button" class="preset-btn" style="--preset-color: #ffffff;" onclick="applyPresetColor('se-ig-color', 'se-ig-color-text', '#ffffff')" title="Branco"></button>
-                                        <button type="button" class="preset-btn" style="--preset-color: #ffd700;" onclick="applyPresetColor('se-ig-color', 'se-ig-color-text', '#ffd700')" title="Ouro Neon"></button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="se-field">
-                                <label>Link do Instagram</label>
-                                <input type="url" id="se-ig-link" placeholder="https://www.instagram.com/...">
-                            </div>
-                        </div>
-
-                        <div class="se-divider"></div>
-
-                        <!-- Facebook -->
-                        <div class="se-sub-title"><i class="fa-brands fa-facebook" style="color:#1877f2"></i> Botão Facebook</div>
-                        <div class="se-row" style="align-items:center; margin-bottom:8px">
-                            <div class="se-field" style="flex:0 0 auto">
-                                <label>Ativar Botão</label>
-                                <label class="social-toggle">
-                                    <input type="checkbox" id="se-fb-enabled">
-                                    <span class="social-toggle-slider"></span>
-                                </label>
-                            </div>
-                        </div>
-                        <div id="se-fb-fields" style="display:none">
-                            <div class="se-row">
-                                <div class="se-field">
-                                    <label>Texto do Botão</label>
-                                    <input type="text" id="se-fb-label" placeholder="Ex: Facebook">
-                                </div>
-                                <div class="se-field">
-                                    <label>Cor do Botão</label>
-                                    <div class="se-color-row">
-                                        <input type="color" id="se-fb-color" value="#1877f2">
-                                        <input type="text" id="se-fb-color-text" placeholder="#1877f2">
-                                    </div>
-                                    <div class="se-presets-row">
-                                        <button type="button" class="preset-btn" style="--preset-color: #1877f2;" onclick="applyPresetColor('se-fb-color', 'se-fb-color-text', '#1877f2')" title="Facebook Azul"></button>
-                                        <button type="button" class="preset-btn" style="--preset-color: #0a66c2;" onclick="applyPresetColor('se-fb-color', 'se-fb-color-text', '#0a66c2')" title="Azul Escuro"></button>
-                                        <button type="button" class="preset-btn" style="--preset-color: #00e5ff;" onclick="applyPresetColor('se-fb-color', 'se-fb-color-text', '#00e5ff')" title="Ciano Neon"></button>
-                                        <button type="button" class="preset-btn" style="--preset-color: #ff007f;" onclick="applyPresetColor('se-fb-color', 'se-fb-color-text', '#ff007f')" title="Rosa Neon"></button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="se-field">
-                                <label>Link do Facebook</label>
-                                <input type="url" id="se-fb-link" placeholder="https://www.facebook.com/...">
-                            </div>
-                        </div>
-
-                        <div class="se-divider"></div>
-
-                        <!-- Telegram -->
-                        <div class="se-sub-title"><i class="fa-brands fa-telegram" style="color:#2ca5e0"></i> Botão Telegram</div>
-                        <div class="se-row" style="align-items:center; margin-bottom:8px">
-                            <div class="se-field" style="flex:0 0 auto">
-                                <label>Ativar Botão</label>
-                                <label class="social-toggle">
-                                    <input type="checkbox" id="se-tg-enabled">
-                                    <span class="social-toggle-slider"></span>
-                                </label>
-                            </div>
-                        </div>
-                        <div id="se-tg-fields" style="display:none">
-                            <div class="se-row">
-                                <div class="se-field">
-                                    <label>Texto do Botão</label>
-                                    <input type="text" id="se-tg-label" placeholder="Ex: Telegram">
-                                </div>
-                                <div class="se-field">
-                                    <label>Cor do Botão</label>
-                                    <div class="se-color-row">
-                                        <input type="color" id="se-tg-color" value="#2ca5e0">
-                                        <input type="text" id="se-tg-color-text" placeholder="#2ca5e0">
-                                    </div>
-                                    <div class="se-presets-row">
-                                        <button type="button" class="preset-btn" style="--preset-color: #2ca5e0;" onclick="applyPresetColor('se-tg-color', 'se-tg-color-text', '#2ca5e0')" title="Telegram Azul"></button>
-                                        <button type="button" class="preset-btn" style="--preset-color: #229ed9;" onclick="applyPresetColor('se-tg-color', 'se-tg-color-text', '#229ed9')" title="Azul Escuro"></button>
-                                        <button type="button" class="preset-btn" style="--preset-color: #00e5ff;" onclick="applyPresetColor('se-tg-color', 'se-tg-color-text', '#00e5ff')" title="Ciano Neon"></button>
-                                        <button type="button" class="preset-btn" style="--preset-color: #ff007f;" onclick="applyPresetColor('se-tg-color', 'se-tg-color-text', '#ff007f')" title="Rosa Neon"></button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="se-field">
-                                <label>Link do Telegram</label>
-                                <input type="url" id="se-tg-link" placeholder="https://t.me/...">
-                            </div>
+                        
+                        <div style="margin-top:20px; text-align:center;">
+                            <button type="button" class="btn-se-upload-sm" id="btn-add-social-link" style="width:auto; padding:10px 20px; font-weight:700; background:var(--admin-theme);">
+                                <i class="fa-solid fa-plus"></i> Adicionar Novo Botão / Link
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -2860,6 +2727,236 @@
             section.classList.toggle('open');
         }
 
+        // ===== SOCIAL LINKS DYNAMIC LIST EDITOR =====
+        let loadedSocialLinks = [];
+
+        function renderAdminSocialLinks() {
+            const container = document.getElementById('se-social-links-container');
+            container.innerHTML = '';
+            
+            if (loadedSocialLinks.length === 0) {
+                container.innerHTML = `<div style="text-align:center; padding:20px; color:#64748b; background:rgba(255,255,255,0.01); border:1px dashed rgba(255,255,255,0.1); border-radius:8px; font-size:13px;">
+                    <i class="fa-solid fa-link-slash" style="font-size:24px; margin-bottom:8px; display:block;"></i>
+                    Nenhum link social cadastrado. Clique no botão abaixo para adicionar!
+                </div>`;
+                updateAdminPreviewSocialButtons();
+                return;
+            }
+            
+            loadedSocialLinks.forEach(link => {
+                const card = document.createElement('div');
+                card.className = 'social-link-item-card';
+                card.dataset.id = link.id;
+                card.style.cssText = `background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:12px; padding:16px; display:flex; flex-direction:column; gap:12px;`;
+                
+                const isWa = link.type === 'whatsapp';
+                const isIg = link.type === 'instagram';
+                const isFb = link.type === 'facebook';
+                const isTg = link.type === 'telegram';
+                const isCustom = link.type === 'custom';
+                
+                let iconClass = 'fa-solid fa-link';
+                if (isWa) iconClass = 'fa-brands fa-whatsapp';
+                else if (isIg) iconClass = 'fa-brands fa-instagram';
+                else if (isFb) iconClass = 'fa-brands fa-facebook';
+                else if (isTg) iconClass = 'fa-brands fa-telegram';
+                
+                card.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:8px;">
+                        <div style="display:flex; align-items:center; gap:8px; font-weight:700; color:#fff; font-size:14px;">
+                            <i class="${iconClass}" style="color:${link.color || '#fff'}; font-size:18px;"></i>
+                            <span class="social-link-item-title-disp">${escapeHtml(link.label || link.type)}</span>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <label class="social-toggle" style="margin:0;">
+                                <input type="checkbox" class="social-link-enabled" ${link.enabled ? 'checked' : ''} onchange="toggleSocialLinkEnabled('${link.id}', this.checked)">
+                                <span class="social-toggle-slider"></span>
+                            </label>
+                            <button type="button" class="btn-delete-social" onclick="deleteSocialLink('${link.id}')" style="background:none; border:none; color:#ef4444; cursor:pointer; font-size:15px; padding:4px;" title="Excluir Link">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="se-row" style="margin-top:4px;">
+                        <div class="se-field">
+                            <label>Tipo de Rede</label>
+                            <select onchange="updateSocialLinkType('${link.id}', this.value)" style="width:100%; background:#09090b; border:1px solid rgba(255,255,255,0.15); border-radius:8px; color:#fff; padding:8px; outline:none; font-family:'Inter', sans-serif;">
+                                <option value="whatsapp" ${isWa ? 'selected' : ''}>WhatsApp</option>
+                                <option value="instagram" ${isIg ? 'selected' : ''}>Instagram</option>
+                                <option value="telegram" ${isTg ? 'selected' : ''}>Telegram</option>
+                                <option value="facebook" ${isFb ? 'selected' : ''}>Facebook</option>
+                                <option value="custom" ${isCustom ? 'selected' : ''}>Outro / Personalizado</option>
+                            </select>
+                        </div>
+                        <div class="se-field">
+                            <label>Texto do Botão</label>
+                            <input type="text" value="${escapeHtml(link.label || '')}" placeholder="Ex: WhatsApp 2" oninput="updateSocialLinkLabel('${link.id}', this.value)" style="width:100%;">
+                        </div>
+                    </div>
+                    
+                    <div class="se-row">
+                        <div class="se-field" style="flex:2">
+                            <label>Link / URL</label>
+                            <input type="url" value="${escapeHtml(link.link || '')}" placeholder="https://..." oninput="updateSocialLinkUrl('${link.id}', this.value)" style="width:100%;">
+                        </div>
+                        <div class="se-field" style="flex:1">
+                            <label>Cor do Botão</label>
+                            <div class="se-color-row">
+                                <input type="color" value="${link.color || '#25d366'}" oninput="updateSocialLinkColor('${link.id}', this.value)">
+                                <input type="text" id="color-text-${link.id}" value="${link.color || '#25d366'}" placeholder="#25d366" oninput="updateSocialLinkColorText('${link.id}', this.value)" style="width:100%;">
+                            </div>
+                            <div class="se-presets-row" style="margin-top:6px;">
+                                <button type="button" class="preset-btn" style="--preset-color: #25d366;" onclick="applySocialLinkColorPreset('${link.id}', '#25d366')" title="WhatsApp Verde"></button>
+                                <button type="button" class="preset-btn" style="--preset-color: #e1306c;" onclick="applySocialLinkColorPreset('${link.id}', '#e1306c')" title="Instagram Rosa"></button>
+                                <button type="button" class="preset-btn" style="--preset-color: #2ca5e0;" onclick="applySocialLinkColorPreset('${link.id}', '#2ca5e0')" title="Telegram Azul"></button>
+                                <button type="button" class="preset-btn" style="--preset-color: #1877f2;" onclick="applySocialLinkColorPreset('${link.id}', '#1877f2')" title="Facebook Azul"></button>
+                                <button type="button" class="preset-btn" style="--preset-color: #ffffff;" onclick="applySocialLinkColorPreset('${link.id}', '#ffffff')" title="Branco"></button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+            updateAdminPreviewSocialButtons();
+        }
+
+        window.toggleSocialLinkEnabled = function(id, val) {
+            const link = loadedSocialLinks.find(l => l.id === id);
+            if (link) {
+                link.enabled = val;
+                updateAdminPreviewSocialButtons();
+            }
+        };
+
+        window.deleteSocialLink = function(id) {
+            loadedSocialLinks = loadedSocialLinks.filter(l => l.id !== id);
+            renderAdminSocialLinks();
+        };
+
+        window.updateSocialLinkType = function(id, type) {
+            const link = loadedSocialLinks.find(l => l.id === id);
+            if (link) {
+                link.type = type;
+                if (type === 'whatsapp') {
+                    link.color = '#25d366';
+                    link.label = 'WhatsApp';
+                } else if (type === 'instagram') {
+                    link.color = '#e1306c';
+                    link.label = 'Instagram';
+                } else if (type === 'telegram') {
+                    link.color = '#2ca5e0';
+                    link.label = 'Telegram';
+                } else if (type === 'facebook') {
+                    link.color = '#1877f2';
+                    link.label = 'Facebook';
+                } else {
+                    link.color = '#a200ff';
+                    link.label = 'Link';
+                }
+                renderAdminSocialLinks();
+            }
+        };
+
+        window.updateSocialLinkLabel = function(id, label) {
+            const link = loadedSocialLinks.find(l => l.id === id);
+            if (link) {
+                link.label = label;
+                const card = document.querySelector(`.social-link-item-card[data-id="${id}"]`);
+                if (card) {
+                    card.querySelector('.social-link-item-title-disp').textContent = label || link.type;
+                }
+                updateAdminPreviewSocialButtons();
+            }
+        };
+
+        window.updateSocialLinkUrl = function(id, url) {
+            const link = loadedSocialLinks.find(l => l.id === id);
+            if (link) {
+                link.link = url;
+            }
+        };
+
+        window.updateSocialLinkColor = function(id, color) {
+            const link = loadedSocialLinks.find(l => l.id === id);
+            if (link) {
+                link.color = color;
+                const txt = document.getElementById(`color-text-${id}`);
+                if (txt) txt.value = color;
+                const card = document.querySelector(`.social-link-item-card[data-id="${id}"]`);
+                if (card) {
+                    card.querySelector('.social-link-item-title-disp').previousElementSibling.style.color = color;
+                }
+                updateAdminPreviewSocialButtons();
+            }
+        };
+
+        window.updateSocialLinkColorText = function(id, color) {
+            if (color.startsWith('#') && color.length === 7) {
+                updateSocialLinkColor(id, color);
+                const card = document.querySelector(`.social-link-item-card[data-id="${id}"]`);
+                if (card) {
+                    card.querySelector('input[type="color"]').value = color;
+                }
+            }
+        };
+
+        window.applySocialLinkColorPreset = function(id, color) {
+            updateSocialLinkColor(id, color);
+            const card = document.querySelector(`.social-link-item-card[data-id="${id}"]`);
+            if (card) {
+                card.querySelector('input[type="color"]').value = color;
+                const txt = document.getElementById(`color-text-${id}`);
+                if (txt) txt.value = color;
+            }
+        };
+
+        window.addSocialLink = function() {
+            const newId = 'social_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+            loadedSocialLinks.push({
+                id: newId,
+                type: 'whatsapp',
+                label: 'WhatsApp',
+                link: '',
+                color: '#25d366',
+                enabled: true
+            });
+            renderAdminSocialLinks();
+            
+            const container = document.getElementById('se-social-links-container');
+            container.lastElementChild?.scrollIntoView({ behavior: 'smooth' });
+        };
+
+        function updateAdminPreviewSocialButtons() {
+            const container1 = document.getElementById('se-prev-btns-1');
+            const container2 = document.getElementById('se-prev-btns-2');
+            
+            if (container1) container1.innerHTML = '';
+            if (container2) container2.innerHTML = '';
+            
+            loadedSocialLinks.forEach(link => {
+                if (!link.enabled) return;
+                
+                const btn1 = document.createElement('button');
+                btn1.className = 'se-preview-btn';
+                btn1.style.background = link.color || '#25d366';
+                
+                let iconClass = 'fa-solid fa-link';
+                if (link.type === 'whatsapp') iconClass = 'fa-brands fa-whatsapp';
+                else if (link.type === 'instagram') iconClass = 'fa-brands fa-instagram';
+                else if (link.type === 'facebook') iconClass = 'fa-brands fa-facebook';
+                else if (link.type === 'telegram') iconClass = 'fa-brands fa-telegram';
+                
+                const label = escapeHtml(link.label || link.type);
+                btn1.innerHTML = `<i class="${iconClass}"></i> ${label}`;
+                
+                const btn2 = btn1.cloneNode(true);
+                
+                if (container1) container1.appendChild(btn1);
+                if (container2) container2.appendChild(btn2);
+            });
+        }
+
         // ===== SITE EDITOR LOGIC =====
         let siteConfig = null;
 
@@ -2961,73 +3058,9 @@
                 renderPinnedSummary();
             }
 
-            // WhatsApp
-            const waEnabled = cfg.whatsapp?.enabled !== false;
-            document.getElementById('se-wa-enabled').checked = waEnabled;
-            document.getElementById('se-wa-fields').style.display = waEnabled ? '' : 'none';
-            document.getElementById('se-wa-label').value = cfg.whatsapp?.label || 'WhatsApp';
-            document.getElementById('se-wa-link').value = cfg.whatsapp?.link || '';
-            document.getElementById('se-wa-color').value = cfg.whatsapp?.color || '#25d366';
-            document.getElementById('se-wa-color-text').value = cfg.whatsapp?.color || '#25d366';
-            const waColor = cfg.whatsapp?.color || '#25d366';
-            const waLabel = escapeHtml(cfg.whatsapp?.label || 'WhatsApp');
-            document.getElementById('se-prev-wa').style.background = waColor;
-            document.getElementById('se-prev-wa').innerHTML = `<i class="fa-brands fa-whatsapp"></i> ${waLabel}`;
-            document.getElementById('se-prev-wa2').style.background = waColor;
-            document.getElementById('se-prev-wa2').innerHTML = `<i class="fa-brands fa-whatsapp"></i> ${waLabel}`;
-            document.getElementById('se-prev-wa').style.display = waEnabled ? '' : 'none';
-            document.getElementById('se-prev-wa2').style.display = waEnabled ? '' : 'none';
-
-            // Instagram
-            const igEnabled = cfg.instagram?.enabled !== false;
-            document.getElementById('se-ig-enabled').checked = igEnabled;
-            document.getElementById('se-ig-fields').style.display = igEnabled ? '' : 'none';
-            document.getElementById('se-ig-label').value = cfg.instagram?.label || 'Instagram';
-            document.getElementById('se-ig-link').value = cfg.instagram?.link || '';
-            document.getElementById('se-ig-color').value = cfg.instagram?.color || '#e1306c';
-            document.getElementById('se-ig-color-text').value = cfg.instagram?.color || '#e1306c';
-            const igColor = cfg.instagram?.color || '#e1306c';
-            const igLabel = escapeHtml(cfg.instagram?.label || 'Instagram');
-            document.getElementById('se-prev-ig').style.background = igColor;
-            document.getElementById('se-prev-ig').innerHTML = `<i class="fa-brands fa-instagram"></i> ${igLabel}`;
-            document.getElementById('se-prev-ig2').style.background = igColor;
-            document.getElementById('se-prev-ig2').innerHTML = `<i class="fa-brands fa-instagram"></i> ${igLabel}`;
-            document.getElementById('se-prev-ig').style.display = igEnabled ? '' : 'none';
-            document.getElementById('se-prev-ig2').style.display = igEnabled ? '' : 'none';
-
-            // Facebook
-            const fbEnabled = !!(cfg.facebook?.enabled);
-            document.getElementById('se-fb-enabled').checked = fbEnabled;
-            document.getElementById('se-fb-fields').style.display = fbEnabled ? '' : 'none';
-            document.getElementById('se-fb-label').value = cfg.facebook?.label || 'Facebook';
-            document.getElementById('se-fb-link').value = cfg.facebook?.link || '';
-            document.getElementById('se-fb-color').value = cfg.facebook?.color || '#1877f2';
-            document.getElementById('se-fb-color-text').value = cfg.facebook?.color || '#1877f2';
-            const fbColor = cfg.facebook?.color || '#1877f2';
-            const fbLabel = escapeHtml(cfg.facebook?.label || 'Facebook');
-            document.getElementById('se-prev-fb').style.background = fbColor;
-            document.getElementById('se-prev-fb').innerHTML = `<i class="fa-brands fa-facebook"></i> ${fbLabel}`;
-            document.getElementById('se-prev-fb2').style.background = fbColor;
-            document.getElementById('se-prev-fb2').innerHTML = `<i class="fa-brands fa-facebook"></i> ${fbLabel}`;
-            document.getElementById('se-prev-fb').style.display = fbEnabled ? '' : 'none';
-            document.getElementById('se-prev-fb2').style.display = fbEnabled ? '' : 'none';
-
-            // Telegram
-            const tgEnabled = !!(cfg.telegram?.enabled);
-            document.getElementById('se-tg-enabled').checked = tgEnabled;
-            document.getElementById('se-tg-fields').style.display = tgEnabled ? '' : 'none';
-            document.getElementById('se-tg-label').value = cfg.telegram?.label || 'Telegram';
-            document.getElementById('se-tg-link').value = cfg.telegram?.link || '';
-            document.getElementById('se-tg-color').value = cfg.telegram?.color || '#2ca5e0';
-            document.getElementById('se-tg-color-text').value = cfg.telegram?.color || '#2ca5e0';
-            const tgColor = cfg.telegram?.color || '#2ca5e0';
-            const tgLabel = escapeHtml(cfg.telegram?.label || 'Telegram');
-            document.getElementById('se-prev-tg').style.background = tgColor;
-            document.getElementById('se-prev-tg').innerHTML = `<i class="fa-brands fa-telegram"></i> ${tgLabel}`;
-            document.getElementById('se-prev-tg2').style.background = tgColor;
-            document.getElementById('se-prev-tg2').innerHTML = `<i class="fa-brands fa-telegram"></i> ${tgLabel}`;
-            document.getElementById('se-prev-tg').style.display = tgEnabled ? '' : 'none';
-            document.getElementById('se-prev-tg2').style.display = tgEnabled ? '' : 'none';
+            // Social Links dynamic loading
+            loadedSocialLinks = cfg.socialLinks || [];
+            renderAdminSocialLinks();
 
             // Apply card color to both previews
             const prevBg = `linear-gradient(135deg, ${cardColor}, ${adjustColorAdmin(cardColor, 20)})`;
@@ -3215,108 +3248,9 @@
                 updateFooterPreview(document.getElementById('se-footer-bg-color').value, v);
             });
 
-            // WhatsApp toggle
-            document.getElementById('se-wa-enabled').addEventListener('change', (e) => {
-                const on = e.target.checked;
-                document.getElementById('se-wa-fields').style.display = on ? '' : 'none';
-                document.getElementById('se-prev-wa').style.display = on ? '' : 'none';
-                document.getElementById('se-prev-wa2').style.display = on ? '' : 'none';
-            });
-            // WhatsApp color sync
-            document.getElementById('se-wa-color').addEventListener('input', (e) => {
-                document.getElementById('se-wa-color-text').value = e.target.value;
-                document.getElementById('se-prev-wa').style.background = e.target.value;
-                document.getElementById('se-prev-wa2').style.background = e.target.value;
-            });
-            document.getElementById('se-wa-color-text').addEventListener('input', (e) => {
-                if (/^#[0-9A-Fa-f]{6}$/.test(e.target.value)) {
-                    document.getElementById('se-wa-color').value = e.target.value;
-                    document.getElementById('se-prev-wa').style.background = e.target.value;
-                    document.getElementById('se-prev-wa2').style.background = e.target.value;
-                }
-            });
-            document.getElementById('se-wa-label').addEventListener('input', (e) => {
-                const html = `<i class="fa-brands fa-whatsapp"></i> ${escapeHtml(e.target.value)}`;
-                document.getElementById('se-prev-wa').innerHTML = html;
-                document.getElementById('se-prev-wa2').innerHTML = html;
-            });
-
-            // Instagram toggle
-            document.getElementById('se-ig-enabled').addEventListener('change', (e) => {
-                const on = e.target.checked;
-                document.getElementById('se-ig-fields').style.display = on ? '' : 'none';
-                document.getElementById('se-prev-ig').style.display = on ? '' : 'none';
-                document.getElementById('se-prev-ig2').style.display = on ? '' : 'none';
-            });
-            // Instagram color sync
-            document.getElementById('se-ig-color').addEventListener('input', (e) => {
-                document.getElementById('se-ig-color-text').value = e.target.value;
-                document.getElementById('se-prev-ig').style.background = e.target.value;
-                document.getElementById('se-prev-ig2').style.background = e.target.value;
-            });
-            document.getElementById('se-ig-color-text').addEventListener('input', (e) => {
-                if (/^#[0-9A-Fa-f]{6}$/.test(e.target.value)) {
-                    document.getElementById('se-ig-color').value = e.target.value;
-                    document.getElementById('se-prev-ig').style.background = e.target.value;
-                    document.getElementById('se-prev-ig2').style.background = e.target.value;
-                }
-            });
-            document.getElementById('se-ig-label').addEventListener('input', (e) => {
-                const html = `<i class="fa-brands fa-instagram"></i> ${escapeHtml(e.target.value)}`;
-                document.getElementById('se-prev-ig').innerHTML = html;
-                document.getElementById('se-prev-ig2').innerHTML = html;
-            });
-
-            // Facebook toggle
-            document.getElementById('se-fb-enabled').addEventListener('change', (e) => {
-                const on = e.target.checked;
-                document.getElementById('se-fb-fields').style.display = on ? '' : 'none';
-                document.getElementById('se-prev-fb').style.display = on ? '' : 'none';
-                document.getElementById('se-prev-fb2').style.display = on ? '' : 'none';
-            });
-            // Facebook color sync
-            document.getElementById('se-fb-color').addEventListener('input', (e) => {
-                document.getElementById('se-fb-color-text').value = e.target.value;
-                document.getElementById('se-prev-fb').style.background = e.target.value;
-                document.getElementById('se-prev-fb2').style.background = e.target.value;
-            });
-            document.getElementById('se-fb-color-text').addEventListener('input', (e) => {
-                if (/^#[0-9A-Fa-f]{6}$/.test(e.target.value)) {
-                    document.getElementById('se-fb-color').value = e.target.value;
-                    document.getElementById('se-prev-fb').style.background = e.target.value;
-                    document.getElementById('se-prev-fb2').style.background = e.target.value;
-                }
-            });
-            document.getElementById('se-fb-label').addEventListener('input', (e) => {
-                const html = `<i class="fa-brands fa-facebook"></i> ${escapeHtml(e.target.value)}`;
-                document.getElementById('se-prev-fb').innerHTML = html;
-                document.getElementById('se-prev-fb2').innerHTML = html;
-            });
-
-            // Telegram toggle
-            document.getElementById('se-tg-enabled').addEventListener('change', (e) => {
-                const on = e.target.checked;
-                document.getElementById('se-tg-fields').style.display = on ? '' : 'none';
-                document.getElementById('se-prev-tg').style.display = on ? '' : 'none';
-                document.getElementById('se-prev-tg2').style.display = on ? '' : 'none';
-            });
-            // Telegram color sync
-            document.getElementById('se-tg-color').addEventListener('input', (e) => {
-                document.getElementById('se-tg-color-text').value = e.target.value;
-                document.getElementById('se-prev-tg').style.background = e.target.value;
-                document.getElementById('se-prev-tg2').style.background = e.target.value;
-            });
-            document.getElementById('se-tg-color-text').addEventListener('input', (e) => {
-                if (/^#[0-9A-Fa-f]{6}$/.test(e.target.value)) {
-                    document.getElementById('se-tg-color').value = e.target.value;
-                    document.getElementById('se-prev-tg').style.background = e.target.value;
-                    document.getElementById('se-prev-tg2').style.background = e.target.value;
-                }
-            });
-            document.getElementById('se-tg-label').addEventListener('input', (e) => {
-                const html = `<i class="fa-brands fa-telegram"></i> ${escapeHtml(e.target.value)}`;
-                document.getElementById('se-prev-tg').innerHTML = html;
-                document.getElementById('se-prev-tg2').innerHTML = html;
+            // Add social link button listener
+            document.getElementById('btn-add-social-link').addEventListener('click', () => {
+                addSocialLink();
             });
         }
         setupLivePreview();
@@ -3409,33 +3343,10 @@
                 buttonColor: document.getElementById('se-button-color').value,
                 displayName: document.getElementById('se-display-name').value.trim(),
                 username: document.getElementById('se-username').value.trim(),
-                whatsapp: {
-                    enabled: document.getElementById('se-wa-enabled').checked,
-                    label: document.getElementById('se-wa-label').value.trim(),
-                    link: document.getElementById('se-wa-link').value.trim(),
-                    color: document.getElementById('se-wa-color').value,
-                },
                 navbarBgColor: document.getElementById('se-navbar-bg-color').value,
                 footerBgColor: document.getElementById('se-footer-bg-color').value,
                 footerTextColor: document.getElementById('se-footer-text-color').value,
-                instagram: {
-                    enabled: document.getElementById('se-ig-enabled').checked,
-                    label: document.getElementById('se-ig-label').value.trim(),
-                    link: document.getElementById('se-ig-link').value.trim(),
-                    color: document.getElementById('se-ig-color').value,
-                },
-                facebook: {
-                    enabled: document.getElementById('se-fb-enabled').checked,
-                    label: document.getElementById('se-fb-label').value.trim(),
-                    link: document.getElementById('se-fb-link').value.trim(),
-                    color: document.getElementById('se-fb-color').value,
-                },
-                telegram: {
-                    enabled: document.getElementById('se-tg-enabled').checked,
-                    label: document.getElementById('se-tg-label').value.trim(),
-                    link: document.getElementById('se-tg-link').value.trim(),
-                    color: document.getElementById('se-tg-color').value,
-                },
+                socialLinks: loadedSocialLinks,
                 top3Games: [
                     document.getElementById('se-top1-game').value.trim(),
                     document.getElementById('se-top2-game').value.trim(),
