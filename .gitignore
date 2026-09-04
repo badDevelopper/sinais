@@ -11,6 +11,9 @@ credentials.json
 # Plataformas cadastradas pelo usuário
 platforms.json
 
+# Estado persistente do contador de acessos
+visitor-stats.json
+
 # Imagens uploadadas pelo usuário (perfil, banners customizados)
 assets/profile-photo.*
 assets/banner-*

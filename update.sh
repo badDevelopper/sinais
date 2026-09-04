@@ -74,6 +74,7 @@ USER_FILES=(
     "credentials.json"
     "platforms.json"
     "port.json"
+    "visitor-stats.json"
 )
 
 USER_DIRS=(

@@ -54,7 +54,8 @@ $UserFiles = @(
     "site-config.json",
     "credentials.json",
     "platforms.json",
-    "port.json"
+    "port.json",
+    "visitor-stats.json"
 )
 
 $UserDirs = @(

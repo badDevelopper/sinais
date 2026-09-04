@@ -64,6 +64,142 @@ app.get(['/', '/index.html'], (req, res) => {
 app.use(express.static(publicDir));
 
 /* ===================================================
+   VISITOR COUNTER - persisted across restarts
+   =================================================== */
+const visitorStatsFile = path.join(__dirname, 'visitor-stats.json');
+
+function localDayKey(date = new Date()) {
+  const offset = date.getTimezoneOffset() * 60000;
+  return new Date(date.getTime() - offset).toISOString().slice(0, 10);
+}
+
+function randomDailyVisits() {
+  return Math.floor(Math.random() * 41) + 10;
+}
+
+function randomFirstMinuteVisits() {
+  return Math.floor(Math.random() * 16) + 5;
+}
+
+function randomConnectedNow() {
+  return Math.floor(Math.random() * 8) + 2;
+}
+
+function createVisitorStats() {
+  // A base nasce em zero. O bônus de primeiro minuto é controlado separadamente.
+  return {
+    total: 0,
+    lastDailyIncrease: localDayKey(),
+    createdAt: Date.now(),
+    firstMinuteBonusApplied: false,
+    firstVisitRegistered: false,
+    connectedNow: randomConnectedNow(),
+    lastConnectedUpdate: Date.now()
+  };
+}
+
+function readVisitorStats() {
+  try {
+    if (fs.existsSync(visitorStatsFile)) {
+      const stats = JSON.parse(fs.readFileSync(visitorStatsFile, 'utf8'));
+      if (Number.isFinite(stats.total) && stats.lastDailyIncrease) return stats;
+    }
+  } catch (error) {
+    console.error('Erro ao ler contador de acessos:', error);
+  }
+
+  const stats = createVisitorStats();
+  fs.writeFileSync(visitorStatsFile, JSON.stringify(stats, null, 2), 'utf8');
+  return stats;
+}
+
+function saveVisitorStats(stats) {
+  fs.writeFileSync(visitorStatsFile, JSON.stringify(stats, null, 2), 'utf8');
+}
+
+function applyDailyVisits(stats) {
+  const today = localDayKey();
+  if (stats.lastDailyIncrease !== today) {
+    stats.total += randomDailyVisits();
+    stats.lastDailyIncrease = today;
+  }
+}
+
+function applyFirstMinuteBonus(stats) {
+  if (stats.firstMinuteBonusApplied) return false;
+
+  // O registro do primeiro início permanece salvo e não é reiniciado pelo servidor.
+  if (!Number.isFinite(stats.createdAt)) stats.createdAt = Date.now();
+  if (Date.now() - stats.createdAt < 60000) return false;
+
+  stats.total += randomFirstMinuteVisits();
+  stats.firstMinuteBonusApplied = true;
+  return true;
+}
+
+function syncVisitorStats(stats) {
+  const totalBefore = stats.total;
+  applyDailyVisits(stats);
+  applyFirstMinuteBonus(stats);
+  return stats.total !== totalBefore;
+}
+
+function getConnectedNow(stats) {
+  const now = Date.now();
+  if (!Number.isInteger(stats.connectedNow) || !Number.isFinite(stats.lastConnectedUpdate)) {
+    stats.connectedNow = randomConnectedNow();
+    stats.lastConnectedUpdate = now;
+    return true;
+  }
+
+  if (now - stats.lastConnectedUpdate >= 30000) {
+    const previousConnected = stats.connectedNow;
+    const nextConnected = randomConnectedNow();
+
+    // Quando há mais pessoas conectadas, simula a mesma quantidade de novos acessos.
+    if (nextConnected > previousConnected) {
+      stats.total += nextConnected - previousConnected;
+    }
+
+    stats.connectedNow = nextConnected;
+    stats.lastConnectedUpdate = now;
+    return true;
+  }
+
+  return false;
+}
+
+// Cada carregamento da página é contabilizado, inclusive um F5/atualização.
+app.post('/api/visitor-stats/visit', (req, res) => {
+  const stats = readVisitorStats();
+  syncVisitorStats(stats);
+  // Mantém o primeiro carregamento em zero; os seguintes (inclusive F5) contam +1.
+  if (stats.firstVisitRegistered) {
+    stats.total += 1;
+  } else {
+    stats.firstVisitRegistered = true;
+  }
+  getConnectedNow(stats);
+  saveVisitorStats(stats);
+
+  res.set('Cache-Control', 'no-store');
+  res.json({
+    total: stats.total,
+    connectedNow: stats.connectedNow
+  });
+});
+
+// Valor compartilhado e persistente, renovado no máximo uma vez a cada 30 segundos.
+app.get('/api/visitor-stats/online', (req, res) => {
+  const stats = readVisitorStats();
+  const statsChanged = syncVisitorStats(stats);
+  if (getConnectedNow(stats) || statsChanged) saveVisitorStats(stats);
+
+  res.set('Cache-Control', 'no-store');
+  res.json({ total: stats.total, connectedNow: stats.connectedNow });
+});
+
+/* ===================================================
    GAME DATA - All providers loaded from scrapper/export
    =================================================== */
 
@@ -96,6 +232,50 @@ for (const p of PROVIDERS) {
   };
 
   console.log(`📦 ${p.key}: ${allGames.length} jogos (${hotGames.length} hot, ${newGames.length} new)`);
+}
+
+/* ===================================================
+   SIGNAL PAGES - one signal page for every game
+   =================================================== */
+const gerarSinaisFile = path.join(exportDir, 'gerar-sinais', 'list.json');
+const gerarSinaisData = fs.existsSync(gerarSinaisFile)
+  ? JSON.parse(fs.readFileSync(gerarSinaisFile, 'utf8'))
+  : [];
+const legacySignalSlugs = new Set(gerarSinaisData.map(game => game.slug));
+
+function slugifyGameName(value) {
+  return String(value || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+function getSignalSlug(title, provider) {
+  const baseSlug = slugifyGameName(title);
+  return legacySignalSlugs.has(baseSlug) ? baseSlug : `${baseSlug}-${provider}`;
+}
+
+function getAllSignalGames() {
+  const games = [...gerarSinaisData];
+  const slugs = new Set(games.map(game => game.slug));
+
+  for (const [providerKey, data] of Object.entries(providerData)) {
+    data.all.forEach(game => {
+      const slug = getSignalSlug(game.title, providerKey);
+      if (slugs.has(slug)) return;
+      slugs.add(slug);
+      games.push({
+        slug,
+        title: game.title,
+        image: buildLocalImgUrl(providerKey, game.cardNo, game.image, 'banner'),
+        bgColor: game.bgColor || 'rgb(30, 30, 40)'
+      });
+    });
+  }
+
+  return games;
 }
 
 /* ===================================================
@@ -265,6 +445,7 @@ app.get('/api/games', (req, res) => {
         max: max,
         badge: g.badge,
         provider: providerKey,
+        signalSlug: getSignalSlug(g.title, providerKey),
         hot: data.hotSet.has(g.cardNo),
         isNew: data.newSet.has(g.cardNo),
       });
@@ -277,13 +458,8 @@ app.get('/api/games', (req, res) => {
 /* ===================================================
    GERAR SINAIS API
    =================================================== */
-const gerarSinaisFile = path.join(exportDir, 'gerar-sinais', 'list.json');
-const gerarSinaisData = fs.existsSync(gerarSinaisFile)
-  ? JSON.parse(fs.readFileSync(gerarSinaisFile, 'utf8'))
-  : [];
-
 app.get('/api/gerar-sinais', (req, res) => {
-  res.json(gerarSinaisData);
+  res.json(getAllSignalGames());
 });
 
 /* ===================================================
@@ -640,7 +816,9 @@ function readSiteConfig() {
     whatsapp: { enabled: true, label: 'WhatsApp', link: '', color: '#25d366' },
     instagram: { enabled: true, label: 'Instagram', link: '', color: '#e1306c' },
     facebook: { enabled: false, label: 'Facebook', link: '', color: '#1877f2' },
-    telegram: { enabled: false, label: 'Telegram', link: '', color: '#2ca5e0' }
+    telegram: { enabled: false, label: 'Telegram', link: '', color: '#2ca5e0' },
+    announcement: { enabled: false, link: '' },
+    visitorCounterBgColor: '#15171b'
   };
 
   if (fs.existsSync(siteConfigFile)) {
@@ -726,7 +904,7 @@ app.get('/api/admin/site-config', requireAuth, (req, res) => {
 // Update site config
 app.put('/api/admin/site-config', requireAuth, (req, res) => {
   try {
-    const { siteName, themeColor, cardColor, platformsColor, updateColor, bgColor, buttonColor, navbarBgColor, footerBgColor, footerTextColor, displayName, username, whatsapp, instagram, facebook, telegram, port, top3Games, socialLinks } = req.body;
+    const { siteName, themeColor, cardColor, platformsColor, updateColor, bgColor, buttonColor, navbarBgColor, footerBgColor, footerTextColor, visitorCounterBgColor, displayName, username, whatsapp, instagram, facebook, telegram, port, top3Games, socialLinks, announcement } = req.body;
     const current = readSiteConfig();
 
     if (siteName !== undefined) current.siteName = siteName;
@@ -739,9 +917,23 @@ app.put('/api/admin/site-config', requireAuth, (req, res) => {
     if (navbarBgColor !== undefined) current.navbarBgColor = navbarBgColor;
     if (footerBgColor !== undefined) current.footerBgColor = footerBgColor;
     if (footerTextColor !== undefined) current.footerTextColor = footerTextColor;
+    if (visitorCounterBgColor !== undefined) current.visitorCounterBgColor = visitorCounterBgColor;
     if (displayName !== undefined) current.displayName = displayName;
     if (username !== undefined) current.username = username;
     if (top3Games !== undefined) current.top3Games = top3Games;
+    if (announcement !== undefined) {
+      let link = String(announcement?.link || '').trim();
+      if (link) {
+        try {
+          const url = new URL(link);
+          if (!['http:', 'https:'].includes(url.protocol)) throw new Error('protocol');
+          link = url.href;
+        } catch (_) {
+          return res.status(400).json({ error: 'O link do anúncio deve começar com http:// ou https://.' });
+        }
+      }
+      current.announcement = { enabled: Boolean(announcement?.enabled), link };
+    }
     
     // Save socialLinks
     if (socialLinks !== undefined) {

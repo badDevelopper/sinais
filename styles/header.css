@@ -67,7 +67,8 @@
   }
 
   .nav-spacer {
-    height: 60px;
+    /* A navegação pode ocupar duas linhas no celular. */
+    height: 100px;
   }
 }
 
@@ -82,6 +83,6 @@
   }
 
   .nav-spacer {
-    height: 50px;
+    height: 88px;
   }
 }

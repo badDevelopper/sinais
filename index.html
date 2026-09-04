@@ -15,9 +15,9 @@
         }
     </style>
     <link rel="stylesheet" href="/styles/globalStyles.css">
-    <link rel="stylesheet" href="/styles/header.css">
-    <link rel="stylesheet" href="/styles/main.css">
-    <link rel="stylesheet" href="/styles/footer.css">
+    <link rel="stylesheet" href="/styles/header.css?v=mobile-nav-spacing-20260905">
+    <link rel="stylesheet" href="/styles/main.css?v=announcement-icons-20260905">
+    <link rel="stylesheet" href="/styles/footer.css?v=visitor-counter-bg-20260905">
     <link rel="shortcut icon" href="/assets/favicon.png" type="image/x-icon">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
         rel="stylesheet">
@@ -62,11 +62,25 @@
 
     <main>
         <div class="nav-spacer"></div>
+        <div class="visitor-counter" aria-live="polite">
+            <div class="visitor-counter-item">
+                <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
+                <span><strong id="visitor-total">--</strong> acessos ao site</span>
+            </div>
+            <div class="visitor-counter-item visitor-online">
+                <span class="visitor-online-dot" aria-hidden="true"></span>
+                <span><strong id="visitor-online">--</strong> conectados agora</span>
+            </div>
+        </div>
 
         <!-- HERO BANNER -->
         <div class="carousel-wrapper">
             <section id="carousel-container">
                 <div id="carousel"></div>
+                <button id="carousel-sound-toggle" class="carousel-sound-toggle" type="button" aria-label="Ativar áudio do banner" title="Ativar áudio" hidden>
+                    <i class="fa-solid fa-volume-xmark" aria-hidden="true"></i>
+                    <span class="carousel-sound-text">Som</span>
+                </button>
             </section>
         </div>
         <script>
@@ -196,9 +210,13 @@
                     if (cfg.footerTextColor) {
                         document.documentElement.style.setProperty('--footer-text', cfg.footerTextColor);
                     }
+                    if (cfg.visitorCounterBgColor) {
+                        document.documentElement.style.setProperty('--visitor-counter-bg', cfg.visitorCounterBgColor);
+                    }
 
                     // Load banners
                     initCarousel(cfg.banners || ['/assets/jcsinais01.png', '/assets/jcsinais02.png', '/assets/jcsinais03.png', '/assets/jcsinais04.png']);
+                    showAnnouncement(cfg.announcement);
                 } catch (e) {
                     console.error('Config error:', e);
                     initCarousel(['/assets/jcsinais01.png', '/assets/jcsinais02.png', '/assets/jcsinais03.png', '/assets/jcsinais04.png']);
@@ -215,23 +233,86 @@
                 return '#' + [r, g, b].map(c => c.toString(16).padStart(2, '0')).join('');
             }
 
+            function showAnnouncement(announcement) {
+                if (!announcement?.enabled || !announcement?.link) return;
+
+                let url;
+                try {
+                    url = new URL(announcement.link);
+                    if (!['http:', 'https:'].includes(url.protocol)) return;
+                } catch (_) { return; }
+
+                const storageKey = `announcement-hidden-until:${url.href}`;
+                if (Number(localStorage.getItem(storageKey)) > Date.now()) return;
+
+                const overlay = document.getElementById('announcement-overlay');
+                const favicon = document.getElementById('announcement-favicon');
+                const faviconIcon = document.getElementById('announcement-favicon-icon');
+                const hideOption = document.getElementById('announcement-hide-24h');
+                const domain = url.hostname.replace(/^www\./i, '');
+                const socialIcons = [
+                    { domains: ['whatsapp.com', 'wa.me'], icon: 'fa-whatsapp', color: '#25d366' },
+                    { domains: ['t.me', 'telegram.me', 'telegram.org'], icon: 'fa-telegram', color: '#2ca5e0' },
+                    { domains: ['instagram.com'], icon: 'fa-instagram', color: '#e1306c' },
+                    { domains: ['facebook.com', 'fb.com'], icon: 'fa-facebook-f', color: '#1877f2' },
+                    { domains: ['tiktok.com'], icon: 'fa-tiktok', color: '#fff' }
+                ];
+                const social = socialIcons.find(item => item.domains.some(itemDomain => domain === itemDomain || domain.endsWith(`.${itemDomain}`)));
+
+                if (social) {
+                    favicon.hidden = true;
+                    faviconIcon.hidden = false;
+                    faviconIcon.className = `fa-brands ${social.icon}`;
+                    faviconIcon.style.color = social.color;
+                } else {
+                    faviconIcon.hidden = true;
+                    favicon.hidden = false;
+                    favicon.src = `https://www.google.com/s2/favicons?sz=128&domain_url=${encodeURIComponent(url.origin)}`;
+                    favicon.onerror = () => { favicon.hidden = true; };
+                }
+                document.getElementById('announcement-title').textContent = `Conheça ${domain}`;
+                overlay.hidden = false;
+
+                const close = () => {
+                    if (hideOption.checked) localStorage.setItem(storageKey, String(Date.now() + 86400000));
+                    overlay.hidden = true;
+                };
+                document.getElementById('announcement-close').onclick = close;
+                document.getElementById('announcement-dismiss').onclick = close;
+                document.getElementById('announcement-open').onclick = () => {
+                    window.open(url.href, '_blank', 'noopener,noreferrer');
+                    close();
+                };
+                overlay.onclick = event => { if (event.target === overlay) close(); };
+            }
+
             function initCarousel(banners) {
                 if (!banners.length) return;
                 const carousel = document.getElementById('carousel');
                 const container = document.getElementById('carousel-container');
+                const soundToggle = document.getElementById('carousel-sound-toggle');
                 let currentIndex = 0, interval, startX = 0, isDragging = false;
+                let audioEnabled = false;
+                let hasVideo = false;
 
                 banners.forEach(src => {
                     const cleanSrc = src.split('?')[0].split('#')[0];
                     const isVideo = /\.(mp4|webm|ogg|mov)$/i.test(cleanSrc);
                     let el;
                     if (isVideo) {
+                        hasVideo = true;
                         el = document.createElement('video');
                         el.src = src;
                         el.autoplay = true;
                         el.loop = true;
                         el.muted = true;
+                        el.defaultMuted = true;
+                        el.preload = 'metadata';
+                        el.setAttribute('autoplay', '');
+                        el.setAttribute('loop', '');
+                        el.setAttribute('muted', '');
                         el.setAttribute('playsinline', '');
+                        el.setAttribute('webkit-playsinline', '');
                     } else {
                         el = document.createElement('img');
                         el.src = src;
@@ -242,19 +323,93 @@
                 const firstClone = carousel.firstElementChild.cloneNode(true);
                 carousel.appendChild(firstClone);
 
+                if (hasVideo && soundToggle) {
+                    soundToggle.hidden = false;
+                    let lastPointerSoundToggleAt = 0;
+                    const toggleSound = () => {
+                        audioEnabled = !audioEnabled;
+                        syncVideoAudio();
+                    };
+                    soundToggle.addEventListener('pointerdown', (event) => {
+                        event.preventDefault();
+                        lastPointerSoundToggleAt = Date.now();
+                        toggleSound();
+                    });
+                    soundToggle.addEventListener('click', () => {
+                        if (Date.now() - lastPointerSoundToggleAt < 500) {
+                            return;
+                        }
+                        toggleSound();
+                    });
+                }
+
+                if (hasVideo) {
+                    const enableAudioOnInteraction = (event) => {
+                        if (soundToggle && event.target.closest && event.target.closest('#carousel-sound-toggle')) return;
+                        audioEnabled = true;
+                        syncVideoAudio();
+                    };
+                    document.addEventListener('pointerdown', enableAudioOnInteraction, { once: true, passive: true });
+                    document.addEventListener('keydown', enableAudioOnInteraction, { once: true });
+                }
+
                 // Play all videos to ensure loop is working
                 carousel.querySelectorAll('video').forEach(v => {
                     v.play().catch(e => console.log('Autoplay play failed:', e));
                 });
 
+                function getActiveSlideIndex() {
+                    return currentIndex === banners.length ? banners.length : currentIndex;
+                }
+
+                function updateSoundButton() {
+                    if (!soundToggle) return;
+                    const icon = soundToggle.querySelector('i');
+                    soundToggle.setAttribute('aria-label', audioEnabled ? 'Desativar áudio do banner' : 'Ativar áudio do banner');
+                    soundToggle.setAttribute('title', audioEnabled ? 'Desativar áudio' : 'Ativar áudio');
+                    if (icon) {
+                        icon.className = audioEnabled ? 'fa-solid fa-volume-high' : 'fa-solid fa-volume-xmark';
+                    }
+                }
+
+                function syncVideoAudio() {
+                    const activeSlide = carousel.children[getActiveSlideIndex()];
+                    carousel.querySelectorAll('video').forEach(v => {
+                        const shouldPlaySound = audioEnabled && v === activeSlide;
+                        const wasPaused = v.paused;
+                        v.muted = !shouldPlaySound;
+                        v.defaultMuted = !shouldPlaySound;
+                        if (shouldPlaySound) {
+                            v.removeAttribute('muted');
+                        } else {
+                            v.setAttribute('muted', '');
+                        }
+                        if (shouldPlaySound) {
+                            v.volume = 1;
+                            if (wasPaused || v.paused) {
+                                v.play().catch(e => {
+                                    audioEnabled = false;
+                                    v.muted = true;
+                                    v.defaultMuted = true;
+                                    updateSoundButton();
+                                    console.log('Audio play failed:', e);
+                                });
+                            }
+                        }
+                    });
+                    updateSoundButton();
+                }
+
                 function nextBanner() {
                     currentIndex++;
                     carousel.style.transform = `translateX(-${currentIndex * 100}%)`;
+                    syncVideoAudio();
                     if (currentIndex === banners.length) {
                         setTimeout(() => {
                             carousel.style.transition = 'none';
                             currentIndex = 0;
                             carousel.style.transform = 'translateX(0)';
+                            syncVideoAudio();
                             setTimeout(() => carousel.style.transition = 'transform 0.5s ease-in-out', 50);
                         }, 500);
                     }
@@ -262,6 +417,7 @@
                 function prevBanner() {
                     currentIndex = currentIndex > 0 ? currentIndex - 1 : banners.length - 1;
                     carousel.style.transform = `translateX(-${currentIndex * 100}%)`;
+                    syncVideoAudio();
                 }
                 function startAutoSlide() { interval = setInterval(nextBanner, 5000); }
                 function resetAutoSlide() { clearInterval(interval); startAutoSlide(); }
@@ -272,6 +428,7 @@
                 container.addEventListener('mousedown', e => { startX = e.clientX; isDragging = true; });
                 container.addEventListener('mousemove', e => { if (!isDragging) return; let m = e.clientX - startX; if (Math.abs(m) > 50) { m > 0 ? prevBanner() : nextBanner(); isDragging = false; resetAutoSlide(); } });
                 container.addEventListener('mouseup', () => isDragging = false);
+                syncVideoAudio();
                 startAutoSlide();
             }
         </script>
@@ -770,12 +927,47 @@
                         return;
                     }
 
-                    row.innerHTML = platforms.map(g => `
-                        <a href="${g.link}" target="_blank" class="plat-list-item">
-                            <span class="plat-list-name">${g.nome}</span>
-                            <span class="plat-list-url">${g.link}</span>
-                        </a>
-                    `).join('');
+                    const escapeHtml = (value) => String(value ?? '').replace(/[&<>'"]/g, char => ({
+                        '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+                    })[char]);
+
+                    const getLinkPreview = (link) => {
+                        try {
+                            const url = new URL(link);
+                            if (!['http:', 'https:'].includes(url.protocol)) throw new Error('Invalid protocol');
+                            const hostname = url.hostname.replace(/^www\./i, '');
+                            return {
+                                href: url.href,
+                                label: hostname,
+                                // O serviço retorna o favicon publicado pelo próprio domínio.
+                                favicon: `https://www.google.com/s2/favicons?sz=128&domain_url=${encodeURIComponent(url.origin)}`
+                            };
+                        } catch (_) {
+                            return { href: '#', label: 'Link inválido', favicon: '' };
+                        }
+                    };
+
+                    row.innerHTML = platforms.map(g => {
+                        const preview = getLinkPreview(g.link);
+                        const name = escapeHtml(g.nome || preview.label);
+                        const address = escapeHtml(preview.label);
+                        const href = escapeHtml(preview.href);
+                        const favicon = escapeHtml(preview.favicon);
+                        return `
+                            <a href="${href}" target="_blank" rel="noopener noreferrer" class="plat-list-item" aria-label="Abrir ${name}">
+                                <span class="plat-list-favicon" aria-hidden="true">
+                                    <span class="plat-list-favicon-fallback">↗</span>
+                                    ${favicon
+                                        ? `<img src="${favicon}" alt="" onerror="this.remove()">`
+                                        : ''}
+                                </span>
+                                <span class="plat-list-content">
+                                    <span class="plat-list-name">${name}</span>
+                                    <span class="plat-list-url">${address}</span>
+                                </span>
+                            </a>
+                        `;
+                    }).join('');
                 }
 
                 function renderGames(games) {
@@ -809,7 +1001,6 @@
                             modeClass = 'mode-turbo';
                         }
                         
-                        const isSinalGame = ["Fortune Rabbit", "Fortune Tiger", "Fortune Ox", "Fortune Mouse", "Fortune Dragon"].includes(g.nome);
                         const btnTextColor = isColorLight(neonColor) ? '#000' : '#fff';
                         const alertClass = g.updatedThisTick ? 'live-alert-flash' : '';
 
@@ -884,8 +1075,8 @@
                                 </div>
                                 
                                 <div class="gcard-footer">
-                                    <button class="gcard-action-btn" onclick="${isSinalGame ? `window.location.href='/gerar-sinais/${g.nome.toLowerCase().replace(/ /g, '-')}'` : `window.open('${g.link}', '_blank')`}">
-                                        ${isSinalGame ? '▶ GERAR SINAL' : `▶ ACESSAR ${siteConfigData?.siteName?.toUpperCase() || 'JOGAR'}`}
+                                    <button class="gcard-action-btn" onclick="window.location.href='/gerar-sinais/${encodeURIComponent(g.signalSlug)}'">
+                                        ▶ GERAR SINAL
                                     </button>
                                 </div>
                             </div>
@@ -1110,6 +1301,21 @@
 
     </main>
 
+    <div class="announcement-overlay" id="announcement-overlay" hidden>
+        <section class="announcement-modal" role="dialog" aria-modal="true" aria-labelledby="announcement-title">
+            <button class="announcement-close" id="announcement-close" type="button" aria-label="Fechar anúncio">×</button>
+            <div class="announcement-icon"><img id="announcement-favicon" alt=""><i id="announcement-favicon-icon" hidden aria-hidden="true"></i></div>
+            <span class="announcement-eyebrow">NOVIDADE</span>
+            <h2 id="announcement-title">Confira esta novidade</h2>
+            <p>Temos uma novidade para você. Toque no botão para acessar.</p>
+            <label class="announcement-hide-option"><input type="checkbox" id="announcement-hide-24h"> Não mostrar por 24 horas</label>
+            <div class="announcement-actions">
+                <button class="announcement-primary" id="announcement-open" type="button">ACESSAR AGORA</button>
+                <button class="announcement-secondary" id="announcement-dismiss" type="button">FECHAR</button>
+            </div>
+        </section>
+    </div>
+
     <!-- FOOTER -->
     <footer>
         <div class="footer-inner">
@@ -1130,6 +1336,29 @@
     </footer>
 
     <script>
+        // Registra cada carregamento, inclusive atualizações da página, como um acesso.
+        fetch('/api/visitor-stats/visit', { method: 'POST' })
+            .then(response => response.ok ? response.json() : Promise.reject())
+            .then(stats => {
+                document.getElementById('visitor-total').textContent = Number(stats.total).toLocaleString('pt-BR');
+                document.getElementById('visitor-online').textContent = stats.connectedNow;
+            })
+            .catch(() => {
+                document.getElementById('visitor-total').textContent = '—';
+                document.getElementById('visitor-online').textContent = '—';
+            });
+
+        // Atualiza somente os conectados, sem registrar outro acesso.
+        setInterval(() => {
+            fetch('/api/visitor-stats/online', { cache: 'no-store' })
+                .then(response => response.ok ? response.json() : Promise.reject())
+                .then(stats => {
+                    document.getElementById('visitor-total').textContent = Number(stats.total).toLocaleString('pt-BR');
+                    document.getElementById('visitor-online').textContent = stats.connectedNow;
+                })
+                .catch(() => {});
+        }, 30000);
+
         Notiflix.Notify.init({
             width: '280px', position: 'right-bottom', distance: '10px',
             opacity: 1, borderRadius: '8px', timeout: 3000,

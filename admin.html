@@ -779,6 +779,48 @@
             display: block;
         }
 
+        .announcement-editor {
+            display: none;
+            max-width: 620px;
+            margin: 20px auto 0;
+        }
+
+        .announcement-editor.active { display: block; }
+
+        .announcement-editor-card {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 12px 16px;
+            padding: 28px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 18px;
+            background: linear-gradient(145deg, rgba(35, 24, 63, 0.9), rgba(15, 17, 34, 0.95));
+            box-shadow: 0 16px 35px rgba(0, 0, 0, 0.22);
+        }
+
+        .announcement-editor-icon {
+            width: 48px;
+            height: 48px;
+            display: grid;
+            place-items: center;
+            border-radius: 14px;
+            background: var(--admin-theme);
+            color: #fff;
+            font-size: 20px;
+        }
+
+        .announcement-editor-card h2 { margin: 2px 0 5px; font-size: 19px; }
+        .announcement-editor-card p { margin: 0; color: #94a3b8; font-size: 13px; line-height: 1.45; }
+        .announcement-editor-toggle,
+        .announcement-editor-field,
+        .announcement-editor-save { grid-column: 1 / -1; }
+        .announcement-editor-toggle { display: flex; align-items: center; gap: 10px; color: #e2e8f0; font-size: 14px; font-weight: 700; cursor: pointer; }
+        .announcement-editor-field label { display: block; margin-bottom: 8px; color: #cbd5e1; font-size: 12px; font-weight: 700; }
+        .announcement-editor-field input { width: 100%; box-sizing: border-box; padding: 13px 14px; border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; background: #09090f; color: #fff; font: inherit; outline: none; }
+        .announcement-editor-field input:focus { border-color: var(--admin-theme); }
+        .announcement-editor-field small { display: block; margin-top: 8px; color: #94a3b8; font-size: 11px; }
+        .announcement-editor-save { width: auto; justify-self: start; margin-top: 4px; }
+
         /* Collapsible Sections */
         .se-section {
             background: rgba(255, 255, 255, 0.02);
@@ -1437,6 +1479,8 @@
             <button class="ptab" data-provider="tada"><i class="fa-solid fa-star"></i>&nbsp; Tada Games</button>
             <button class="ptab" data-provider="platforms" style="border-color: var(--admin-theme)"><i
                     class="fa-solid fa-list"></i>&nbsp; Plataformas</button>
+            <button class="ptab" data-provider="announcement" style="border-color: var(--admin-theme)"><i
+                    class="fa-solid fa-bullhorn"></i>&nbsp; Anúncio</button>
             <button class="ptab" data-provider="site-editor" style="border-color: var(--admin-theme-dark)"><i
                     class="fa-solid fa-palette"></i>&nbsp; Editar Site</button>
         </div>
@@ -1464,6 +1508,34 @@
             <div class="loading-state">
                 <i class="fa-solid fa-spinner"></i>
                 <p>Carregando jogos...</p>
+            </div>
+        </div>
+
+        <!-- ANÚNCIO: acesso rápido ao lado de Plataformas -->
+        <div class="announcement-editor" id="announcement-editor">
+            <div class="announcement-editor-card">
+                <div class="announcement-editor-icon"><i class="fa-solid fa-bullhorn"></i></div>
+                <div>
+                    <h2>Anúncio Pop-up</h2>
+                    <p>Configure o link que será exibido quando o visitante abrir o site.</p>
+                </div>
+                <label class="announcement-editor-toggle">
+                    <span class="social-toggle"><input type="checkbox" id="announcement-quick-enabled"><span class="social-toggle-slider"></span></span>
+                    <span>Ativar anúncio</span>
+                </label>
+                <div class="announcement-editor-field">
+                    <label for="announcement-quick-link">Link do anúncio</label>
+                    <input type="url" id="announcement-quick-link" placeholder="https://chat.whatsapp.com/...">
+                    <small>WhatsApp, Telegram, Facebook, Instagram, TikTok ou qualquer link HTTP/HTTPS.</small>
+                </div>
+                <div class="announcement-editor-field">
+                    <label for="visitor-counter-bg-color">Fundo da faixa de acessos</label>
+                    <input type="color" id="visitor-counter-bg-color" value="#15171b" style="width:54px; height:40px; padding:3px; cursor:pointer;">
+                    <small>Cor do fundo em “acessos ao site” e “conectados agora”.</small>
+                </div>
+                <button type="button" class="btn-se-save announcement-editor-save" id="announcement-quick-save">
+                    <i class="fa-solid fa-floppy-disk"></i> Salvar Anúncio
+                </button>
             </div>
         </div>
 
@@ -1604,6 +1676,32 @@
                     <div class="se-section-content">
                         <div class="se-banners-grid" id="se-banners-grid"></div>
                         <input type="file" id="se-banner-input" accept="image/*,video/*" style="display:none">
+                    </div>
+                </div>
+            </div>
+
+            <div class="se-section sec-social">
+                <div class="se-section-header" onclick="toggleSection(this)">
+                    <div class="se-section-icon"><i class="fa-solid fa-bullhorn"></i></div>
+                    <div>
+                        <div class="se-section-title">Anúncio Pop-up</div>
+                        <div class="se-section-desc">Convite com favicon do link e opção de ocultar por 24 horas</div>
+                    </div>
+                    <i class="fa-solid fa-chevron-down se-chevron"></i>
+                </div>
+                <div class="se-section-body">
+                    <div class="se-section-content">
+                        <div class="se-field" style="margin-bottom:16px;">
+                            <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
+                                <span class="social-toggle"><input type="checkbox" id="se-announcement-enabled"><span class="social-toggle-slider"></span></span>
+                                Mostrar anúncio ao abrir o site
+                            </label>
+                        </div>
+                        <div class="se-field">
+                            <label>Link do anúncio</label>
+                            <input type="url" id="se-announcement-link" placeholder="https://chat.whatsapp.com/... ou https://t.me/...">
+                            <small style="display:block; margin-top:7px; color:#94a3b8; font-size:11px;">Use WhatsApp, Telegram, Instagram, Facebook, TikTok ou qualquer link HTTP/HTTPS.</small>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -2700,14 +2798,19 @@
                 document.getElementById('bulk-href').value = '';
 
                 const isSiteEditor = currentProvider === 'site-editor';
+                const isAnnouncement = currentProvider === 'announcement';
+                const isCustomPanel = isSiteEditor || isAnnouncement;
                 document.getElementById('site-editor').classList.toggle('active', isSiteEditor);
-                document.querySelector('.bulk-section').style.display = isSiteEditor ? 'none' : '';
-                document.querySelector('.search-wrap').style.display = isSiteEditor ? 'none' : '';
-                document.getElementById('stats-bar').style.display = isSiteEditor ? 'none' : '';
-                document.getElementById('game-list').style.display = isSiteEditor ? 'none' : '';
+                document.getElementById('announcement-editor').classList.toggle('active', isAnnouncement);
+                document.querySelector('.bulk-section').style.display = isCustomPanel ? 'none' : '';
+                document.querySelector('.search-wrap').style.display = isCustomPanel ? 'none' : '';
+                document.getElementById('stats-bar').style.display = isCustomPanel ? 'none' : '';
+                document.getElementById('game-list').style.display = isCustomPanel ? 'none' : '';
 
                 if (isSiteEditor) {
                     loadSiteConfig();
+                } else if (isAnnouncement) {
+                    loadAnnouncementEditor();
                 } else {
                     loadGames();
                 }
@@ -2971,6 +3074,52 @@
             }
         }
 
+        async function loadAnnouncementEditor() {
+            try {
+                const res = await fetch('/api/admin/site-config', { headers: authHeaders() });
+                if (res.status === 401) { showLogin(); return; }
+                const cfg = await res.json();
+                const announcement = cfg.announcement || {};
+                document.getElementById('announcement-quick-enabled').checked = Boolean(announcement.enabled);
+                document.getElementById('announcement-quick-link').value = announcement.link || '';
+                document.getElementById('visitor-counter-bg-color').value = cfg.visitorCounterBgColor || '#15171b';
+            } catch (_) {
+                showToast('Erro ao carregar anúncio', 'error');
+            }
+        }
+
+        document.getElementById('announcement-quick-save').addEventListener('click', async () => {
+            const button = document.getElementById('announcement-quick-save');
+            const enabled = document.getElementById('announcement-quick-enabled').checked;
+            const link = document.getElementById('announcement-quick-link').value.trim();
+            if (enabled && !link) {
+                showToast('Cole o link antes de ativar o anúncio.', 'error');
+                return;
+            }
+
+            button.disabled = true;
+            button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Salvando...';
+            try {
+                const res = await fetch('/api/admin/site-config', {
+                    method: 'PUT',
+                    headers: authHeaders(),
+                    body: JSON.stringify({
+                        announcement: { enabled, link },
+                        visitorCounterBgColor: document.getElementById('visitor-counter-bg-color').value
+                    })
+                });
+                const data = await res.json();
+                if (!res.ok || !data.success) throw new Error(data.error || 'Erro ao salvar');
+                button.innerHTML = '<i class="fa-solid fa-check"></i> Salvo!';
+                showToast('Anúncio salvo com sucesso!');
+            } catch (error) {
+                showToast(error.message || 'Erro ao salvar anúncio', 'error');
+            } finally {
+                button.disabled = false;
+                setTimeout(() => { button.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Salvar Anúncio'; }, 1600);
+            }
+        });
+
         function fillSiteEditor(cfg) {
             // Site info
             document.getElementById('se-site-name').value = cfg.siteName || '';
@@ -3029,6 +3178,10 @@
 
             // Banners
             renderBannerGrid(cfg.banners || []);
+
+            const announcement = cfg.announcement || {};
+            document.getElementById('se-announcement-enabled').checked = Boolean(announcement.enabled);
+            document.getElementById('se-announcement-link').value = announcement.link || '';
 
             // Photo
             document.getElementById('se-photo-thumb').src = cfg.profilePhoto;
@@ -3346,6 +3499,10 @@
                 navbarBgColor: document.getElementById('se-navbar-bg-color').value,
                 footerBgColor: document.getElementById('se-footer-bg-color').value,
                 footerTextColor: document.getElementById('se-footer-text-color').value,
+                announcement: {
+                    enabled: document.getElementById('se-announcement-enabled').checked,
+                    link: document.getElementById('se-announcement-link').value.trim()
+                },
                 socialLinks: loadedSocialLinks,
                 top3Games: [
                     document.getElementById('se-top1-game').value.trim(),
