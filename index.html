@@ -214,6 +214,13 @@
                         document.documentElement.style.setProperty('--visitor-counter-bg', cfg.visitorCounterBgColor);
                     }
 
+                    // Show or hide chart
+                    if (cfg.showChart === false) {
+                        document.body.classList.add('hide-chart');
+                    } else {
+                        document.body.classList.remove('hide-chart');
+                    }
+
                     // Load banners
                     initCarousel(cfg.banners || ['/assets/jcsinais01.png', '/assets/jcsinais02.png', '/assets/jcsinais03.png', '/assets/jcsinais04.png']);
                     showAnnouncement(cfg.announcement);
@@ -436,7 +443,8 @@
         <!-- PLATAFORMAS PARCEIRAS -->
         <section class="platforms-section">
             <div class="platforms-title">
-                <h2>PLATAFORMA</h2>
+                <h2 id="platforms-section-title">PLATAFORMA</h2>
+                <p id="platforms-section-subtitle" class="platforms-subtitle" style="display:none;"></p>
             </div>
             <div class="platforms-list" id="platforms-row"></div>
         </section>
@@ -920,54 +928,110 @@
                     applyFilter(document.querySelector('.ftab.active')?.dataset?.filter || 'all', false);
                 }
 
+                function getPlatformIcon(platform) {
+                    if (platform.icon && platform.icon.trim()) {
+                        return platform.icon.trim();
+                    }
+                    try {
+                        let raw = (platform.link || '').trim();
+                        if (!raw.startsWith('http://') && !raw.startsWith('https://')) raw = 'https://' + raw;
+                        const u = new URL(raw);
+                        return `https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${encodeURIComponent(u.origin)}&size=128`;
+                    } catch(e) {
+                        return (siteConfigData && siteConfigData.favicon) || '/assets/favicon.png';
+                    }
+                }
+
+                function getPlatformDomain(link) {
+                    try {
+                        let raw = (link || '').trim();
+                        if (!raw.startsWith('http://') && !raw.startsWith('https://')) raw = 'https://' + raw;
+                        return new URL(raw).hostname.replace(/^www\./, '');
+                    } catch(e) {
+                        return link || '';
+                    }
+                }
+
+                function handlePlatImgError(img, link) {
+                    if (!img.dataset.triedS2) {
+                        img.dataset.triedS2 = '1';
+                        const domain = getPlatformDomain(link);
+                        img.src = `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
+                    } else if (!img.dataset.triedFav) {
+                        img.dataset.triedFav = '1';
+                        img.src = (siteConfigData && siteConfigData.favicon) || '/assets/favicon.png';
+                    }
+                }
+
                 function renderPlatforms(platforms) {
                     const row = document.getElementById('platforms-row');
-                    if (platforms.length === 0) {
-                        row.innerHTML = '<span style="color:#cbd5e1;font-size:12px">Nenhuma plataforma cadastrada.</span>';
+                    const titleEl = document.getElementById('platforms-section-title');
+                    const subtitleEl = document.getElementById('platforms-section-subtitle');
+                    if (!row) return;
+
+                    const mode = (siteConfigData && siteConfigData.platformsDisplayMode) || 'list';
+                    const customTitle = siteConfigData && siteConfigData.platformsTitle;
+                    const customSubtitle = siteConfigData && siteConfigData.platformsSubtitle;
+
+                    if (titleEl) {
+                        if (customTitle !== undefined && customTitle !== '') {
+                            titleEl.innerHTML = customTitle;
+                        } else {
+                            titleEl.innerHTML = mode === 'icons' ? '👑 PLATAFORMAS INDICADAS 👑' : 'PLATAFORMA';
+                        }
+                    }
+
+                    if (subtitleEl) {
+                        const sub = customSubtitle !== undefined ? customSubtitle : (mode === 'icons' ? 'Os melhores jogos das principais plataformas parceiras' : '');
+                        if (sub) {
+                            subtitleEl.innerHTML = sub;
+                            subtitleEl.style.display = 'block';
+                        } else {
+                            subtitleEl.style.display = 'none';
+                        }
+                    }
+
+                    if (!platforms || platforms.length === 0) {
+                        row.className = 'platforms-list';
+                        row.innerHTML = '<span style="color:#cbd5e1;font-size:12px;text-align:center;display:block;padding:10px;">Nenhuma plataforma cadastrada.</span>';
                         return;
                     }
 
-                    const escapeHtml = (value) => String(value ?? '').replace(/[&<>'"]/g, char => ({
-                        '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
-                    })[char]);
-
-                    const getLinkPreview = (link) => {
-                        try {
-                            const url = new URL(link);
-                            if (!['http:', 'https:'].includes(url.protocol)) throw new Error('Invalid protocol');
-                            const hostname = url.hostname.replace(/^www\./i, '');
-                            return {
-                                href: url.href,
-                                label: hostname,
-                                // O serviço retorna o favicon publicado pelo próprio domínio.
-                                favicon: `https://www.google.com/s2/favicons?sz=128&domain_url=${encodeURIComponent(url.origin)}`
-                            };
-                        } catch (_) {
-                            return { href: '#', label: 'Link inválido', favicon: '' };
-                        }
-                    };
-
-                    row.innerHTML = platforms.map(g => {
-                        const preview = getLinkPreview(g.link);
-                        const name = escapeHtml(g.nome || preview.label);
-                        const address = escapeHtml(preview.label);
-                        const href = escapeHtml(preview.href);
-                        const favicon = escapeHtml(preview.favicon);
-                        return `
-                            <a href="${href}" target="_blank" rel="noopener noreferrer" class="plat-list-item" aria-label="Abrir ${name}">
-                                <span class="plat-list-favicon" aria-hidden="true">
-                                    <span class="plat-list-favicon-fallback">↗</span>
-                                    ${favicon
-                                        ? `<img src="${favicon}" alt="" onerror="this.remove()">`
-                                        : ''}
-                                </span>
-                                <span class="plat-list-content">
-                                    <span class="plat-list-name">${name}</span>
-                                    <span class="plat-list-url">${address}</span>
-                                </span>
-                            </a>
-                        `;
-                    }).join('');
+                    if (mode === 'icons') {
+                        row.className = 'platforms-grid';
+                        row.innerHTML = platforms.map(g => {
+                            const iconUrl = getPlatformIcon(g);
+                            const badgeHtml = g.badge ? `<span class="plat-badge ${g.badge.toLowerCase()}">${g.badge}</span>` : '';
+                            return `
+                                <a href="${g.link}" target="_blank" rel="noopener noreferrer" class="plat-grid-item" title="${g.nome}">
+                                    ${badgeHtml}
+                                    <img src="${iconUrl}" alt="${g.nome}" class="plat-grid-img" loading="lazy" onerror="handlePlatImgError(this, '${g.link}')">
+                                    <span class="plat-grid-label">${g.nome}</span>
+                                </a>
+                            `;
+                        }).join('');
+                    } else {
+                        row.className = 'platforms-list';
+                        row.innerHTML = platforms.map(g => {
+                            const iconUrl = getPlatformIcon(g);
+                            const domain = getPlatformDomain(g.link);
+                            const badgeHtml = g.badge ? `<span class="plat-badge ${g.badge.toLowerCase()}" style="position:static;display:inline-block;">${g.badge}</span>` : '';
+                            return `
+                                <a href="${g.link}" target="_blank" rel="noopener noreferrer" class="plat-list-item">
+                                    <div class="plat-list-icon-wrap">
+                                        <img src="${iconUrl}" alt="${g.nome}" class="plat-list-icon" loading="lazy" onerror="handlePlatImgError(this, '${g.link}')">
+                                    </div>
+                                    <div class="plat-list-info">
+                                        <div class="plat-list-name-row">
+                                            <span class="plat-list-name">${g.nome}</span>
+                                            ${badgeHtml}
+                                        </div>
+                                        <span class="plat-list-url">${domain}</span>
+                                    </div>
+                                </a>
+                            `;
+                        }).join('');
+                    }
                 }
 
                 function renderGames(games) {
@@ -1003,6 +1067,7 @@
                         
                         const btnTextColor = isColorLight(neonColor) ? '#000' : '#fff';
                         const alertClass = g.updatedThisTick ? 'live-alert-flash' : '';
+                        const showChart = !siteConfigData || siteConfigData.showChart !== false;
 
                         // Determine individual bar color based on percentage value
                         const getSingleBarColor = (val) => {
@@ -1038,9 +1103,11 @@
                                     <div class="rtp-value" style="color: ${neonColor}; text-shadow: 0 0 10px ${neonColor}, 0 0 20px ${neonColor}">${g.rtp.toFixed(2)}%</div>
                                 </div>
                                 
+                                ${showChart ? `
                                 <div class="gcard-chart-container">
                                     ${generateSparklineSVG(g.id, neonColor, g.baseRtp, g.min, g.padrao, g.max, g.rtp)}
                                 </div>
+                                ` : ''}
                                 
                                 <div class="gcard-volat-row" style="margin-top: 1px;">
                                     <span>ANÁLISE LIVE</span>

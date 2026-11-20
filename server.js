@@ -493,14 +493,16 @@ app.get('/api/admin/platforms', requireAuth, (req, res) => {
 // POST new platform
 app.post('/api/admin/platforms', requireAuth, (req, res) => {
   try {
-    const { nome, link } = req.body;
+    const { nome, link, icon, badge } = req.body;
     if (!nome || !link) return res.status(400).json({ error: 'Nome e link são obrigatórios' });
 
     const platforms = readPlatforms();
     platforms.push({
       id: Date.now().toString(),
       nome,
-      link
+      link,
+      icon: icon || '',
+      badge: badge || ''
     });
     writePlatforms(platforms);
     res.json({ success: true });
@@ -513,7 +515,7 @@ app.post('/api/admin/platforms', requireAuth, (req, res) => {
 app.put('/api/admin/platforms/:id', requireAuth, (req, res) => {
   try {
     const { id } = req.params;
-    const { nome, link } = req.body;
+    const { nome, link, icon, badge } = req.body;
     if (!nome || !link) return res.status(400).json({ error: 'Nome e link são obrigatórios' });
 
     const platforms = readPlatforms();
@@ -522,6 +524,8 @@ app.put('/api/admin/platforms/:id', requireAuth, (req, res) => {
 
     platforms[index].nome = nome;
     platforms[index].link = link;
+    if (icon !== undefined) platforms[index].icon = icon;
+    if (badge !== undefined) platforms[index].badge = badge;
     writePlatforms(platforms);
     res.json({ success: true });
   } catch (e) {
@@ -806,6 +810,10 @@ function readSiteConfig() {
     themeColor: '#d4007a',
     cardColor: '#b5006e',
     platformsColor: '#b5006e',
+    platformsDisplayMode: 'list',
+    platformsTitle: 'PLATAFORMA',
+    platformsSubtitle: '',
+    showChart: true,
     updateColor: '#b5006e',
     bgColor: '#1a0011',
     buttonColor: '#d4007a',
@@ -904,13 +912,17 @@ app.get('/api/admin/site-config', requireAuth, (req, res) => {
 // Update site config
 app.put('/api/admin/site-config', requireAuth, (req, res) => {
   try {
-    const { siteName, themeColor, cardColor, platformsColor, updateColor, bgColor, buttonColor, navbarBgColor, footerBgColor, footerTextColor, visitorCounterBgColor, displayName, username, whatsapp, instagram, facebook, telegram, port, top3Games, socialLinks, announcement } = req.body;
+    const { siteName, themeColor, cardColor, platformsColor, platformsDisplayMode, platformsTitle, platformsSubtitle, showChart, updateColor, bgColor, buttonColor, navbarBgColor, footerBgColor, footerTextColor, visitorCounterBgColor, displayName, username, whatsapp, instagram, facebook, telegram, port, top3Games, socialLinks, announcement } = req.body;
     const current = readSiteConfig();
 
     if (siteName !== undefined) current.siteName = siteName;
     if (themeColor !== undefined) current.themeColor = themeColor;
     if (cardColor !== undefined) current.cardColor = cardColor;
     if (platformsColor !== undefined) current.platformsColor = platformsColor;
+    if (platformsDisplayMode !== undefined) current.platformsDisplayMode = platformsDisplayMode;
+    if (platformsTitle !== undefined) current.platformsTitle = platformsTitle;
+    if (platformsSubtitle !== undefined) current.platformsSubtitle = platformsSubtitle;
+    if (showChart !== undefined) current.showChart = Boolean(showChart);
     if (updateColor !== undefined) current.updateColor = updateColor;
     if (bgColor !== undefined) current.bgColor = bgColor;
     if (buttonColor !== undefined) current.buttonColor = buttonColor;
@@ -1058,6 +1070,34 @@ function createUploader(filenamePrefix) {
 
 const uploadProfile = createUploader('profile-photo');
 const uploadFavicon = createUploader('favicon');
+
+const uploadPlatIcon = multer({
+  storage: multer.diskStorage({
+    destination: (req, file, cb) => cb(null, path.join(__dirname, 'assets')),
+    filename: (req, file, cb) => {
+      const ext = path.extname(file.originalname).toLowerCase() || '.png';
+      cb(null, 'plat-' + Date.now() + ext);
+    }
+  }),
+  limits: { fileSize: 10 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    const allowed = ['.jpg', '.jpeg', '.png', '.webp', '.gif', '.ico', '.svg'];
+    const ext = path.extname(file.originalname).toLowerCase();
+    cb(null, allowed.includes(ext));
+  }
+});
+
+// Upload platform icon
+app.post('/api/admin/platforms/upload-icon', requireAuth, uploadPlatIcon.single('icon'), (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ error: 'Nenhuma imagem enviada' });
+    const iconPath = '/assets/' + req.file.filename + '?v=' + Date.now();
+    res.json({ success: true, iconPath });
+  } catch (e) {
+    console.error('Platform icon upload error:', e);
+    res.status(500).json({ error: e.message });
+  }
+});
 
 // Banner uploads use unique timestamped names
 const uploadBanner = multer({

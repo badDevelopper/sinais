@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Slot — Painel Admin</title>
+    <title>Slot â€” Painel Admin</title>
     <link rel="shortcut icon" href="/assets/favicon.png" type="image/x-icon">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
         rel="stylesheet">
@@ -1404,12 +1404,12 @@
         <div class="login-card">
             <img src="/assets/favicon.png" class="login-logo" alt="JC">
             <h1 id="login-title">Painel Admin</h1>
-            <p class="login-sub">Faça login para gerenciar os jogos</p>
+            <p class="login-sub">FaÃ§a login para gerenciar os jogos</p>
             <form id="login-form">
                 <div class="login-field">
-                    <label>Usuário</label>
+                    <label>UsuÃ¡rio</label>
                     <i class="fa-solid fa-user"></i>
-                    <input type="text" id="login-user" placeholder="Digite seu usuário" autocomplete="username"
+                    <input type="text" id="login-user" placeholder="Digite seu usuÃ¡rio" autocomplete="username"
                         required>
                 </div>
                 <div class="login-field">
@@ -1435,12 +1435,12 @@
                 <input type="password" id="set-current-pass" placeholder="Digite a senha atual">
             </div>
             <div class="modal-field">
-                <label>Novo Usuário</label>
-                <input type="text" id="set-new-user" placeholder="Digite o novo usuário">
+                <label>Novo UsuÃ¡rio</label>
+                <input type="text" id="set-new-user" placeholder="Digite o novo usuÃ¡rio">
             </div>
             <div class="modal-field">
                 <label>Nova Senha</label>
-                <input type="password" id="set-new-pass" placeholder="Digite a nova senha (mín. 4 caracteres)">
+                <input type="password" id="set-new-pass" placeholder="Digite a nova senha (mÃ­n. 4 caracteres)">
             </div>
             <div class="modal-error" id="settings-error"></div>
             <div class="modal-actions">
@@ -1460,7 +1460,7 @@
         </div>
         <div class="header-actions">
             <button class="header-btn" id="btn-settings" title="Alterar credenciais">
-                <i class="fa-solid fa-gear"></i> Configurações
+                <i class="fa-solid fa-gear"></i> ConfiguraÃ§Ãµes
             </button>
             <a href="/" class="header-btn"><i class="fa-solid fa-arrow-left"></i> Voltar ao site</a>
             <button class="header-btn btn-logout" id="btn-logout" title="Sair">
@@ -1480,7 +1480,7 @@
             <button class="ptab" data-provider="platforms" style="border-color: var(--admin-theme)"><i
                     class="fa-solid fa-list"></i>&nbsp; Plataformas</button>
             <button class="ptab" data-provider="announcement" style="border-color: var(--admin-theme)"><i
-                    class="fa-solid fa-bullhorn"></i>&nbsp; Anúncio</button>
+                    class="fa-solid fa-bullhorn"></i>&nbsp; AnÃºncio</button>
             <button class="ptab" data-provider="site-editor" style="border-color: var(--admin-theme-dark)"><i
                     class="fa-solid fa-palette"></i>&nbsp; Editar Site</button>
         </div>
@@ -1511,30 +1511,30 @@
             </div>
         </div>
 
-        <!-- ANÚNCIO: acesso rápido ao lado de Plataformas -->
+        <!-- ANÃšNCIO: acesso rÃ¡pido ao lado de Plataformas -->
         <div class="announcement-editor" id="announcement-editor">
             <div class="announcement-editor-card">
                 <div class="announcement-editor-icon"><i class="fa-solid fa-bullhorn"></i></div>
                 <div>
-                    <h2>Anúncio Pop-up</h2>
-                    <p>Configure o link que será exibido quando o visitante abrir o site.</p>
+                    <h2>AnÃºncio Pop-up</h2>
+                    <p>Configure o link que serÃ¡ exibido quando o visitante abrir o site.</p>
                 </div>
                 <label class="announcement-editor-toggle">
                     <span class="social-toggle"><input type="checkbox" id="announcement-quick-enabled"><span class="social-toggle-slider"></span></span>
-                    <span>Ativar anúncio</span>
+                    <span>Ativar anÃºncio</span>
                 </label>
                 <div class="announcement-editor-field">
-                    <label for="announcement-quick-link">Link do anúncio</label>
+                    <label for="announcement-quick-link">Link do anÃºncio</label>
                     <input type="url" id="announcement-quick-link" placeholder="https://chat.whatsapp.com/...">
                     <small>WhatsApp, Telegram, Facebook, Instagram, TikTok ou qualquer link HTTP/HTTPS.</small>
                 </div>
                 <div class="announcement-editor-field">
                     <label for="visitor-counter-bg-color">Fundo da faixa de acessos</label>
                     <input type="color" id="visitor-counter-bg-color" value="#15171b" style="width:54px; height:40px; padding:3px; cursor:pointer;">
-                    <small>Cor do fundo em “acessos ao site” e “conectados agora”.</small>
+                    <small>Cor do fundo em â€œacessos ao siteâ€ e â€œconectados agoraâ€.</small>
                 </div>
                 <button type="button" class="btn-se-save announcement-editor-save" id="announcement-quick-save">
-                    <i class="fa-solid fa-floppy-disk"></i> Salvar Anúncio
+                    <i class="fa-solid fa-floppy-disk"></i> Salvar AnÃºncio
                 </button>
             </div>
         </div>
@@ -1542,12 +1542,12 @@
         <!-- SITE EDITOR -->
         <div class="site-editor" id="site-editor">
 
-            <!-- ═══════ SEÇÃO 1: PÁGINA EM GERAL ═══════ -->
+            <!-- â•â•â•â•â•â•â• SEÃ‡ÃƒO 1: PÃGINA EM GERAL â•â•â•â•â•â•â• -->
             <div class="se-section sec-geral open">
                 <div class="se-section-header" onclick="toggleSection(this)">
                     <div class="se-section-icon"><i class="fa-solid fa-globe"></i></div>
                     <div>
-                        <div class="se-section-title">Página em Geral</div>
+                        <div class="se-section-title">PÃ¡gina em Geral</div>
                         <div class="se-section-desc">Nome do site, favicon, cor do tema e fundo</div>
                     </div>
                     <i class="fa-solid fa-chevron-down se-chevron"></i>
@@ -1616,13 +1616,13 @@
                 </div>
             </div>
 
-            <!-- ═══════ SEÇÃO 2: BARRA DO TOPO ═══════ -->
+            <!-- â•â•â•â•â•â•â• SEÃ‡ÃƒO 2: BARRA DO TOPO â•â•â•â•â•â•â• -->
             <div class="se-section sec-navbar">
                 <div class="se-section-header" onclick="toggleSection(this)">
                     <div class="se-section-icon"><i class="fa-solid fa-bars"></i></div>
                     <div>
                         <div class="se-section-title">Barra do Topo (Navbar)</div>
-                        <div class="se-section-desc">Cor de fundo e aparência da barra de navegação</div>
+                        <div class="se-section-desc">Cor de fundo e aparÃªncia da barra de navegaÃ§Ã£o</div>
                     </div>
                     <i class="fa-solid fa-chevron-down se-chevron"></i>
                 </div>
@@ -1662,13 +1662,13 @@
                 </div>
             </div>
 
-            <!-- ═══════ SEÇÃO 3: BANNERS DO CARROSSEL ═══════ -->
+            <!-- â•â•â•â•â•â•â• SEÃ‡ÃƒO 3: BANNERS DO CARROSSEL â•â•â•â•â•â•â• -->
             <div class="se-section sec-banners">
                 <div class="se-section-header" onclick="toggleSection(this)">
                     <div class="se-section-icon"><i class="fa-solid fa-images"></i></div>
                     <div>
                         <div class="se-section-title">Banners do Carrossel</div>
-                        <div class="se-section-desc">Imagens e vídeos (GIF/MP4) que aparecem no topo do site</div>
+                        <div class="se-section-desc">Imagens e vÃ­deos (GIF/MP4) que aparecem no topo do site</div>
                     </div>
                     <i class="fa-solid fa-chevron-down se-chevron"></i>
                 </div>
@@ -1684,8 +1684,8 @@
                 <div class="se-section-header" onclick="toggleSection(this)">
                     <div class="se-section-icon"><i class="fa-solid fa-bullhorn"></i></div>
                     <div>
-                        <div class="se-section-title">Anúncio Pop-up</div>
-                        <div class="se-section-desc">Convite com favicon do link e opção de ocultar por 24 horas</div>
+                        <div class="se-section-title">AnÃºncio Pop-up</div>
+                        <div class="se-section-desc">Convite com favicon do link e opÃ§Ã£o de ocultar por 24 horas</div>
                     </div>
                     <i class="fa-solid fa-chevron-down se-chevron"></i>
                 </div>
@@ -1694,11 +1694,11 @@
                         <div class="se-field" style="margin-bottom:16px;">
                             <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
                                 <span class="social-toggle"><input type="checkbox" id="se-announcement-enabled"><span class="social-toggle-slider"></span></span>
-                                Mostrar anúncio ao abrir o site
+                                Mostrar anÃºncio ao abrir o site
                             </label>
                         </div>
                         <div class="se-field">
-                            <label>Link do anúncio</label>
+                            <label>Link do anÃºncio</label>
                             <input type="url" id="se-announcement-link" placeholder="https://chat.whatsapp.com/... ou https://t.me/...">
                             <small style="display:block; margin-top:7px; color:#94a3b8; font-size:11px;">Use WhatsApp, Telegram, Instagram, Facebook, TikTok ou qualquer link HTTP/HTTPS.</small>
                         </div>
@@ -1706,7 +1706,7 @@
                 </div>
             </div>
 
-            <!-- ═══════ SEÇÃO 4: CARD SOCIAL ═══════ -->
+            <!-- â•â•â•â•â•â•â• SEÃ‡ÃƒO 4: CARD SOCIAL â•â•â•â•â•â•â• -->
             <div class="se-section sec-social">
                 <div class="se-section-header" onclick="toggleSection(this)">
                     <div class="se-section-icon"><i class="fa-solid fa-address-card"></i></div>
@@ -1746,18 +1746,18 @@
                             <img src="/assets/favicon.png" class="se-upload-thumb" id="se-photo-thumb" alt="">
                             <div class="se-upload-text">
                                 <strong>Clique para trocar a foto</strong><br>
-                                JPG, PNG ou WebP — máx. 5MB
+                                JPG, PNG ou WebP â€” mÃ¡x. 5MB
                             </div>
                         </div>
                         <input type="file" id="se-photo-input" accept="image/*" style="display:none">
 
                         <div class="se-divider"></div>
 
-                        <!-- Informações do Perfil -->
-                        <div class="se-sub-title"><i class="fa-solid fa-user"></i> Informações do Perfil</div>
+                        <!-- InformaÃ§Ãµes do Perfil -->
+                        <div class="se-sub-title"><i class="fa-solid fa-user"></i> InformaÃ§Ãµes do Perfil</div>
                         <div class="se-row">
                             <div class="se-field">
-                                <label>Nome de Exibição</label>
+                                <label>Nome de ExibiÃ§Ã£o</label>
                                 <input type="text" id="se-display-name" placeholder="Ex: GRUPO Slot">
                             </div>
                             <div class="se-field">
@@ -1815,7 +1815,7 @@
                         <!-- Dynamic Social Links -->
                         <div class="se-sub-title"><i class="fa-solid fa-share-nodes"></i> Links Sociais do Perfil</div>
                         <p style="font-size:12px; color:#94a3b8; margin-top:-6px; margin-bottom:16px;">
-                            Adicione, edite ou remova links para WhatsApp, Instagram, Telegram, Facebook e mais. Você pode colocar quantos botões desejar!
+                            Adicione, edite ou remova links para WhatsApp, Instagram, Telegram, Facebook e mais. VocÃª pode colocar quantos botÃµes desejar!
                         </p>
                         
                         <div id="se-social-links-container" style="display:flex; flex-direction:column; gap:16px;">
@@ -1824,28 +1824,65 @@
                         
                         <div style="margin-top:20px; text-align:center;">
                             <button type="button" class="btn-se-upload-sm" id="btn-add-social-link" style="width:auto; padding:10px 20px; font-weight:700; background:var(--admin-theme);">
-                                <i class="fa-solid fa-plus"></i> Adicionar Novo Botão / Link
+                                <i class="fa-solid fa-plus"></i> Adicionar Novo BotÃ£o / Link
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- ═══════ SEÇÃO 5: PLATAFORMAS PARCEIRAS ═══════ -->
+            <!-- â•â•â•â•â•â•â• SEÃ‡ÃƒO 5: PLATAFORMAS PARCEIRAS â•â•â•â•â•â•â• -->
             <div class="se-section sec-plat">
                 <div class="se-section-header" onclick="toggleSection(this)">
                     <div class="se-section-icon"><i class="fa-solid fa-building-columns"></i></div>
                     <div>
                         <div class="se-section-title">Plataformas Parceiras</div>
-                        <div class="se-section-desc">Cor de fundo da seção de plataformas</div>
+                        <div class="se-section-desc">Modo de exibiÃ§Ã£o (sÃ³ Ã­cone/fivecon ou lista), tÃ­tulos e cores</div>
                     </div>
                     <i class="fa-solid fa-chevron-down se-chevron"></i>
                 </div>
                 <div class="se-section-body">
                     <div class="se-section-content">
+                        <!-- Seletor de Modo de ExibiÃ§Ã£o -->
+                        <div class="se-field" style="margin-bottom:14px;">
+                            <label style="font-size:12.5px; font-weight:700; color:#f1f5f9; display:flex; align-items:center; gap:6px; margin-bottom:8px;">
+                                <i class="fa-solid fa-mobile-screen-button" style="color:#ec4899;"></i> Formato de ExibiÃ§Ã£o (Design Mobile)
+                            </label>
+                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                                <div id="se-mode-card-icons" onclick="setAdminPlatformsMode('icons')"
+                                    style="cursor:pointer; padding:12px; border-radius:12px; border:2px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.03); display:flex; align-items:center; gap:10px; transition:all 0.2s;">
+                                    <input type="radio" name="adminPlatformsMode" id="admin-plat-mode-icons" value="icons" style="accent-color:#ec4899; cursor:pointer;">
+                                    <div>
+                                        <div style="font-weight:800; color:#fff; font-size:13px;"><i class="fa-solid fa-grip"></i> SÃ³ Ãcone / Fivecon</div>
+                                        <div style="font-size:11px; color:#cbd5e1;">Grade 3 colunas com Ã­cones e badges</div>
+                                    </div>
+                                </div>
+                                <div id="se-mode-card-list" onclick="setAdminPlatformsMode('list')"
+                                    style="cursor:pointer; padding:12px; border-radius:12px; border:2px solid #ec4899; background:rgba(236,72,153,0.18); display:flex; align-items:center; gap:10px; transition:all 0.2s;">
+                                    <input type="radio" name="adminPlatformsMode" id="admin-plat-mode-list" value="list" checked style="accent-color:#ec4899; cursor:pointer;">
+                                    <div>
+                                        <div style="font-weight:800; color:#fff; font-size:13px;"><i class="fa-solid fa-list-ul"></i> Lista com Ãcones</div>
+                                        <div style="font-size:11px; color:#cbd5e1;">Como estÃ¡ agora (lista com Ã­cones)</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TÃ­tulo e SubtÃ­tulo da SeÃ§Ã£o -->
+                        <div class="se-row" style="margin-bottom:14px;">
+                            <div class="se-field">
+                                <label>TÃ­tulo da SeÃ§Ã£o</label>
+                                <input type="text" id="se-platforms-title" placeholder="ðŸ‘‘ PLATAFORMAS INDICADAS ðŸ‘‘" oninput="updatePlatformsPreview()">
+                            </div>
+                            <div class="se-field">
+                                <label>SubtÃ­tulo (Opcional)</label>
+                                <input type="text" id="se-platforms-subtitle" placeholder="Os melhores jogos das principais plataformas parceiras" oninput="updatePlatformsPreview()">
+                            </div>
+                        </div>
+
                         <div class="se-row">
                             <div class="se-field">
-                                <label>Cor de Fundo da Seção</label>
+                                <label>Cor de Fundo da SeÃ§Ã£o</label>
                                 <div class="se-color-row">
                                     <input type="color" id="se-platforms-color" value="#b5006e">
                                     <input type="text" id="se-platforms-color-text" placeholder="#b5006e">
@@ -1861,31 +1898,24 @@
                                 </div>
                             </div>
                         </div>
-                        <div style="margin-top:12px; font-size:12px; color:#94a3b8; font-weight:600; margin-bottom:8px">
-                            <i class="fa-solid fa-eye"></i> Preview:
+                        <div style="margin-top:14px; font-size:12px; color:#94a3b8; font-weight:600; margin-bottom:8px">
+                            <i class="fa-solid fa-eye"></i> Preview Ao Vivo:
                         </div>
                         <div id="se-platforms-preview"
-                            style="background: linear-gradient(135deg, #b5006e, #d4007a); border-radius:16px; padding:16px 20px; border:2px solid rgba(255,255,255,0.15);">
-                            <div
-                                style="text-align:center; color:#fff; font-weight:900; font-size:16px; letter-spacing:2px; margin-bottom:10px;">
-                                PLATAFORMA</div>
-                            <div
-                                style="background:rgba(0,0,0,0.25); border-radius:10px; padding:8px 12px; border:1px solid rgba(255,255,255,0.15);">
-                                <span style="color:#fff; font-weight:800; font-size:13px;">FORTUNE</span><br>
-                                <span style="color:rgba(255,255,255,0.5); font-size:10px;">https://exemplo.com</span>
-                            </div>
+                            style="background: linear-gradient(135deg, #b5006e, #d4007a); border-radius:18px; padding:18px 16px; border:2px solid rgba(255,255,255,0.2); max-width:480px; margin:0 auto; box-shadow:0 8px 24px rgba(0,0,0,0.3);">
+                            <!-- Dynamic preview generated by JS -->
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- ═══════ SEÇÃO 6: ÚLTIMA ATUALIZAÇÃO ═══════ -->
+            <!-- â•â•â•â•â•â•â• SEÃ‡ÃƒO 6: ÃšLTIMA ATUALIZAÃ‡ÃƒO â•â•â•â•â•â•â• -->
             <div class="se-section sec-update">
                 <div class="se-section-header" onclick="toggleSection(this)">
                     <div class="se-section-icon"><i class="fa-solid fa-arrows-rotate"></i></div>
                     <div>
-                        <div class="se-section-title">Última Atualização</div>
-                        <div class="se-section-desc">Cor de fundo da barra de atualização</div>
+                        <div class="se-section-title">Ãšltima AtualizaÃ§Ã£o</div>
+                        <div class="se-section-desc">Cor de fundo da barra de atualizaÃ§Ã£o</div>
                     </div>
                     <i class="fa-solid fa-chevron-down se-chevron"></i>
                 </div>
@@ -1893,7 +1923,7 @@
                     <div class="se-section-content">
                         <div class="se-row">
                             <div class="se-field">
-                                <label>Cor de Fundo da Seção</label>
+                                <label>Cor de Fundo da SeÃ§Ã£o</label>
                                 <div class="se-color-row">
                                     <input type="color" id="se-update-color" value="#b5006e">
                                     <input type="text" id="se-update-color-text" placeholder="#b5006e">
@@ -1916,8 +1946,8 @@
                             style="background: linear-gradient(135deg, #b5006e, #a30060); border-radius:16px; padding:14px 20px; display:flex; align-items:center; gap:14px; border:2px solid rgba(255,255,255,0.15);">
                             <i class="fa-solid fa-arrows-rotate" style="color:#fff; font-size:24px;"></i>
                             <div>
-                                <strong style="color:#fff; font-size:14px;">Última Atualização: 12:30:05</strong><br>
-                                <span style="color:rgba(255,255,255,0.6); font-size:11px;">Nosso site é Atualizado a
+                                <strong style="color:#fff; font-size:14px;">Ãšltima AtualizaÃ§Ã£o: 12:30:05</strong><br>
+                                <span style="color:rgba(255,255,255,0.6); font-size:11px;">Nosso site Ã© Atualizado a
                                     cada 05 Minutos</span>
                             </div>
                         </div>
@@ -1925,21 +1955,37 @@
                 </div>
             </div>
 
-            <!-- ═══════ SEÇÃO 7: CARDS DE JOGOS ═══════ -->
+            <!-- â•â•â•â•â•â•â• SEÃ‡ÃƒO 7: CARDS DE JOGOS â•â•â•â•â•â•â• -->
             <div class="se-section sec-cards">
                 <div class="se-section-header" onclick="toggleSection(this)">
                     <div class="se-section-icon"><i class="fa-solid fa-gamepad"></i></div>
                     <div>
-                        <div class="se-section-title">Cards de Jogos & Botões</div>
-                        <div class="se-section-desc">Cor dos botões dos cards de jogos</div>
+                        <div class="se-section-title">Cards de Jogos & GrÃ¡ficos</div>
+                        <div class="se-section-desc">Ativar/desativar o grÃ¡fico de RTP e cores dos botÃµes</div>
                     </div>
                     <i class="fa-solid fa-chevron-down se-chevron"></i>
                 </div>
                 <div class="se-section-body">
                     <div class="se-section-content">
+                        <!-- Toggle Exibir GrÃ¡fico de RTP -->
+                        <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:12px 16px; margin-bottom:14px;">
+                            <div>
+                                <div style="font-weight:800; color:#fff; font-size:13.5px; display:flex; align-items:center; gap:8px;">
+                                    <i class="fa-solid fa-chart-line" style="color:#00e5ff;"></i> Exibir GrÃ¡fico nos Cards (RTP Scan)
+                                </div>
+                                <div style="font-size:11px; color:#94a3b8; margin-top:2px;">
+                                    Desmarque para tirar o grÃ¡fico de linha que aparece dentro dos cards de jogos.
+                                </div>
+                            </div>
+                            <label class="social-toggle" style="flex-shrink:0;">
+                                <input type="checkbox" id="se-show-chart" checked>
+                                <span class="social-toggle-slider"></span>
+                            </label>
+                        </div>
+
                         <div class="se-row">
                             <div class="se-field">
-                                <label>Cor dos Botões (Jogue Agora / Gerar Sinal)</label>
+                                <label>Cor dos BotÃµes (Jogue Agora / Gerar Sinal)</label>
                                 <div class="se-color-row">
                                     <input type="color" id="se-button-color" value="#d4007a">
                                     <input type="text" id="se-button-color-text" placeholder="#d4007a">
@@ -1970,13 +2016,13 @@
                 </div>
             </div>
 
-            <!-- ═══════ SEÇÃO 8: RODAPÉ ═══════ -->
+            <!-- â•â•â•â•â•â•â• SEÃ‡ÃƒO 8: RODAPÃ‰ â•â•â•â•â•â•â• -->
             <div class="se-section sec-footer">
                 <div class="se-section-header" onclick="toggleSection(this)">
                     <div class="se-section-icon"><i class="fa-solid fa-shoe-prints"></i></div>
                     <div>
-                        <div class="se-section-title">Rodapé (Footer)</div>
-                        <div class="se-section-desc">Cores do rodapé do site</div>
+                        <div class="se-section-title">RodapÃ© (Footer)</div>
+                        <div class="se-section-desc">Cores do rodapÃ© do site</div>
                     </div>
                     <i class="fa-solid fa-chevron-down se-chevron"></i>
                 </div>
@@ -1984,7 +2030,7 @@
                     <div class="se-section-content">
                         <div class="se-row">
                             <div class="se-field">
-                                <label>Cor de Fundo do Rodapé</label>
+                                <label>Cor de Fundo do RodapÃ©</label>
                                 <div class="se-color-row">
                                     <input type="color" id="se-footer-bg-color" value="#000000">
                                     <input type="text" id="se-footer-bg-color-text" placeholder="#000000">
@@ -1998,7 +2044,7 @@
                                 </div>
                             </div>
                             <div class="se-field">
-                                <label>Cor do Texto do Rodapé</label>
+                                <label>Cor do Texto do RodapÃ©</label>
                                 <div class="se-color-row">
                                     <input type="color" id="se-footer-text-color" value="#94a3b8">
                                     <input type="text" id="se-footer-text-color-text" placeholder="#94a3b8">
@@ -2019,14 +2065,14 @@
                             style="border-radius:12px; padding:16px 20px; border:2px solid rgba(255,255,255,0.1);">
                             <div id="se-footer-preview-title"
                                 style="font-weight:800; font-size:14px; margin-bottom:6px; text-transform:uppercase; letter-spacing:1px;">
-                                DEFENSORES DO JOGO RESPONSÁVEL</div>
-                            <div id="se-footer-preview-text" style="font-size:12px; line-height:1.6;">Nós promovemos o
-                                jogo responsável como uma forma de entretenimento.</div>
+                                DEFENSORES DO JOGO RESPONSÃVEL</div>
+                            <div id="se-footer-preview-text" style="font-size:12px; line-height:1.6;">NÃ³s promovemos o
+                                jogo responsÃ¡vel como uma forma de entretenimento.</div>
                         </div>
                     </div>
                 </div>
             </div>
-                    <!-- ═══════ SEÇÃO 9: TOP 3 JOGOS FIXADOS ═══════ -->
+                    <!-- â•â•â•â•â•â•â• SEÃ‡ÃƒO 9: TOP 3 JOGOS FIXADOS â•â•â•â•â•â•â• -->
             <div class="se-section sec-top3-games">
                 <style>
                     .pinned-summary {
@@ -2223,14 +2269,14 @@
                     <div class="se-section-icon"><i class="fa-solid fa-thumbtack" style="color:#fbbf24"></i></div>
                     <div>
                         <div class="se-section-title">Fixar Jogos no Top 3</div>
-                        <div class="se-section-desc">Selecione até 3 jogos da própria plataforma para fixar no topo com gráficos ativos</div>
+                        <div class="se-section-desc">Selecione atÃ© 3 jogos da prÃ³pria plataforma para fixar no topo com grÃ¡ficos ativos</div>
                     </div>
                     <i class="fa-solid fa-chevron-down se-chevron"></i>
                 </div>
                 <div class="se-section-body">
                     <div class="se-section-content">
                         <p style="font-size: 13px; color: #94a3b8; margin-bottom: 15px; line-height: 1.6;">
-                            Selecione até 3 jogos abaixo clicando nos cards. Os jogos fixados aparecerão no topo do site com status <strong>Alta</strong> e gráficos ativos, ignorando as rotações randômicas.
+                            Selecione atÃ© 3 jogos abaixo clicando nos cards. Os jogos fixados aparecerÃ£o no topo do site com status <strong>Alta</strong> e grÃ¡ficos ativos, ignorando as rotaÃ§Ãµes randÃ´micas.
                         </p>
                         
                         <!-- Hidden inputs to preserve standard saving mechanism -->
@@ -2252,7 +2298,7 @@
                         <div style="margin-top:20px; margin-bottom:15px;">
                             <label style="font-size:11px; font-weight:600; color:#94a3b8; margin-bottom:8px; display:block; text-transform: uppercase; letter-spacing: 0.5px;">Selecione os jogos na lista abaixo:</label>
                             <div style="position:relative;">
-                                <input type="text" id="pin-search-input" placeholder="🔍 Buscar jogo da plataforma por nome..." style="width:100%; padding:11px 16px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(0,0,0,0.2); color:#fff; font-size:13px; outline:none; transition: border-color 0.2s;">
+                                <input type="text" id="pin-search-input" placeholder="ðŸ” Buscar jogo da plataforma por nome..." style="width:100%; padding:11px 16px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(0,0,0,0.2); color:#fff; font-size:13px; outline:none; transition: border-color 0.2s;">
                             </div>
                         </div>
 
@@ -2267,25 +2313,25 @@
                 </div>
             </div>
 
-            <!-- ═══════ SEÇÃO 10: ATUALIZAÇÃO DO SISTEMA ═══════ -->
+            <!-- â•â•â•â•â•â•â• SEÃ‡ÃƒO 10: ATUALIZAÃ‡ÃƒO DO SISTEMA â•â•â•â•â•â•â• -->
             <div class="se-section sec-system-update">
                 <div class="se-section-header" onclick="toggleSection(this)">
                     <div class="se-section-icon"><i class="fa-solid fa-arrows-rotate"></i></div>
                     <div>
-                        <div class="se-section-title">Atualização do Sistema</div>
-                        <div class="se-section-desc">Puxar atualizações mais recentes do GitHub e reiniciar o servidor</div>
+                        <div class="se-section-title">AtualizaÃ§Ã£o do Sistema</div>
+                        <div class="se-section-desc">Puxar atualizaÃ§Ãµes mais recentes do GitHub e reiniciar o servidor</div>
                     </div>
                     <i class="fa-solid fa-chevron-down se-chevron"></i>
                 </div>
                 <div class="se-section-body">
                     <div class="se-section-content">
                         <p style="font-size: 13px; color: #94a3b8; margin-bottom: 15px; line-height: 1.6;">
-                            Clique no botão abaixo para baixar os arquivos mais recentes do GitHub e atualizar o site. 
-                            Esse processo preserva suas configurações locais (nome do site, links de plataformas, fotos e credenciais).
-                            O servidor será reiniciado automaticamente após a conclusão da atualização.
+                            Clique no botÃ£o abaixo para baixar os arquivos mais recentes do GitHub e atualizar o site. 
+                            Esse processo preserva suas configuraÃ§Ãµes locais (nome do site, links de plataformas, fotos e credenciais).
+                            O servidor serÃ¡ reiniciado automaticamente apÃ³s a conclusÃ£o da atualizaÃ§Ã£o.
                         </p>
                         <button type="button" class="btn-se-save" id="btn-update-system" onclick="runSystemUpdate()" style="width: auto; padding: 12px 24px; background: linear-gradient(135deg, #10b981, #059669); margin-bottom: 15px;">
-                            <i class="fa-solid fa-cloud-arrow-down"></i> Iniciar Atualização do GitHub
+                            <i class="fa-solid fa-cloud-arrow-down"></i> Iniciar AtualizaÃ§Ã£o do GitHub
                         </button>
                         
                         <div id="update-status-msg" style="display:none; font-size:13px; font-weight:600; margin-top:8px; margin-bottom:8px;"></div>
@@ -2295,10 +2341,10 @@
                 </div>
             </div>
 
-            <!-- BOTÃO SALVAR -->
+            <!-- BOTÃƒO SALVAR -->
             <div class="se-save-row">
                 <button class="btn-se-save" id="btn-se-save">
-                    <i class="fa-solid fa-floppy-disk"></i> Salvar Alterações
+                    <i class="fa-solid fa-floppy-disk"></i> Salvar AlteraÃ§Ãµes
                 </button>
             </div>
         </div>
@@ -2337,9 +2383,9 @@
 
                 // Update title and header with site name
                 if (cfg.siteName) {
-                    document.title = cfg.siteName + ' — Painel Admin';
+                    document.title = cfg.siteName + ' â€” Painel Admin';
                     document.getElementById('login-title').textContent = 'Painel Admin';
-                    document.getElementById('admin-header-name').textContent = cfg.siteName + ' — Painel Admin';
+                    document.getElementById('admin-header-name').textContent = cfg.siteName + ' â€” Painel Admin';
                 }
 
                 // Update favicon
@@ -2405,7 +2451,7 @@
                     errEl.textContent = data.error || 'Erro ao fazer login';
                 }
             } catch (err) {
-                errEl.textContent = 'Erro de conexão';
+                errEl.textContent = 'Erro de conexÃ£o';
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Entrar';
@@ -2455,7 +2501,7 @@
                 return;
             }
             if (newPassword.length < 4) {
-                errEl.textContent = 'Senha deve ter no mínimo 4 caracteres';
+                errEl.textContent = 'Senha deve ter no mÃ­nimo 4 caracteres';
                 return;
             }
 
@@ -2473,14 +2519,14 @@
                 const data = await res.json();
 
                 if (data.success) {
-                    showToast('Credenciais alteradas! Faça login novamente.');
+                    showToast('Credenciais alteradas! FaÃ§a login novamente.');
                     document.getElementById('settings-modal').classList.remove('show');
                     setTimeout(() => showLogin(), 1500);
                 } else {
                     errEl.textContent = data.error || 'Erro ao alterar credenciais';
                 }
             } catch (err) {
-                errEl.textContent = 'Erro de conexão';
+                errEl.textContent = 'Erro de conexÃ£o';
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Salvar';
@@ -2542,8 +2588,8 @@
             const totalNew = allGamesData.filter(g => g.inNew).length;
             stats.innerHTML = `
                 <div class="stat-chip">Total: <span>${totalAll}</span></div>
-                <div class="stat-chip">🔥 Hot: <span>${totalHot}</span></div>
-                <div class="stat-chip">⭐ New: <span>${totalNew}</span></div>
+                <div class="stat-chip">ðŸ”¥ Hot: <span>${totalHot}</span></div>
+                <div class="stat-chip">â­ New: <span>${totalNew}</span></div>
                 <div class="stat-chip">Exibindo: <span>${filteredData.length}</span></div>
             `;
 
@@ -2552,34 +2598,82 @@
                 document.querySelector('.bulk-section').style.display = 'none';
 
                 list.innerHTML =
-                    `<div class="game-row" style="background: rgba(236,72,153,0.1); border-color:#ec4899; justify-content:space-between">
-                    <div style="font-weight:bold; color:#f472b6"><i class="fa-solid fa-plus"></i> Adicionar Nova Plataforma</div>
-                    <div style="display:flex; gap:8px; flex:1; max-width:600px">
-                        <input type="text" id="new-plat-name" class="g-href" placeholder="Nome Ex: FORTUNE" style="max-width:200px">
-                        <input type="text" id="new-plat-link" class="g-href" placeholder="Link da plataforma">
-                        <button class="btn-save" onclick="addPlatform(this)" style="background:#ec4899"><i class="fa-solid fa-check"></i> Criar</button>
+                    `<div class="game-row" style="background: rgba(236,72,153,0.1); border-color:#ec4899; flex-direction:column; gap:12px; align-items:stretch;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div style="font-weight:bold; color:#f472b6; font-size:14px;"><i class="fa-solid fa-plus-circle"></i> Adicionar Nova Plataforma</div>
+                        <div style="font-size:11px; color:#94a3b8;">Ãcone automÃ¡tico via favicon ou upload customizado</div>
+                    </div>
+                    <div style="display:grid; grid-template-columns: 140px 1fr 140px; gap:8px;">
+                        <input type="text" id="new-plat-name" class="g-href" placeholder="Nome Ex: BBW">
+                        <input type="text" id="new-plat-link" class="g-href" placeholder="Link (ex: https://bbwj7g.com/...)">
+                        <select id="new-plat-badge" class="g-href" style="cursor:pointer; background:#0f172a;">
+                            <option value="">Sem Badge</option>
+                            <option value="NOVO">Badge: NOVO</option>
+                            <option value="HOT">Badge: HOT</option>
+                            <option value="VIP">Badge: VIP</option>
+                        </select>
+                    </div>
+                    <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                        <input type="text" id="new-plat-icon" class="g-href" placeholder="URL do Ãcone / Fivecon (Opcional - detecta auto do link)" style="flex:1;">
+                        <input type="file" id="new-plat-file" accept="image/*" style="display:none;" onchange="uploadPlatIconFile(this, 'new-plat-icon', 'new-plat-thumb')">
+                        <button type="button" class="btn-save" onclick="document.getElementById('new-plat-file').click()" style="background:#0ea5e9; white-space:nowrap;">
+                            <i class="fa-solid fa-upload"></i> Enviar Imagem
+                        </button>
+                        <button type="button" class="btn-save" onclick="autoDetectFavicon('new-plat-link', 'new-plat-icon', 'new-plat-thumb')" style="background:#6366f1; white-space:nowrap;">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> Auto Favicon
+                        </button>
+                        <img id="new-plat-thumb" src="/assets/favicon.png" style="width:34px; height:34px; border-radius:8px; object-fit:cover; border:1px solid rgba(255,255,255,0.2);">
+                        <button class="btn-save" onclick="addPlatform(this)" style="background:#ec4899; white-space:nowrap; padding:8px 16px;">
+                            <i class="fa-solid fa-check"></i> Criar Plataforma
+                        </button>
                     </div>
                 </div>` +
                     (filteredData.length === 0
-                        ? `<div class="loading-state" style="color:#64748b"><i class="fa-solid fa-link" style="animation:none"></i><p>Nenhuma plataforma. Adicione uma acima!</p></div>`
-                        : filteredData.map((g, i) => `
-                <div class="game-row" style="animation-delay:${Math.min(i * 0.02, 0.6)}s; flex-wrap:wrap; gap:12px;" data-id="${g.id}">
-                    <div class="g-info" style="min-width:120px">
-                        <div class="g-name" style="color:#ec4899; font-size:14px"><i class="fa-solid fa-link"></i> ${escapeHtml(g.nome)}</div>
-                        <div style="font-size:11px; color:#64748b; margin-top:2px; word-break:break-all">${escapeHtml(g.link)}</div>
+                        ? `<div class="loading-state" style="color:#64748b"><i class="fa-solid fa-link" style="animation:none"></i><p>Nenhuma plataforma cadastrada. Adicione uma acima!</p></div>`
+                        : filteredData.map((g, i) => {
+                            const iconUrl = g.icon || getAdminPlatIcon(g);
+                            return `
+                <div class="game-row" style="animation-delay:${Math.min(i * 0.02, 0.6)}s; flex-direction:column; gap:10px; align-items:stretch; background:rgba(30,27,75,0.4); border-color:rgba(255,255,255,0.12);" data-id="${g.id}">
+                    <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+                        <img id="thumb-${g.id}" class="g-icon" src="${iconUrl}" alt="" onerror="this.src='/assets/favicon.png'" style="width:46px; height:46px; border-radius:10px; object-fit:cover; border:1.5px solid rgba(255,255,255,0.2);">
+                        <div style="flex:1; min-width:160px;">
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <span class="g-name" style="color:#ec4899; font-size:15px; font-weight:800;">${escapeHtml(g.nome)}</span>
+                                ${g.badge ? `<span style="background:${g.badge === 'NOVO' ? '#ff007f' : g.badge === 'HOT' ? '#ff6d00' : '#00e5ff'}; color:#fff; font-size:9px; font-weight:900; padding:2px 6px; border-radius:4px;">${g.badge}</span>` : ''}
+                            </div>
+                            <div style="font-size:11px; color:#94a3b8; word-break:break-all; margin-top:2px;">${escapeHtml(g.link)}</div>
+                        </div>
+                        <div style="display:flex; gap:6px;">
+                            <button class="btn-save" onclick="savePlatform('${g.id}', this)" style="background:#8b5cf6; white-space:nowrap">
+                                <i class="fa-solid fa-floppy-disk"></i> Salvar
+                            </button>
+                            <button class="btn-save" onclick="deletePlatform('${g.id}', this)" style="background:#ef4444; white-space:nowrap">
+                                <i class="fa-solid fa-trash"></i> Excluir
+                            </button>
+                        </div>
                     </div>
-                    <div class="g-href-wrap" style="flex-wrap:wrap; min-width:200px">
-                        <input class="g-href" id="plat-name-${g.id}" value="${escapeHtml(g.nome)}" spellcheck="false" placeholder="Nome" style="max-width:160px; min-width:100px">
+                    <div style="display:grid; grid-template-columns: 140px 1fr 130px; gap:8px;">
+                        <input class="g-href" id="plat-name-${g.id}" value="${escapeHtml(g.nome)}" spellcheck="false" placeholder="Nome">
                         <input class="g-href" id="plat-link-${g.id}" value="${escapeHtml(g.link)}" spellcheck="false" placeholder="Link">
-                        <button class="btn-save" onclick="savePlatform('${g.id}', this)" style="background:#8b5cf6; white-space:nowrap">
-                            <i class="fa-solid fa-floppy-disk"></i> Salvar
+                        <select id="plat-badge-${g.id}" class="g-href" style="cursor:pointer; background:#0f172a;">
+                            <option value="" ${!g.badge ? 'selected' : ''}>Sem Badge</option>
+                            <option value="NOVO" ${g.badge === 'NOVO' ? 'selected' : ''}>Badge: NOVO</option>
+                            <option value="HOT" ${g.badge === 'HOT' ? 'selected' : ''}>Badge: HOT</option>
+                            <option value="VIP" ${g.badge === 'VIP' ? 'selected' : ''}>Badge: VIP</option>
+                        </select>
+                    </div>
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <input class="g-href" id="plat-icon-${g.id}" value="${escapeHtml(g.icon || '')}" spellcheck="false" placeholder="URL do Ãcone / Fivecon (Vazio = auto favicon)" style="flex:1;">
+                        <input type="file" id="file-${g.id}" accept="image/*" style="display:none;" onchange="uploadPlatIconFile(this, 'plat-icon-${g.id}', 'thumb-${g.id}')">
+                        <button type="button" class="btn-save" onclick="document.getElementById('file-${g.id}').click()" style="background:#0ea5e9; white-space:nowrap; padding:6px 12px; font-size:11px;">
+                            <i class="fa-solid fa-upload"></i> Trocar Ãcone
                         </button>
-                        <button class="btn-save" onclick="deletePlatform('${g.id}', this)" style="background:#ef4444; white-space:nowrap">
-                            <i class="fa-solid fa-trash"></i> Excluir
+                        <button type="button" class="btn-save" onclick="autoDetectFavicon('plat-link-${g.id}', 'plat-icon-${g.id}', 'thumb-${g.id}')" style="background:#6366f1; white-space:nowrap; padding:6px 12px; font-size:11px;">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> Auto Favicon
                         </button>
                     </div>
-                </div>
-                `).join(''));
+                </div>`;
+                        }).join(''));
                 return;
             } else {
                 document.querySelector('.bulk-section').style.display = 'flex';
@@ -2617,12 +2711,77 @@
             return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         }
 
-        // --- PLATFORMS ACTIONS (New) ---
+        // --- PLATFORMS ACTIONS (Enhanced) ---
+        function getAdminPlatIcon(g) {
+            if (g && g.icon && g.icon.trim()) return g.icon.trim();
+            try {
+                let raw = (g && g.link ? g.link : '').trim();
+                if (!raw.startsWith('http://') && !raw.startsWith('https://')) raw = 'https://' + raw;
+                const u = new URL(raw);
+                return `https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${encodeURIComponent(u.origin)}&size=128`;
+            } catch(e) {
+                return '/assets/favicon.png';
+            }
+        }
+
+        async function uploadPlatIconFile(inputEl, targetInputId, previewImgId) {
+            const file = inputEl.files && inputEl.files[0];
+            if (!file) return;
+            const formData = new FormData();
+            formData.append('icon', file);
+            showToast('Enviando Ã­cone...');
+            try {
+                const res = await fetch('/api/admin/platforms/upload-icon', {
+                    method: 'POST',
+                    headers: authHeaders(),
+                    body: formData
+                });
+                const data = await res.json();
+                if (data.success) {
+                    const target = document.getElementById(targetInputId);
+                    if (target) target.value = data.iconPath;
+                    const preview = document.getElementById(previewImgId);
+                    if (preview) preview.src = data.iconPath;
+                    showToast('Ãcone enviado com sucesso!');
+                } else {
+                    showToast('Erro ao enviar Ã­cone: ' + (data.error || ''), 'error');
+                }
+            } catch (e) {
+                showToast('Erro de conexÃ£o ao enviar Ã­cone', 'error');
+            }
+        }
+
+        function autoDetectFavicon(linkInputId, targetIconInputId, previewImgId) {
+            const linkVal = (document.getElementById(linkInputId)?.value || '').trim();
+            if (!linkVal) {
+                showToast('Insira o link primeiro', 'error');
+                return;
+            }
+            try {
+                let raw = linkVal;
+                if (!raw.startsWith('http://') && !raw.startsWith('https://')) raw = 'https://' + raw;
+                const u = new URL(raw);
+                const faviconUrl = `https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${encodeURIComponent(u.origin)}&size=128`;
+                const target = document.getElementById(targetIconInputId);
+                if (target) target.value = faviconUrl;
+                const preview = document.getElementById(previewImgId);
+                if (preview) preview.src = faviconUrl;
+                showToast('Favicon detectado!');
+            } catch (e) {
+                showToast('Link invÃ¡lido', 'error');
+            }
+        }
+
         async function addPlatform(btn) {
             const nomeInfo = document.getElementById('new-plat-name');
             const linkInfo = document.getElementById('new-plat-link');
-            const nome = nomeInfo.value.trim();
-            const link = linkInfo.value.trim();
+            const iconInfo = document.getElementById('new-plat-icon');
+            const badgeInfo = document.getElementById('new-plat-badge');
+
+            const nome = (nomeInfo?.value || '').trim();
+            const link = (linkInfo?.value || '').trim();
+            const icon = (iconInfo?.value || '').trim();
+            const badge = (badgeInfo?.value || '').trim();
 
             if (!nome || !link) { showToast('Preencha nome e link', 'error'); return; }
 
@@ -2633,28 +2792,32 @@
                 const res = await fetch('/api/admin/platforms', {
                     method: 'POST',
                     headers: authHeaders(),
-                    body: JSON.stringify({ nome, link })
+                    body: JSON.stringify({ nome, link, icon, badge })
                 });
                 const data = await res.json();
                 if (data.success) {
                     showToast('Plataforma adicionada!');
-                    nomeInfo.value = '';
-                    linkInfo.value = '';
+                    if (nomeInfo) nomeInfo.value = '';
+                    if (linkInfo) linkInfo.value = '';
+                    if (iconInfo) iconInfo.value = '';
+                    if (badgeInfo) badgeInfo.value = '';
                     loadGames();
                 } else {
                     showToast('Erro: ' + data.error, 'error');
                 }
             } catch (e) {
-                showToast('Erro de conexão', 'error');
+                showToast('Erro de conexÃ£o', 'error');
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = '<i class="fa-solid fa-check"></i> Criar';
+                btn.innerHTML = '<i class="fa-solid fa-check"></i> Criar Plataforma';
             }
         }
 
         async function savePlatform(id, btn) {
-            const nome = document.getElementById(`plat-name-${id}`).value.trim();
-            const link = document.getElementById(`plat-link-${id}`).value.trim();
+            const nome = (document.getElementById(`plat-name-${id}`)?.value || '').trim();
+            const link = (document.getElementById(`plat-link-${id}`)?.value || '').trim();
+            const icon = (document.getElementById(`plat-icon-${id}`)?.value || '').trim();
+            const badge = (document.getElementById(`plat-badge-${id}`)?.value || '').trim();
 
             if (!nome || !link) { showToast('Preencha nome e link', 'error'); return; }
 
@@ -2666,7 +2829,7 @@
                 const res = await fetch(`/api/admin/platforms/${id}`, {
                     method: 'PUT',
                     headers: authHeaders(),
-                    body: JSON.stringify({ nome, link })
+                    body: JSON.stringify({ nome, link, icon, badge })
                 });
                 const data = await res.json();
                 if (data.success) {
@@ -2682,7 +2845,7 @@
                     btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Salvar';
                 }
             } catch (e) {
-                showToast('Erro de conexão', 'error');
+                showToast('Erro de conexÃ£o', 'error');
                 btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Salvar';
             } finally {
                 btn.disabled = false;
@@ -2703,7 +2866,7 @@
                 });
                 const data = await res.json();
                 if (data.success) {
-                    showToast('Plataforma excluída!');
+                    showToast('Plataforma excluÃ­da!');
                     loadGames();
                 } else {
                     showToast('Erro: ' + data.error, 'error');
@@ -2711,7 +2874,7 @@
                     btn.disabled = false;
                 }
             } catch (e) {
-                showToast('Erro de conexão', 'error');
+                showToast('Erro de conexÃ£o', 'error');
                 btn.innerHTML = '<i class="fa-solid fa-trash"></i>';
                 btn.disabled = false;
             }
@@ -2721,7 +2884,7 @@
         async function saveGame(cardNo, btn) {
             const input = document.getElementById(`href - ${cardNo} `);
             const href = input.value.trim();
-            if (!href) { showToast('Link não pode ser vazio', 'error'); return; }
+            if (!href) { showToast('Link nÃ£o pode ser vazio', 'error'); return; }
 
             btn.classList.add('saving');
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
@@ -2840,7 +3003,7 @@
             if (loadedSocialLinks.length === 0) {
                 container.innerHTML = `<div style="text-align:center; padding:20px; color:#64748b; background:rgba(255,255,255,0.01); border:1px dashed rgba(255,255,255,0.1); border-radius:8px; font-size:13px;">
                     <i class="fa-solid fa-link-slash" style="font-size:24px; margin-bottom:8px; display:block;"></i>
-                    Nenhum link social cadastrado. Clique no botão abaixo para adicionar!
+                    Nenhum link social cadastrado. Clique no botÃ£o abaixo para adicionar!
                 </div>`;
                 updateAdminPreviewSocialButtons();
                 return;
@@ -2893,7 +3056,7 @@
                             </select>
                         </div>
                         <div class="se-field">
-                            <label>Texto do Botão</label>
+                            <label>Texto do BotÃ£o</label>
                             <input type="text" value="${escapeHtml(link.label || '')}" placeholder="Ex: WhatsApp 2" oninput="updateSocialLinkLabel('${link.id}', this.value)" style="width:100%;">
                         </div>
                     </div>
@@ -2904,7 +3067,7 @@
                             <input type="url" value="${escapeHtml(link.link || '')}" placeholder="https://..." oninput="updateSocialLinkUrl('${link.id}', this.value)" style="width:100%;">
                         </div>
                         <div class="se-field" style="flex:1">
-                            <label>Cor do Botão</label>
+                            <label>Cor do BotÃ£o</label>
                             <div class="se-color-row">
                                 <input type="color" value="${link.color || '#25d366'}" oninput="updateSocialLinkColor('${link.id}', this.value)">
                                 <input type="text" id="color-text-${link.id}" value="${link.color || '#25d366'}" placeholder="#25d366" oninput="updateSocialLinkColorText('${link.id}', this.value)" style="width:100%;">
@@ -3084,7 +3247,7 @@
                 document.getElementById('announcement-quick-link').value = announcement.link || '';
                 document.getElementById('visitor-counter-bg-color').value = cfg.visitorCounterBgColor || '#15171b';
             } catch (_) {
-                showToast('Erro ao carregar anúncio', 'error');
+                showToast('Erro ao carregar anÃºncio', 'error');
             }
         }
 
@@ -3093,7 +3256,7 @@
             const enabled = document.getElementById('announcement-quick-enabled').checked;
             const link = document.getElementById('announcement-quick-link').value.trim();
             if (enabled && !link) {
-                showToast('Cole o link antes de ativar o anúncio.', 'error');
+                showToast('Cole o link antes de ativar o anÃºncio.', 'error');
                 return;
             }
 
@@ -3111,12 +3274,12 @@
                 const data = await res.json();
                 if (!res.ok || !data.success) throw new Error(data.error || 'Erro ao salvar');
                 button.innerHTML = '<i class="fa-solid fa-check"></i> Salvo!';
-                showToast('Anúncio salvo com sucesso!');
+                showToast('AnÃºncio salvo com sucesso!');
             } catch (error) {
-                showToast(error.message || 'Erro ao salvar anúncio', 'error');
+                showToast(error.message || 'Erro ao salvar anÃºncio', 'error');
             } finally {
                 button.disabled = false;
-                setTimeout(() => { button.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Salvar Anúncio'; }, 1600);
+                setTimeout(() => { button.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Salvar AnÃºncio'; }, 1600);
             }
         });
 
@@ -3146,10 +3309,13 @@
             document.getElementById('se-card-color-text').value = cardColor;
             updateCardColorPreview(cardColor);
 
-            // Platforms color
+            // Platforms color & mode & title & subtitle
             const platColor = cfg.platformsColor || '#b5006e';
             document.getElementById('se-platforms-color').value = platColor;
             document.getElementById('se-platforms-color-text').value = platColor;
+            document.getElementById('se-platforms-title').value = cfg.platformsTitle !== undefined ? cfg.platformsTitle : '';
+            document.getElementById('se-platforms-subtitle').value = cfg.platformsSubtitle !== undefined ? cfg.platformsSubtitle : '';
+            setAdminPlatformsMode(cfg.platformsDisplayMode || 'list');
             updatePlatformsPreview(platColor);
 
             // Update color
@@ -3176,12 +3342,18 @@
             // Button preview
             updateButtonPreview(btnColor);
 
+            // Show or hide chart in cards
+            const showChartEl = document.getElementById('se-show-chart');
+            if (showChartEl) showChartEl.checked = cfg.showChart !== false;
+
             // Banners
             renderBannerGrid(cfg.banners || []);
 
             const announcement = cfg.announcement || {};
-            document.getElementById('se-announcement-enabled').checked = Boolean(announcement.enabled);
-            document.getElementById('se-announcement-link').value = announcement.link || '';
+            const annEnabled = document.getElementById('se-announcement-enabled');
+            if (annEnabled) annEnabled.checked = Boolean(announcement.enabled);
+            const annLink = document.getElementById('se-announcement-link');
+            if (annLink) annLink.value = announcement.link || '';
 
             // Photo
             document.getElementById('se-photo-thumb').src = cfg.profilePhoto;
@@ -3237,8 +3409,101 @@
             document.getElementById('se-card-color-preview').style.background = bg;
         }
 
+        let currentPlatformsDisplayMode = 'list';
+
+        function setAdminPlatformsMode(mode) {
+            currentPlatformsDisplayMode = mode;
+            const iconsCard = document.getElementById('se-mode-card-icons');
+            const listCard = document.getElementById('se-mode-card-list');
+            const radioIcons = document.getElementById('admin-plat-mode-icons');
+            const radioList = document.getElementById('admin-plat-mode-list');
+
+            if (mode === 'icons') {
+                if (radioIcons) radioIcons.checked = true;
+                if (iconsCard) {
+                    iconsCard.style.borderColor = '#ec4899';
+                    iconsCard.style.background = 'rgba(236,72,153,0.18)';
+                }
+                if (listCard) {
+                    listCard.style.borderColor = 'rgba(255,255,255,0.15)';
+                    listCard.style.background = 'rgba(255,255,255,0.03)';
+                }
+            } else {
+                if (radioList) radioList.checked = true;
+                if (listCard) {
+                    listCard.style.borderColor = '#ec4899';
+                    listCard.style.background = 'rgba(236,72,153,0.18)';
+                }
+                if (iconsCard) {
+                    iconsCard.style.borderColor = 'rgba(255,255,255,0.15)';
+                    iconsCard.style.background = 'rgba(255,255,255,0.03)';
+                }
+            }
+            updatePlatformsPreview();
+        }
+
         function updatePlatformsPreview(hex) {
-            document.getElementById('se-platforms-preview').style.background = `linear-gradient(135deg, ${hex}, ${adjustColorAdmin(hex, 20)})`;
+            const previewEl = document.getElementById('se-platforms-preview');
+            if (!previewEl) return;
+            const color = hex || document.getElementById('se-platforms-color')?.value || '#b5006e';
+            previewEl.style.background = `linear-gradient(135deg, ${color}, ${adjustColorAdmin(color, 20)})`;
+
+            const titleVal = document.getElementById('se-platforms-title')?.value.trim();
+            const subVal = document.getElementById('se-platforms-subtitle')?.value.trim();
+            const mode = currentPlatformsDisplayMode || 'icons';
+
+            const displayTitle = titleVal !== '' && titleVal !== undefined ? titleVal : (mode === 'icons' ? 'ðŸ‘‘ PLATAFORMAS INDICADAS ðŸ‘‘' : 'PLATAFORMA');
+            const displaySub = subVal !== '' && subVal !== undefined ? subVal : (mode === 'icons' ? 'Os melhores jogos das principais plataformas parceiras' : '');
+
+            let bodyHtml = '';
+            if (mode === 'icons') {
+                bodyHtml = `
+                    <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:8px;">
+                        <div style="position:relative; aspect-ratio:1/1; border-radius:12px; overflow:hidden; background:rgba(0,0,0,0.4); border:1.5px solid rgba(255,255,255,0.25); display:flex; align-items:center; justify-content:center;">
+                            <span style="position:absolute; top:3px; right:3px; background:#ff007f; color:#fff; font-size:7.5px; font-weight:900; padding:1px 4px; border-radius:4px; box-shadow:0 0 6px #ff007f;">NOVO</span>
+                            <img src="https://upload-us.z-9-a-b.com/s6/app-icon/1303117/APP4.png" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='/assets/favicon.png'">
+                            <span style="position:absolute; bottom:0; left:0; right:0; background:rgba(0,0,0,0.85); color:#fff; font-size:8.5px; font-weight:800; text-align:center; padding:2px;">BBW</span>
+                        </div>
+                        <div style="position:relative; aspect-ratio:1/1; border-radius:12px; overflow:hidden; background:rgba(0,0,0,0.4); border:1.5px solid rgba(255,255,255,0.25); display:flex; align-items:center; justify-content:center;">
+                            <span style="position:absolute; top:3px; right:3px; background:#ff6d00; color:#fff; font-size:7.5px; font-weight:900; padding:1px 4px; border-radius:4px; box-shadow:0 0 6px #ff6d00;">HOT</span>
+                            <img src="https://upload-us.z-9-a-b.com/s6/app-icon/2285733/83F512.png" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='/assets/favicon.png'">
+                            <span style="position:absolute; bottom:0; left:0; right:0; background:rgba(0,0,0,0.85); color:#fff; font-size:8.5px; font-weight:800; text-align:center; padding:2px;">83F</span>
+                        </div>
+                        <div style="position:relative; aspect-ratio:1/1; border-radius:12px; overflow:hidden; background:rgba(0,0,0,0.4); border:1.5px solid rgba(255,255,255,0.25); display:flex; align-items:center; justify-content:center;">
+                            <span style="position:absolute; top:3px; right:3px; background:#00e5ff; color:#fff; font-size:7.5px; font-weight:900; padding:1px 4px; border-radius:4px; box-shadow:0 0 6px #00e5ff;">VIP</span>
+                            <img src="https://upload-us.x-y-2-z.com/s3/app-icon/8790051/85F_icon.png" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='/assets/favicon.png'">
+                            <span style="position:absolute; bottom:0; left:0; right:0; background:rgba(0,0,0,0.85); color:#fff; font-size:8.5px; font-weight:800; text-align:center; padding:2px;">85F</span>
+                        </div>
+                    </div>
+                `;
+            } else {
+                bodyHtml = `
+                    <div style="display:flex; flex-direction:column; gap:6px;">
+                        <div style="display:flex; align-items:center; gap:10px; background:rgba(0,0,0,0.28); border-radius:10px; padding:6px 10px; border:1px solid rgba(255,255,255,0.15);">
+                            <img src="https://upload-us.z-9-a-b.com/s6/app-icon/1303117/APP4.png" style="width:36px; height:36px; border-radius:8px; object-fit:cover;" onerror="this.src='/assets/favicon.png'">
+                            <div>
+                                <div style="color:#fff; font-weight:800; font-size:12px;">BBW <span style="background:#ff007f; color:#fff; font-size:7px; font-weight:900; padding:1px 3px; border-radius:3px;">NOVO</span></div>
+                                <div style="color:rgba(255,255,255,0.6); font-size:9.5px;">bbwj7g.com</div>
+                            </div>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:10px; background:rgba(0,0,0,0.28); border-radius:10px; padding:6px 10px; border:1px solid rgba(255,255,255,0.15);">
+                            <img src="https://upload-us.z-9-a-b.com/s6/app-icon/2285733/83F512.png" style="width:36px; height:36px; border-radius:8px; object-fit:cover;" onerror="this.src='/assets/favicon.png'">
+                            <div>
+                                <div style="color:#fff; font-weight:800; font-size:12px;">83F <span style="background:#ff6d00; color:#fff; font-size:7px; font-weight:900; padding:1px 3px; border-radius:3px;">HOT</span></div>
+                                <div style="color:rgba(255,255,255,0.6); font-size:9.5px;">83f005.com</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            previewEl.innerHTML = `
+                <div style="text-align:center; color:#fff; font-weight:900; font-size:15px; letter-spacing:1px; margin-bottom:${displaySub ? '2px' : '8px'}; text-shadow:0 1px 4px rgba(0,0,0,0.5);">
+                    ${escapeHtml(displayTitle)}
+                </div>
+                ${displaySub ? `<div style="text-align:center; color:rgba(255,255,255,0.75); font-size:10px; margin-bottom:10px;">${escapeHtml(displaySub)}</div>` : ''}
+                ${bodyHtml}
+            `;
         }
 
         function updateUpdatePreview(hex) {
@@ -3491,6 +3756,10 @@
                 themeColor: document.getElementById('se-theme-color').value,
                 cardColor: document.getElementById('se-card-color').value,
                 platformsColor: document.getElementById('se-platforms-color').value,
+                platformsDisplayMode: currentPlatformsDisplayMode || 'icons',
+                platformsTitle: document.getElementById('se-platforms-title').value.trim(),
+                platformsSubtitle: document.getElementById('se-platforms-subtitle').value.trim(),
+                showChart: document.getElementById('se-show-chart').checked,
                 updateColor: document.getElementById('se-update-color').value,
                 bgColor: document.getElementById('se-bg-color').value,
                 buttonColor: document.getElementById('se-button-color').value,
@@ -3579,7 +3848,7 @@
             const statusMsg = document.getElementById('update-status-msg');
             const logPre = document.getElementById('update-log');
             
-            if (!confirm('Deseja realmente iniciar a atualização do sistema? O servidor será reiniciado e ficará offline por alguns segundos.')) {
+            if (!confirm('Deseja realmente iniciar a atualizaÃ§Ã£o do sistema? O servidor serÃ¡ reiniciado e ficarÃ¡ offline por alguns segundos.')) {
                 return;
             }
             
@@ -3587,7 +3856,7 @@
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Atualizando...';
             statusMsg.style.display = 'block';
             statusMsg.style.color = '#e2e8f0';
-            statusMsg.innerHTML = '<i class="fa-solid fa-arrows-rotate fa-spin"></i> Executando o script de atualização no servidor, por favor aguarde...';
+            statusMsg.innerHTML = '<i class="fa-solid fa-arrows-rotate fa-spin"></i> Executando o script de atualizaÃ§Ã£o no servidor, por favor aguarde...';
             logPre.style.display = 'none';
             logPre.textContent = '';
             
@@ -3600,10 +3869,10 @@
                 
                 logPre.style.display = 'block';
                 if (res.ok && data.success) {
-                    logPre.textContent = data.log || 'Atualização concluída sem logs.';
+                    logPre.textContent = data.log || 'AtualizaÃ§Ã£o concluÃ­da sem logs.';
                     statusMsg.style.color = '#10b981';
                     statusMsg.innerHTML = '<i class="fa-solid fa-circle-check"></i> Sistema atualizado com sucesso! Reiniciando o servidor em breve...';
-                    showToast('Atualização concluída com sucesso!');
+                    showToast('AtualizaÃ§Ã£o concluÃ­da com sucesso!');
                     
                     // Show a count down for reconnection attempt
                     let seconds = 5;
@@ -3616,23 +3885,23 @@
                                 window.location.reload();
                             }, 1000);
                         } else {
-                            statusMsg.innerHTML = `<i class="fa-solid fa-circle-check"></i> Sistema atualizado! Recarregando página em ${seconds} segundos...`;
+                            statusMsg.innerHTML = `<i class="fa-solid fa-circle-check"></i> Sistema atualizado! Recarregando pÃ¡gina em ${seconds} segundos...`;
                         }
                     }, 1000);
                 } else {
                     logPre.textContent = (data.error || 'Erro desconhecido') + '\n\n' + (data.stderr || '') + '\n\n' + (data.stdout || '');
                     statusMsg.style.color = '#ef4444';
-                    statusMsg.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> Ocorreu um erro durante a atualização.';
-                    showToast('Falha na atualização', 'error');
+                    statusMsg.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> Ocorreu um erro durante a atualizaÃ§Ã£o.';
+                    showToast('Falha na atualizaÃ§Ã£o', 'error');
                     btn.disabled = false;
-                    btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-down"></i> Iniciar Atualização do GitHub';
+                    btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-down"></i> Iniciar AtualizaÃ§Ã£o do GitHub';
                 }
             } catch (err) {
                 // Network error is expected because the server restarts and closes connections
                 logPre.style.display = 'block';
-                logPre.textContent = 'Conexão interrompida. O servidor está reiniciando para carregar a atualização.';
+                logPre.textContent = 'ConexÃ£o interrompida. O servidor estÃ¡ reiniciando para carregar a atualizaÃ§Ã£o.';
                 statusMsg.style.color = '#10b981';
-                statusMsg.innerHTML = '<i class="fa-solid fa-circle-check"></i> O comando foi executado. O servidor está reiniciando...';
+                statusMsg.innerHTML = '<i class="fa-solid fa-circle-check"></i> O comando foi executado. O servidor estÃ¡ reiniciando...';
                 showToast('Servidor reiniciando...', 'info');
                 
                 setTimeout(() => {
@@ -3653,14 +3922,14 @@
                 } else {
                     const grid = document.getElementById('pin-games-grid');
                     if (grid) {
-                        grid.innerHTML = '<div style="grid-column: 1/-1; padding: 30px; text-align: center; color: #f87171; font-size: 13px;"><i class="fa-solid fa-circle-xmark" style="font-size: 20px; margin-bottom: 8px; display: block;"></i>Erro ao obter resposta do servidor. Recarregue a página.</div>';
+                        grid.innerHTML = '<div style="grid-column: 1/-1; padding: 30px; text-align: center; color: #f87171; font-size: 13px;"><i class="fa-solid fa-circle-xmark" style="font-size: 20px; margin-bottom: 8px; display: block;"></i>Erro ao obter resposta do servidor. Recarregue a pÃ¡gina.</div>';
                     }
                 }
             } catch (e) {
-                console.error("Erro ao carregar jogos para fixação:", e);
+                console.error("Erro ao carregar jogos para fixaÃ§Ã£o:", e);
                 const grid = document.getElementById('pin-games-grid');
                 if (grid) {
-                    grid.innerHTML = '<div style="grid-column: 1/-1; padding: 30px; text-align: center; color: #f87171; font-size: 13px;"><i class="fa-solid fa-circle-xmark" style="font-size: 20px; margin-bottom: 8px; display: block;"></i>Falha de rede ao carregar a lista de jogos. Recarregue a página.</div>';
+                    grid.innerHTML = '<div style="grid-column: 1/-1; padding: 30px; text-align: center; color: #f87171; font-size: 13px;"><i class="fa-solid fa-circle-xmark" style="font-size: 20px; margin-bottom: 8px; display: block;"></i>Falha de rede ao carregar a lista de jogos. Recarregue a pÃ¡gina.</div>';
                 }
             }
         }
@@ -3711,7 +3980,7 @@
                     const game = allPlatformGames.find(g => g.nome === gameName) || { nome: gameName, banner: '' };
                     html += `
                         <div class="pinned-slot-card active" onclick="togglePinGame('${escapeHtml(gameName)}')" title="Clique para desfixar">
-                            <div class="pinned-slot-badge">${rankNum}º</div>
+                            <div class="pinned-slot-badge">${rankNum}Âº</div>
                             <div class="pinned-slot-banner" style="background-image: url('${game.banner || ''}');"></div>
                             <div class="pinned-slot-info">
                                 <div class="pinned-slot-title">${escapeHtml(gameName)}</div>
@@ -3723,7 +3992,7 @@
                 } else {
                     html += `
                         <div class="pinned-slot-card empty">
-                            <div class="pinned-slot-badge empty">${rankNum}º</div>
+                            <div class="pinned-slot-badge empty">${rankNum}Âº</div>
                             <div class="pinned-slot-info">
                                 <div class="pinned-slot-title" style="color: #64748b;">Vazio</div>
                                 <div class="pinned-slot-subtitle">Escolha um card abaixo</div>

@@ -142,17 +142,18 @@
 .announcement-secondary { border: 1px solid rgba(255, 255, 255, 0.25); background: transparent; color: #fff; }
 
 /* ================================================
-   PLATAFORMAS — List layout
+   PLATAFORMAS — Mode 1 (Icons/Fivecon Grid) & Mode 2 (List with Icons)
    ================================================ */
 .platforms-section {
-  width: 84%;
-  max-width: 450px;
+  width: 90%;
+  max-width: 500px;
   margin: 20px auto;
   background: linear-gradient(135deg, var(--platforms-color-dark, var(--theme-dark, #b8006e)), var(--platforms-color, var(--theme, #d4007a)), var(--platforms-color-light, var(--theme-darker, #a30060)));
   border: 3px solid var(--theme-light, #ff3ea5);
   border-radius: 20px;
-  padding: 20px 16px;
+  padding: 18px 14px;
   box-shadow: 0 0 20px color-mix(in srgb, var(--theme, #d4007a) 40%, transparent), 0 0 60px color-mix(in srgb, var(--theme, #d4007a) 15%, transparent);
+  box-sizing: border-box;
 }
 
 .platforms-title {
@@ -162,31 +163,156 @@
 
 .platforms-title h2 {
   color: #fff;
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 900;
   text-transform: uppercase;
-  letter-spacing: 3px;
+  letter-spacing: 2px;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
+.platforms-subtitle {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 11.5px;
+  font-weight: 500;
+  margin: 5px 0 0 0;
+  text-align: center;
+  letter-spacing: 0.2px;
+  line-height: 1.3;
+}
+
+/* --- MODO 1: SÓ ÍCONE / FIVECON (GRADE 3 COLUNAS MOBILE) --- */
+.platforms-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.plat-grid-item {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: 16px;
+  overflow: hidden;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.12), rgba(0, 0, 0, 0.5));
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+  padding: 0;
+}
+
+.plat-grid-item:hover {
+  transform: translateY(-3px) scale(1.03);
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 16px color-mix(in srgb, var(--theme, #d4007a) 45%, transparent);
+}
+
+.plat-grid-item:active {
+  transform: scale(0.95);
+}
+
+.plat-grid-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 14px;
+}
+
+/* Badges (NOVO, HOT, VIP) */
+.plat-badge {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  font-size: 8.5px;
+  font-weight: 900;
+  padding: 2px 6px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  z-index: 2;
+  pointer-events: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+  line-height: 1.2;
+}
+
+.plat-badge.novo {
+  background: linear-gradient(135deg, #ff007f, #d4007a);
+  color: #fff;
+  box-shadow: 0 0 8px rgba(255, 0, 127, 0.8), 0 2px 5px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.plat-badge.hot {
+  background: linear-gradient(135deg, #ff8800, #ff1a1a);
+  color: #fff;
+  box-shadow: 0 0 8px rgba(255, 68, 0, 0.8), 0 2px 5px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.plat-badge.vip {
+  background: linear-gradient(135deg, #00f0ff, #0072ff);
+  color: #fff;
+  box-shadow: 0 0 8px rgba(0, 240, 255, 0.8), 0 2px 5px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.plat-grid-label {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 4px 4px 5px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.55) 75%, transparent 100%);
+  text-align: center;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95);
+  z-index: 1;
+}
+
+/* --- MODO 2: LISTA COM ÍCONES (COMO ESTÁ AGORA) --- */
 .platforms-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
+  width: 100%;
 }
 
 .plat-list-item {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  gap: 14px;
   min-height: 82px;
-  padding: 10px 12px;
-  background: rgba(0, 0, 0, 0.25);
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 10px 14px;
+  background: rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(8px);
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
   text-decoration: none;
-  transition: all 0.3s ease;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .plat-list-content {
@@ -227,10 +353,49 @@
 }
 
 .plat-list-item:hover {
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.42);
   border-color: rgba(255, 255, 255, 0.35);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+}
+
+.plat-list-item:active {
+  transform: scale(0.98);
+}
+
+.plat-list-icon-wrap {
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.plat-list-icon {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.plat-list-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+  min-width: 0;
+}
+
+.plat-list-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .plat-list-name {
@@ -239,16 +404,18 @@
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .plat-list-url {
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 11px;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 11.5px;
   font-weight: 500;
-  word-break: break-all;
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 /* ================================================
@@ -764,6 +931,10 @@
 }
 
 /* Chart Container & SVG */
+body.hide-chart .gcard-chart-container {
+  display: none !important;
+}
+
 .gcard-chart-container {
   position: relative;
   background: #050209;
@@ -1113,8 +1284,51 @@
   }
 
   .platforms-title h2 {
-    font-size: 16px;
+    font-size: 17px;
     letter-spacing: 1px;
+  }
+
+  .platforms-subtitle {
+    font-size: 10.5px;
+  }
+
+  .platforms-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .plat-grid-item {
+    border-radius: 14px;
+  }
+
+  .plat-grid-img {
+    border-radius: 12px;
+  }
+
+  .plat-badge {
+    top: 4px;
+    right: 4px;
+    font-size: 7.5px;
+    padding: 1.5px 5px;
+  }
+
+  .plat-grid-label {
+    font-size: 9px;
+    padding: 3px 2px 4px;
+  }
+
+  .plat-list-icon-wrap {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+  }
+
+  .plat-list-name {
+    font-size: 14px;
+  }
+
+  .plat-list-url {
+    font-size: 11px;
   }
 
   .social-card {

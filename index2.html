@@ -16,7 +16,7 @@
     </style>
     <link rel="stylesheet" href="/styles/globalStyles.css">
     <link rel="stylesheet" href="/styles/header.css">
-    <link rel="stylesheet" href="/styles/main.css">
+    <link rel="stylesheet" href="/styles/main.css?v=audio-20260602">
     <link rel="stylesheet" href="/styles/footer.css">
     <link rel="shortcut icon" href="/assets/favicon.png" type="image/x-icon">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
@@ -66,6 +66,10 @@
         <div class="carousel-wrapper">
             <section id="carousel-container">
                 <div id="carousel"></div>
+                <button id="carousel-sound-toggle" class="carousel-sound-toggle" type="button" aria-label="Ativar áudio do banner" title="Ativar áudio" hidden>
+                    <i class="fa-solid fa-volume-xmark" aria-hidden="true"></i>
+                    <span class="carousel-sound-text">Som</span>
+                </button>
             </section>
         </div>
         <script>
@@ -196,6 +200,13 @@
                         document.documentElement.style.setProperty('--footer-text', cfg.footerTextColor);
                     }
 
+                    // Show or hide chart
+                    if (cfg.showChart === false) {
+                        document.body.classList.add('hide-chart');
+                    } else {
+                        document.body.classList.remove('hide-chart');
+                    }
+
                     // Load banners
                     initCarousel(cfg.banners || ['/assets/jcsinais01.png', '/assets/jcsinais02.png', '/assets/jcsinais03.png', '/assets/jcsinais04.png']);
                 } catch (e) {
@@ -218,19 +229,29 @@
                 if (!banners.length) return;
                 const carousel = document.getElementById('carousel');
                 const container = document.getElementById('carousel-container');
+                const soundToggle = document.getElementById('carousel-sound-toggle');
                 let currentIndex = 0, interval, startX = 0, isDragging = false;
+                let audioEnabled = false;
+                let hasVideo = false;
 
                 banners.forEach(src => {
                     const cleanSrc = src.split('?')[0].split('#')[0];
                     const isVideo = /\.(mp4|webm|ogg|mov)$/i.test(cleanSrc);
                     let el;
                     if (isVideo) {
+                        hasVideo = true;
                         el = document.createElement('video');
                         el.src = src;
                         el.autoplay = true;
                         el.loop = true;
                         el.muted = true;
+                        el.defaultMuted = true;
+                        el.preload = 'metadata';
+                        el.setAttribute('autoplay', '');
+                        el.setAttribute('loop', '');
+                        el.setAttribute('muted', '');
                         el.setAttribute('playsinline', '');
+                        el.setAttribute('webkit-playsinline', '');
                     } else {
                         el = document.createElement('img');
                         el.src = src;
@@ -241,19 +262,93 @@
                 const firstClone = carousel.firstElementChild.cloneNode(true);
                 carousel.appendChild(firstClone);
 
+                if (hasVideo && soundToggle) {
+                    soundToggle.hidden = false;
+                    let lastPointerSoundToggleAt = 0;
+                    const toggleSound = () => {
+                        audioEnabled = !audioEnabled;
+                        syncVideoAudio();
+                    };
+                    soundToggle.addEventListener('pointerdown', (event) => {
+                        event.preventDefault();
+                        lastPointerSoundToggleAt = Date.now();
+                        toggleSound();
+                    });
+                    soundToggle.addEventListener('click', () => {
+                        if (Date.now() - lastPointerSoundToggleAt < 500) {
+                            return;
+                        }
+                        toggleSound();
+                    });
+                }
+
+                if (hasVideo) {
+                    const enableAudioOnInteraction = (event) => {
+                        if (soundToggle && event.target.closest && event.target.closest('#carousel-sound-toggle')) return;
+                        audioEnabled = true;
+                        syncVideoAudio();
+                    };
+                    document.addEventListener('pointerdown', enableAudioOnInteraction, { once: true, passive: true });
+                    document.addEventListener('keydown', enableAudioOnInteraction, { once: true });
+                }
+
                 // Play all videos to ensure loop is working
                 carousel.querySelectorAll('video').forEach(v => {
                     v.play().catch(e => console.log('Autoplay play failed:', e));
                 });
 
+                function getActiveSlideIndex() {
+                    return currentIndex === banners.length ? banners.length : currentIndex;
+                }
+
+                function updateSoundButton() {
+                    if (!soundToggle) return;
+                    const icon = soundToggle.querySelector('i');
+                    soundToggle.setAttribute('aria-label', audioEnabled ? 'Desativar áudio do banner' : 'Ativar áudio do banner');
+                    soundToggle.setAttribute('title', audioEnabled ? 'Desativar áudio' : 'Ativar áudio');
+                    if (icon) {
+                        icon.className = audioEnabled ? 'fa-solid fa-volume-high' : 'fa-solid fa-volume-xmark';
+                    }
+                }
+
+                function syncVideoAudio() {
+                    const activeSlide = carousel.children[getActiveSlideIndex()];
+                    carousel.querySelectorAll('video').forEach(v => {
+                        const shouldPlaySound = audioEnabled && v === activeSlide;
+                        const wasPaused = v.paused;
+                        v.muted = !shouldPlaySound;
+                        v.defaultMuted = !shouldPlaySound;
+                        if (shouldPlaySound) {
+                            v.removeAttribute('muted');
+                        } else {
+                            v.setAttribute('muted', '');
+                        }
+                        if (shouldPlaySound) {
+                            v.volume = 1;
+                            if (wasPaused || v.paused) {
+                                v.play().catch(e => {
+                                    audioEnabled = false;
+                                    v.muted = true;
+                                    v.defaultMuted = true;
+                                    updateSoundButton();
+                                    console.log('Audio play failed:', e);
+                                });
+                            }
+                        }
+                    });
+                    updateSoundButton();
+                }
+
                 function nextBanner() {
                     currentIndex++;
                     carousel.style.transform = `translateX(-${currentIndex * 100}%)`;
+                    syncVideoAudio();
                     if (currentIndex === banners.length) {
                         setTimeout(() => {
                             carousel.style.transition = 'none';
                             currentIndex = 0;
                             carousel.style.transform = 'translateX(0)';
+                            syncVideoAudio();
                             setTimeout(() => carousel.style.transition = 'transform 0.5s ease-in-out', 50);
                         }, 500);
                     }
@@ -261,6 +356,7 @@
                 function prevBanner() {
                     currentIndex = currentIndex > 0 ? currentIndex - 1 : banners.length - 1;
                     carousel.style.transform = `translateX(-${currentIndex * 100}%)`;
+                    syncVideoAudio();
                 }
                 function startAutoSlide() { interval = setInterval(nextBanner, 5000); }
                 function resetAutoSlide() { clearInterval(interval); startAutoSlide(); }
@@ -271,6 +367,7 @@
                 container.addEventListener('mousedown', e => { startX = e.clientX; isDragging = true; });
                 container.addEventListener('mousemove', e => { if (!isDragging) return; let m = e.clientX - startX; if (Math.abs(m) > 50) { m > 0 ? prevBanner() : nextBanner(); isDragging = false; resetAutoSlide(); } });
                 container.addEventListener('mouseup', () => isDragging = false);
+                syncVideoAudio();
                 startAutoSlide();
             }
         </script>
@@ -278,7 +375,8 @@
         <!-- PLATAFORMAS PARCEIRAS -->
         <section class="platforms-section">
             <div class="platforms-title">
-                <h2>PLATAFORMA</h2>
+                <h2 id="platforms-section-title">PLATAFORMA</h2>
+                <p id="platforms-section-subtitle" class="platforms-subtitle" style="display:none;"></p>
             </div>
             <div class="platforms-list" id="platforms-row"></div>
         </section>
@@ -422,19 +520,110 @@
                     }
                 }
 
+                function getPlatformIcon(platform) {
+                    if (platform.icon && platform.icon.trim()) {
+                        return platform.icon.trim();
+                    }
+                    try {
+                        let raw = (platform.link || '').trim();
+                        if (!raw.startsWith('http://') && !raw.startsWith('https://')) raw = 'https://' + raw;
+                        const u = new URL(raw);
+                        return `https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${encodeURIComponent(u.origin)}&size=128`;
+                    } catch(e) {
+                        return (siteConfigData && siteConfigData.favicon) || '/assets/favicon.png';
+                    }
+                }
+
+                function getPlatformDomain(link) {
+                    try {
+                        let raw = (link || '').trim();
+                        if (!raw.startsWith('http://') && !raw.startsWith('https://')) raw = 'https://' + raw;
+                        return new URL(raw).hostname.replace(/^www\./, '');
+                    } catch(e) {
+                        return link || '';
+                    }
+                }
+
+                function handlePlatImgError(img, link) {
+                    if (!img.dataset.triedS2) {
+                        img.dataset.triedS2 = '1';
+                        const domain = getPlatformDomain(link);
+                        img.src = `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
+                    } else if (!img.dataset.triedFav) {
+                        img.dataset.triedFav = '1';
+                        img.src = (siteConfigData && siteConfigData.favicon) || '/assets/favicon.png';
+                    }
+                }
+
                 function renderPlatforms(platforms) {
                     const row = document.getElementById('platforms-row');
-                    if (platforms.length === 0) {
-                        row.innerHTML = '<span style="color:#cbd5e1;font-size:12px">Nenhuma plataforma cadastrada.</span>';
+                    const titleEl = document.getElementById('platforms-section-title');
+                    const subtitleEl = document.getElementById('platforms-section-subtitle');
+                    if (!row) return;
+
+                    const mode = (siteConfigData && siteConfigData.platformsDisplayMode) || 'list';
+                    const customTitle = siteConfigData && siteConfigData.platformsTitle;
+                    const customSubtitle = siteConfigData && siteConfigData.platformsSubtitle;
+
+                    if (titleEl) {
+                        if (customTitle !== undefined && customTitle !== '') {
+                            titleEl.innerHTML = customTitle;
+                        } else {
+                            titleEl.innerHTML = mode === 'icons' ? '👑 PLATAFORMAS INDICADAS 👑' : 'PLATAFORMA';
+                        }
+                    }
+
+                    if (subtitleEl) {
+                        const sub = customSubtitle !== undefined ? customSubtitle : (mode === 'icons' ? 'Os melhores jogos das principais plataformas parceiras' : '');
+                        if (sub) {
+                            subtitleEl.innerHTML = sub;
+                            subtitleEl.style.display = 'block';
+                        } else {
+                            subtitleEl.style.display = 'none';
+                        }
+                    }
+
+                    if (!platforms || platforms.length === 0) {
+                        row.className = 'platforms-list';
+                        row.innerHTML = '<span style="color:#cbd5e1;font-size:12px;text-align:center;display:block;padding:10px;">Nenhuma plataforma cadastrada.</span>';
                         return;
                     }
 
-                    row.innerHTML = platforms.map(g => `
-                        <a href="${g.link}" target="_blank" class="plat-list-item">
-                            <span class="plat-list-name">${g.nome}</span>
-                            <span class="plat-list-url">${g.link}</span>
-                        </a>
-                    `).join('');
+                    if (mode === 'icons') {
+                        row.className = 'platforms-grid';
+                        row.innerHTML = platforms.map(g => {
+                            const iconUrl = getPlatformIcon(g);
+                            const badgeHtml = g.badge ? `<span class="plat-badge ${g.badge.toLowerCase()}">${g.badge}</span>` : '';
+                            return `
+                                <a href="${g.link}" target="_blank" rel="noopener noreferrer" class="plat-grid-item" title="${g.nome}">
+                                    ${badgeHtml}
+                                    <img src="${iconUrl}" alt="${g.nome}" class="plat-grid-img" loading="lazy" onerror="handlePlatImgError(this, '${g.link}')">
+                                    <span class="plat-grid-label">${g.nome}</span>
+                                </a>
+                            `;
+                        }).join('');
+                    } else {
+                        row.className = 'platforms-list';
+                        row.innerHTML = platforms.map(g => {
+                            const iconUrl = getPlatformIcon(g);
+                            const domain = getPlatformDomain(g.link);
+                            const badgeHtml = g.badge ? `<span class="plat-badge ${g.badge.toLowerCase()}" style="position:static;display:inline-block;">${g.badge}</span>` : '';
+                            return `
+                                <a href="${g.link}" target="_blank" rel="noopener noreferrer" class="plat-list-item">
+                                    <div class="plat-list-icon-wrap">
+                                        <img src="${iconUrl}" alt="${g.nome}" class="plat-list-icon" loading="lazy" onerror="handlePlatImgError(this, '${g.link}')">
+                                    </div>
+                                    <div class="plat-list-info">
+                                        <div class="plat-list-name-row">
+                                            <span class="plat-list-name">${g.nome}</span>
+                                            ${badgeHtml}
+                                        </div>
+                                        <span class="plat-list-url">${domain}</span>
+                                    </div>
+                                </a>
+                            `;
+                        }).join('');
+                    }
                 }
 
                 function getBarColor(v) {
@@ -804,6 +993,7 @@
 
                         // Button colors
                         const btnTextColor = isColorLight(neonColor) ? '#000' : '#fff';
+                        const showChart = !siteConfigData || siteConfigData.showChart !== false;
 
                         return `
                         <div class="gcard" style="--gcard-color: ${neonColor}; --btn-bg: ${neonColor}; --btn-color: ${btnTextColor}">
@@ -836,10 +1026,12 @@
                                     <div class="rtp-value" style="color: ${neonColor}; text-shadow: 0 0 10px ${neonColor}, 0 0 20px ${neonColor}">${d.rtp.toFixed(2)}%</div>
                                 </div>
                                 
+                                ${showChart ? `
                                 <!-- Gráfico Sparkline -->
                                 <div class="gcard-chart-container">
                                     ${generateSparklineSVG(g.id, neonColor, d.baseRtp, g.min, g.padrao, g.max, d.rtp)}
                                 </div>
+                                ` : ''}
                                 
                                 <!-- Volatilidade -->
                                 <div class="gcard-volat-row">
