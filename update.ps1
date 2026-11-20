@@ -19,6 +19,9 @@ Write-Host "   ATUALIZADOR DO SITE (WINDOWS/POWERSHELL)" -ForegroundColor Cyan
 Write-Host "============================================" -ForegroundColor Cyan
 Write-Host ""
 
+# Determinar comando Git
+$GitCmd = if (Get-Command git -ErrorAction SilentlyContinue) { "git" } elseif (Test-Path "C:\Program Files\Git\cmd\git.exe") { "C:\Program Files\Git\cmd\git.exe" } else { "git" }
+
 # 1. Verificar se e um repo Git
 if (-not (Test-Path ".git")) {
     Write-Host "[ERRO] Este diretorio nao e um repositorio Git." -ForegroundColor Red
@@ -36,7 +39,7 @@ $SensitiveFiles = @("credentials.json", "platforms.json", "site-config.json")
 $TrackedSensitiveFiles = @()
 
 foreach ($file in $SensitiveFiles) {
-    $isTracked = & "C:\Program Files\Git\cmd\git.exe" ls-files --error-unmatch $file 2>$null
+    $isTracked = & $GitCmd ls-files $file
     if ($isTracked) {
         $TrackedSensitiveFiles += $file
         Write-Host "   [AVISO] $file esta sendo rastreado pelo Git!" -ForegroundColor Yellow
@@ -119,17 +122,17 @@ Write-Host ""
 Write-Host "[GIT] Puxando atualizacoes do GitHub..." -ForegroundColor Yellow
 
 # Obter branch atual
-$Branch = (& "C:\Program Files\Git\cmd\git.exe" rev-parse --abbrev-ref HEAD).Trim()
+$Branch = (& $GitCmd rev-parse --abbrev-ref HEAD).Trim()
 Write-Host "   Branch atual: $Branch" -ForegroundColor Cyan
 
 # Guardar commit antigo
-$OldCommit = (& "C:\Program Files\Git\cmd\git.exe" rev-parse HEAD).Trim()
+$OldCommit = (& $GitCmd rev-parse HEAD).Trim()
 
 # Executar fetch e reset hard para a origem
-& "C:\Program Files\Git\cmd\git.exe" fetch origin $Branch
-& "C:\Program Files\Git\cmd\git.exe" reset --hard "origin/$Branch"
+& $GitCmd fetch origin $Branch
+& $GitCmd reset --hard "origin/$Branch"
 
-$NewCommit = (& "C:\Program Files\Git\cmd\git.exe" rev-parse HEAD).Trim()
+$NewCommit = (& $GitCmd rev-parse HEAD).Trim()
 
 if ($OldCommit -eq $NewCommit) {
     Write-Host "[OK] Codigo ja esta atualizado! Nenhuma mudanca." -ForegroundColor Green
@@ -137,7 +140,7 @@ if ($OldCommit -eq $NewCommit) {
     Write-Host "[OK] Codigo atualizado com sucesso!" -ForegroundColor Green
     Write-Host "   $($OldCommit.Substring(0,8)) -> $($NewCommit.Substring(0,8))"
     Write-Host "   Arquivos alterados:" -ForegroundColor Cyan
-    & "C:\Program Files\Git\cmd\git.exe" diff --name-only $OldCommit $NewCommit
+    & $GitCmd diff --name-only $OldCommit $NewCommit
 }
 Write-Host ""
 
@@ -183,7 +186,7 @@ Write-Host ""
 
 # 6. Reinstalar dependencias se o package.json mudou
 if ($OldCommit -ne $NewCommit) {
-    $changedFiles = & "C:\Program Files\Git\cmd\git.exe" diff --name-only $OldCommit $NewCommit
+    $changedFiles = & $GitCmd diff --name-only $OldCommit $NewCommit
     if ($changedFiles -contains "package.json") {
         Write-Host "[INFO] package.json mudou, reinstalando dependencias..." -ForegroundColor Yellow
         npm install --production
