@@ -2810,7 +2810,7 @@
             try {
                 const res = await fetch('/api/admin/platforms/upload-icon', {
                     method: 'POST',
-                    headers: authHeaders(),
+                    headers: { 'X-Admin-Token': authToken },
                     body: formData
                 });
                 const data = await res.json();
@@ -2825,6 +2825,8 @@
                 }
             } catch (e) {
                 showToast('Erro de conexão ao enviar imagem', 'error');
+            } finally {
+                inputEl.value = '';
             }
         }
 
