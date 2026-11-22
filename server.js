@@ -37,7 +37,8 @@ if (!PORT) {
 }
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '100mb' }));
+app.use(express.urlencoded({ extended: true, limit: '100mb' }));
 
 const publicDir = __dirname;
 
@@ -1156,7 +1157,7 @@ function createUploader(filenamePrefix) {
         cb(null, filenamePrefix + ext);
       }
     }),
-    limits: { fileSize: 5 * 1024 * 1024 },
+    limits: { fileSize: 50 * 1024 * 1024 },
     fileFilter: (req, file, cb) => {
       const allowed = ['.jpg', '.jpeg', '.png', '.webp', '.gif', '.ico'];
       const ext = path.extname(file.originalname).toLowerCase();
@@ -1179,7 +1180,7 @@ const uploadPlatIcon = multer({
       cb(null, 'plat-' + Date.now() + ext);
     }
   }),
-  limits: { fileSize: 10 * 1024 * 1024 },
+  limits: { fileSize: 50 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     const allowed = ['.jpg', '.jpeg', '.png', '.webp', '.gif', '.ico', '.svg'];
     const ext = path.extname(file.originalname).toLowerCase();
@@ -1244,7 +1245,7 @@ const uploadBanner = multer({
       cb(null, 'banner-' + Date.now() + ext);
     }
   }),
-  limits: { fileSize: 30 * 1024 * 1024 },
+  limits: { fileSize: 100 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     const allowed = ['.jpg', '.jpeg', '.png', '.webp', '.gif', '.mp4', '.webm', '.mov', '.ogg'];
     const ext = path.extname(file.originalname).toLowerCase();
@@ -1371,6 +1372,18 @@ app.get('/tada-games', (req, res) => res.sendFile(indexFile));
 app.get('/gerar-sinais', (req, res) => res.sendFile(gerarSinaisHtml));
 app.get('/gerar-sinais/:g', (req, res) => res.sendFile(gerarSinaisGameHtml));
 app.get('/download-app', (req, res) => res.sendFile(indexFile));
+
+// Global error handler (handles Multer LIMIT_FILE_SIZE, Payload Too Large, etc.)
+app.use((err, req, res, next) => {
+  if (err) {
+    if (err.code === 'LIMIT_FILE_SIZE' || err.status === 413 || err.statusCode === 413) {
+      return res.status(413).json({ error: 'Arquivo muito grande. O limite máximo permitido é 50MB (100MB para banners).' });
+    }
+    console.error('[SERVER ERROR]', err);
+    return res.status(err.status || 500).json({ error: err.message || 'Erro no servidor' });
+  }
+  next();
+});
 
 app.listen(PORT, () => {
   console.log(`Servidor rodando em http://localhost:${PORT}`);

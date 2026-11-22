@@ -2750,9 +2750,60 @@
             }
         }
 
+        // Comprimir imagem no navegador para upload ultra-rápido sem limite de tamanho
+        async function compressImageIfNeeded(file, maxDimension = 1920, quality = 0.88) {
+            if (!file || !file.type || !file.type.startsWith('image/') || file.type === 'image/svg+xml' || file.type === 'image/gif') {
+                return file;
+            }
+            if (file.size <= 1024 * 1024) {
+                return file;
+            }
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        let width = img.width;
+                        let height = img.height;
+                        if (width > maxDimension || height > maxDimension) {
+                            if (width > height) {
+                                height = Math.round((height * maxDimension) / width);
+                                width = maxDimension;
+                            } else {
+                                width = Math.round((width * maxDimension) / height);
+                                height = maxDimension;
+                            }
+                        }
+                        const canvas = document.createElement('canvas');
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        canvas.toBlob((blob) => {
+                            if (blob && blob.size < file.size) {
+                                const newFile = new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), {
+                                    type: 'image/jpeg',
+                                    lastModified: Date.now()
+                                });
+                                resolve(newFile);
+                            } else {
+                                resolve(file);
+                            }
+                        }, 'image/jpeg', quality);
+                    };
+                    img.onerror = () => resolve(file);
+                    img.src = e.target.result;
+                };
+                reader.onerror = () => resolve(file);
+                reader.readAsDataURL(file);
+            });
+        }
+
         async function uploadPlatIconFile(inputEl, targetInputId, previewImgId) {
-            const file = inputEl.files && inputEl.files[0];
+            let file = inputEl.files && inputEl.files[0];
             if (!file) return;
+            showToast('Preparando imagem...');
+            file = await compressImageIfNeeded(file, 1200, 0.9);
             const formData = new FormData();
             formData.append('icon', file);
             showToast('Enviando imagem para assets/platforms/...');
@@ -3638,10 +3689,14 @@
 
         // Banner upload
         document.getElementById('se-banner-input').addEventListener('change', async (e) => {
-            const file = e.target.files[0];
+            let file = e.target.files[0];
             if (!file) return;
-            if (file.size > 30 * 1024 * 1024) {
-                showToast('Banner deve ter no m\u00e1ximo 30MB', 'error');
+            if (file.type && file.type.startsWith('image/')) {
+                showToast('Otimizando imagem do banner...');
+                file = await compressImageIfNeeded(file, 2560, 0.9);
+            }
+            if (file.size > 100 * 1024 * 1024) {
+                showToast('Banner deve ter no máximo 100MB', 'error');
                 return;
             }
             const formData = new FormData();
@@ -3653,6 +3708,10 @@
                     headers: { 'X-Admin-Token': authToken },
                     body: formData
                 });
+                if (res.status === 413) {
+                    showToast('Arquivo de banner muito grande (máx 100MB)', 'error');
+                    return;
+                }
                 const data = await res.json();
                 if (data.success) {
                     renderBannerGrid(data.banners);
@@ -3762,8 +3821,10 @@
         });
 
         document.getElementById('se-favicon-input').addEventListener('change', async (e) => {
-            const file = e.target.files[0];
+            let file = e.target.files[0];
             if (!file) return;
+            showToast('Otimizando favicon...');
+            file = await compressImageIfNeeded(file, 512, 0.92);
             const formData = new FormData();
             formData.append('favicon', file);
             try {
@@ -3773,6 +3834,10 @@
                     headers: { 'X-Admin-Token': authToken },
                     body: formData
                 });
+                if (res.status === 413) {
+                    showToast('Favicon muito grande (máx 50MB)', 'error');
+                    return;
+                }
                 const data = await res.json();
                 if (data.success) {
                     document.getElementById('se-favicon-thumb').src = data.faviconPath;
@@ -3792,13 +3857,11 @@
         });
 
         document.getElementById('se-photo-input').addEventListener('change', async (e) => {
-            const file = e.target.files[0];
+            let file = e.target.files[0];
             if (!file) return;
 
-            if (file.size > 5 * 1024 * 1024) {
-                showToast('Imagem deve ter no m\u00e1ximo 5MB', 'error');
-                return;
-            }
+            showToast('Otimizando foto...');
+            file = await compressImageIfNeeded(file, 1600, 0.88);
 
             const formData = new FormData();
             formData.append('photo', file);
@@ -3810,6 +3873,10 @@
                     headers: { 'X-Admin-Token': authToken },
                     body: formData
                 });
+                if (res.status === 413) {
+                    showToast('Foto muito grande (máx 50MB)', 'error');
+                    return;
+                }
                 const data = await res.json();
 
                 if (data.success) {
