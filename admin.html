@@ -2723,27 +2723,6 @@
         }
 
         // --- PLATFORMS ACTIONS (Enhanced) ---
-        function getAdminPlatIcon(g) {
-            if (g && g.icon && g.icon.trim()) return g.icon.trim();
-            try {
-                let raw = (g && g.link ? g.link : '').trim();
-                if (!raw.startsWith('http://') && !raw.startsWith('https://')) raw = 'https://' + raw;
-                const u = new URL(raw);
-                return `https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${encodeURIComponent(u.origin)}&size=128`;
-            } catch(e) {
-                return '/assets/favicon.png';
-            }
-        }
-
-        async function uploadPlatIconFile(inputEl, targetInputId, previewImgId) {
-            const file = inputEl.files && inputEl.files[0];
-            if (!file) return;
-            const formData = new FormData();
-            formData.append('icon', file);
-            showToast('Enviando ícone...');
-            try {
-                const res = await fetch('/api/admin/platforms/upload-icon', {
-                    meth        // --- PLATFORMS ACTIONS (Enhanced) ---
         function formatPlatformUrl(link) {
             if (!link) return '#';
             let raw = String(link).trim();
@@ -2957,7 +2936,37 @@
             }
         }
 
-          const href = input.value.trim();
+        async function deletePlatform(id, btn) {
+            if (!confirm('Tem certeza que deseja excluir esta plataforma?')) return;
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+
+            try {
+                const res = await fetch(`/api/admin/platforms/${id}`, {
+                    method: 'DELETE',
+                    headers: authHeaders()
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast('Plataforma excluída!');
+                    loadGames();
+                } else {
+                    showToast('Erro: ' + data.error, 'error');
+                    btn.innerHTML = '<i class="fa-solid fa-trash"></i> Excluir';
+                    btn.disabled = false;
+                }
+            } catch (e) {
+                showToast('Erro de conexão', 'error');
+                btn.innerHTML = '<i class="fa-solid fa-trash"></i> Excluir';
+                btn.disabled = false;
+            }
+        }
+
+        // ===== SAVE INDIVIDUAL =====
+        async function saveGame(cardNo, btn) {
+            const input = document.getElementById(`href-${cardNo}`);
+            const href = input.value.trim();
             if (!href) { showToast('Link não pode ser vazio', 'error'); return; }
 
             btn.classList.add('saving');
