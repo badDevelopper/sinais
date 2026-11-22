@@ -466,11 +466,92 @@ app.get('/api/gerar-sinais', (req, res) => {
    PLATFORMS API
    =================================================== */
 const platformsFile = path.join(__dirname, 'platforms.json');
+const platformsDir = path.join(__dirname, 'assets', 'platforms');
+if (!fs.existsSync(platformsDir)) {
+  try { fs.mkdirSync(platformsDir, { recursive: true }); } catch (_) {}
+}
+
+function normalizePlatformUrl(raw) {
+  if (!raw) return '';
+  let url = String(raw).trim();
+  if (!url) return '';
+  if (!/^https?:\/\//i.test(url)) {
+    url = 'https://' + url;
+  }
+  return url;
+}
+
+// Procurar imagem personalizada local na pasta assets/platforms/
+function findPlatformLocalIcon(platform) {
+  if (!fs.existsSync(platformsDir)) return null;
+  try {
+    const files = fs.readdirSync(platformsDir);
+    const id = String(platform.id || '');
+    const nomeSlug = String(platform.nome || '').toLowerCase().replace(/[^a-z0-9_-]/g, '');
+
+    const candidates = [
+      `plat-${id}`,
+      `${id}`,
+      `plat-fav-${id}`,
+      `plat-${nomeSlug}`,
+      `${nomeSlug}`
+    ];
+
+    for (const file of files) {
+      const ext = path.extname(file).toLowerCase();
+      if (!['.png', '.jpg', '.jpeg', '.webp', '.gif', '.svg', '.ico'].includes(ext)) continue;
+      const base = path.basename(file, ext).toLowerCase();
+      if (candidates.includes(base)) {
+        return `/assets/platforms/${file}`;
+      }
+    }
+  } catch (_) {}
+  return null;
+}
+
+// Baixar e salvar favicon automaticamente na pasta assets/platforms/
+async function downloadPlatformFavicon(link, id) {
+  try {
+    const norm = normalizePlatformUrl(link);
+    if (!norm) return null;
+    const origin = new URL(norm).origin;
+    const serviceUrl = `https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${encodeURIComponent(origin)}&size=128`;
+    const res = await fetch(serviceUrl, {
+      headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' },
+      signal: AbortSignal.timeout(6000)
+    });
+    if (res.ok) {
+      const buf = Buffer.from(await res.arrayBuffer());
+      if (buf.length > 80) {
+        if (!fs.existsSync(platformsDir)) fs.mkdirSync(platformsDir, { recursive: true });
+        const filename = `plat-fav-${id}.png`;
+        const filePath = path.join(platformsDir, filename);
+        fs.writeFileSync(filePath, buf);
+        return `/assets/platforms/${filename}?v=${Date.now()}`;
+      }
+    }
+  } catch (e) {
+    console.warn('Auto favicon fetch skipped:', e.message);
+  }
+  return null;
+}
 
 // Helper to read platforms
 function readPlatforms() {
   if (fs.existsSync(platformsFile)) {
-    return JSON.parse(fs.readFileSync(platformsFile, 'utf8'));
+    try {
+      const data = JSON.parse(fs.readFileSync(platformsFile, 'utf8'));
+      if (Array.isArray(data)) {
+        return data.map(p => {
+          if (p.link) p.link = normalizePlatformUrl(p.link);
+          if (!p.icon || !p.icon.trim()) {
+            const localIcon = findPlatformLocalIcon(p);
+            if (localIcon) p.icon = localIcon;
+          }
+          return p;
+        });
+      }
+    } catch (_) {}
   }
   return [];
 }
@@ -491,43 +572,59 @@ app.get('/api/admin/platforms', requireAuth, (req, res) => {
 });
 
 // POST new platform
-app.post('/api/admin/platforms', requireAuth, (req, res) => {
+app.post('/api/admin/platforms', requireAuth, async (req, res) => {
   try {
-    const { nome, link, icon, badge } = req.body;
+    let { nome, link, icon, badge } = req.body;
     if (!nome || !link) return res.status(400).json({ error: 'Nome e link são obrigatórios' });
+
+    link = normalizePlatformUrl(link);
+    const id = Date.now().toString();
+
+    // Se o ícone não foi informado, tenta baixar automaticamente o favicon para assets/platforms/
+    if (!icon || !icon.trim()) {
+      const autoIcon = await downloadPlatformFavicon(link, id);
+      if (autoIcon) icon = autoIcon;
+    }
 
     const platforms = readPlatforms();
     platforms.push({
-      id: Date.now().toString(),
+      id,
       nome,
       link,
       icon: icon || '',
       badge: badge || ''
     });
     writePlatforms(platforms);
-    res.json({ success: true });
+    res.json({ success: true, id, icon, link });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
 });
 
 // PUT update platform
-app.put('/api/admin/platforms/:id', requireAuth, (req, res) => {
+app.put('/api/admin/platforms/:id', requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
-    const { nome, link, icon, badge } = req.body;
+    let { nome, link, icon, badge } = req.body;
     if (!nome || !link) return res.status(400).json({ error: 'Nome e link são obrigatórios' });
 
+    link = normalizePlatformUrl(link);
     const platforms = readPlatforms();
     const index = platforms.findIndex(p => p.id === id);
     if (index === -1) return res.status(404).json({ error: 'Plataforma não encontrada' });
+
+    // Se o ícone estiver vazio, tenta baixar automaticamente o favicon
+    if (!icon || !icon.trim()) {
+      const autoIcon = await downloadPlatformFavicon(link, id);
+      if (autoIcon) icon = autoIcon;
+    }
 
     platforms[index].nome = nome;
     platforms[index].link = link;
     if (icon !== undefined) platforms[index].icon = icon;
     if (badge !== undefined) platforms[index].badge = badge;
     writePlatforms(platforms);
-    res.json({ success: true });
+    res.json({ success: true, icon: platforms[index].icon, link });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
@@ -1073,7 +1170,10 @@ const uploadFavicon = createUploader('favicon');
 
 const uploadPlatIcon = multer({
   storage: multer.diskStorage({
-    destination: (req, file, cb) => cb(null, path.join(__dirname, 'assets')),
+    destination: (req, file, cb) => {
+      if (!fs.existsSync(platformsDir)) fs.mkdirSync(platformsDir, { recursive: true });
+      cb(null, platformsDir);
+    },
     filename: (req, file, cb) => {
       const ext = path.extname(file.originalname).toLowerCase() || '.png';
       cb(null, 'plat-' + Date.now() + ext);
@@ -1087,14 +1187,50 @@ const uploadPlatIcon = multer({
   }
 });
 
-// Upload platform icon
+// Upload platform icon (salva direto em assets/platforms/)
 app.post('/api/admin/platforms/upload-icon', requireAuth, uploadPlatIcon.single('icon'), (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'Nenhuma imagem enviada' });
-    const iconPath = '/assets/' + req.file.filename + '?v=' + Date.now();
+    const iconPath = '/assets/platforms/' + req.file.filename + '?v=' + Date.now();
     res.json({ success: true, iconPath });
   } catch (e) {
     console.error('Platform icon upload error:', e);
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// Buscar e salvar favicon automaticamente em assets/platforms/
+app.post('/api/admin/platforms/auto-favicon', requireAuth, async (req, res) => {
+  try {
+    const { link, id } = req.body;
+    if (!link) return res.status(400).json({ error: 'Link é obrigatório' });
+    const platId = id || Date.now().toString();
+    const savedPath = await downloadPlatformFavicon(link, platId);
+    if (savedPath) {
+      return res.json({ success: true, iconPath: savedPath });
+    }
+    const norm = normalizePlatformUrl(link);
+    const origin = new URL(norm).origin;
+    const directFallback = `https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${encodeURIComponent(origin)}&size=128`;
+    res.json({ success: true, iconPath: directFallback, fallback: true });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// Listar ícones disponíveis na pasta assets/platforms/
+app.get('/api/admin/platforms/local-icons', requireAuth, (req, res) => {
+  try {
+    if (!fs.existsSync(platformsDir)) return res.json([]);
+    const files = fs.readdirSync(platformsDir).filter(f => {
+      const ext = path.extname(f).toLowerCase();
+      return ['.jpg', '.jpeg', '.png', '.webp', '.gif', '.ico', '.svg'].includes(ext);
+    });
+    res.json(files.map(f => ({
+      name: f,
+      url: '/assets/platforms/' + f
+    })));
+  } catch (e) {
     res.status(500).json({ error: e.message });
   }
 });

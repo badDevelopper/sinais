@@ -2601,11 +2601,11 @@
                     `<div class="game-row" style="background: rgba(236,72,153,0.1); border-color:#ec4899; flex-direction:column; gap:12px; align-items:stretch;">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
                         <div style="font-weight:bold; color:#f472b6; font-size:14px;"><i class="fa-solid fa-plus-circle"></i> Adicionar Nova Plataforma</div>
-                        <div style="font-size:11px; color:#94a3b8;">Ícone automático via favicon ou upload customizado</div>
+                        <div style="font-size:11px; color:#94a3b8;">Ícones automáticos ou personalizados (pasta: <code style="color:#ec4899;">assets/platforms/</code>)</div>
                     </div>
                     <div style="display:grid; grid-template-columns: 140px 1fr 140px; gap:8px;">
                         <input type="text" id="new-plat-name" class="g-href" placeholder="Nome Ex: BBW">
-                        <input type="text" id="new-plat-link" class="g-href" placeholder="Link (ex: https://bbwj7g.com/...)">
+                        <input type="text" id="new-plat-link" class="g-href" placeholder="Link (ex: https://... ou ibl3.iblgroup.cloud)">
                         <select id="new-plat-badge" class="g-href" style="cursor:pointer; background:#0f172a;">
                             <option value="">Sem Badge</option>
                             <option value="NOVO">Badge: NOVO</option>
@@ -2614,13 +2614,16 @@
                         </select>
                     </div>
                     <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-                        <input type="text" id="new-plat-icon" class="g-href" placeholder="URL do Ícone / Favicon (Opcional - detecta auto do link)" style="flex:1;">
+                        <input type="text" id="new-plat-icon" class="g-href" placeholder="URL do Ícone / Imagem (Vazio = auto favicon em assets/platforms/)" style="flex:1;">
                         <input type="file" id="new-plat-file" accept="image/*" style="display:none;" onchange="uploadPlatIconFile(this, 'new-plat-icon', 'new-plat-thumb')">
-                        <button type="button" class="btn-save" onclick="document.getElementById('new-plat-file').click()" style="background:#0ea5e9; white-space:nowrap;">
+                        <button type="button" class="btn-save" onclick="document.getElementById('new-plat-file').click()" style="background:#0ea5e9; white-space:nowrap;" title="Upload de imagem personalizada">
                             <i class="fa-solid fa-upload"></i> Enviar Imagem
                         </button>
-                        <button type="button" class="btn-save" onclick="autoDetectFavicon('new-plat-link', 'new-plat-icon', 'new-plat-thumb')" style="background:#6366f1; white-space:nowrap;">
+                        <button type="button" class="btn-save" onclick="autoDetectFavicon('new-plat-link', 'new-plat-icon', 'new-plat-thumb')" style="background:#6366f1; white-space:nowrap;" title="Baixar favicon automaticamente da plataforma">
                             <i class="fa-solid fa-wand-magic-sparkles"></i> Auto Favicon
+                        </button>
+                        <button type="button" class="btn-save" onclick="pickFromPlatformFolder('new-plat-icon', 'new-plat-thumb')" style="background:#334155; white-space:nowrap;" title="Ver imagens existentes na pasta assets/platforms/">
+                            <i class="fa-solid fa-folder-open"></i> Da Pasta
                         </button>
                         <img id="new-plat-thumb" src="/assets/favicon.png" style="width:34px; height:34px; border-radius:8px; object-fit:cover; border:1px solid rgba(255,255,255,0.2);">
                         <button class="btn-save" onclick="addPlatform(this)" style="background:#ec4899; white-space:nowrap; padding:8px 16px;">
@@ -2632,6 +2635,7 @@
                         ? `<div class="loading-state" style="color:#64748b"><i class="fa-solid fa-link" style="animation:none"></i><p>Nenhuma plataforma cadastrada. Adicione uma acima!</p></div>`
                         : filteredData.map((g, i) => {
                             const iconUrl = g.icon || getAdminPlatIcon(g);
+                            const platUrl = formatPlatformUrl(g.link);
                             return `
                 <div class="game-row" style="animation-delay:${Math.min(i * 0.02, 0.6)}s; flex-direction:column; gap:10px; align-items:stretch; background:rgba(30,27,75,0.4); border-color:rgba(255,255,255,0.12);" data-id="${g.id}">
                     <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
@@ -2641,7 +2645,11 @@
                                 <span class="g-name" style="color:#ec4899; font-size:15px; font-weight:800;">${escapeHtml(g.nome)}</span>
                                 ${g.badge ? `<span style="background:${g.badge === 'NOVO' ? '#ff007f' : g.badge === 'HOT' ? '#ff6d00' : '#00e5ff'}; color:#fff; font-size:9px; font-weight:900; padding:2px 6px; border-radius:4px;">${g.badge}</span>` : ''}
                             </div>
-                            <div style="font-size:11px; color:#94a3b8; word-break:break-all; margin-top:2px;">${escapeHtml(g.link)}</div>
+                            <div style="margin-top:2px;">
+                                <a href="${platUrl}" target="_blank" rel="noopener noreferrer" style="font-size:11px; color:#38bdf8; word-break:break-all; text-decoration:none; display:inline-flex; align-items:center; gap:4px;" title="Clique para testar o link direto">
+                                    <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:10px;"></i> ${escapeHtml(platUrl)}
+                                </a>
+                            </div>
                         </div>
                         <div style="display:flex; gap:6px;">
                             <button class="btn-save" onclick="savePlatform('${g.id}', this)" style="background:#8b5cf6; white-space:nowrap">
@@ -2654,7 +2662,7 @@
                     </div>
                     <div style="display:grid; grid-template-columns: 140px 1fr 130px; gap:8px;">
                         <input class="g-href" id="plat-name-${g.id}" value="${escapeHtml(g.nome)}" spellcheck="false" placeholder="Nome">
-                        <input class="g-href" id="plat-link-${g.id}" value="${escapeHtml(g.link)}" spellcheck="false" placeholder="Link">
+                        <input class="g-href" id="plat-link-${g.id}" value="${escapeHtml(g.link)}" spellcheck="false" placeholder="Link" onchange="this.value = formatPlatformUrl(this.value)">
                         <select id="plat-badge-${g.id}" class="g-href" style="cursor:pointer; background:#0f172a;">
                             <option value="" ${!g.badge ? 'selected' : ''}>Sem Badge</option>
                             <option value="NOVO" ${g.badge === 'NOVO' ? 'selected' : ''}>Badge: NOVO</option>
@@ -2662,14 +2670,17 @@
                             <option value="VIP" ${g.badge === 'VIP' ? 'selected' : ''}>Badge: VIP</option>
                         </select>
                     </div>
-                    <div style="display:flex; gap:8px; align-items:center;">
-                        <input class="g-href" id="plat-icon-${g.id}" value="${escapeHtml(g.icon || '')}" spellcheck="false" placeholder="URL do Ícone / Favicon (Vazio = auto favicon)" style="flex:1;">
+                    <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                        <input class="g-href" id="plat-icon-${g.id}" value="${escapeHtml(g.icon || '')}" spellcheck="false" placeholder="URL ou arquivo em assets/platforms/ (Vazio = auto favicon)" style="flex:1;">
                         <input type="file" id="file-${g.id}" accept="image/*" style="display:none;" onchange="uploadPlatIconFile(this, 'plat-icon-${g.id}', 'thumb-${g.id}')">
-                        <button type="button" class="btn-save" onclick="document.getElementById('file-${g.id}').click()" style="background:#0ea5e9; white-space:nowrap; padding:6px 12px; font-size:11px;">
-                            <i class="fa-solid fa-upload"></i> Trocar Ícone
+                        <button type="button" class="btn-save" onclick="document.getElementById('file-${g.id}').click()" style="background:#0ea5e9; white-space:nowrap; padding:6px 12px; font-size:11px;" title="Upload de imagem para assets/platforms/">
+                            <i class="fa-solid fa-upload"></i> Trocar Imagem
                         </button>
-                        <button type="button" class="btn-save" onclick="autoDetectFavicon('plat-link-${g.id}', 'plat-icon-${g.id}', 'thumb-${g.id}')" style="background:#6366f1; white-space:nowrap; padding:6px 12px; font-size:11px;">
+                        <button type="button" class="btn-save" onclick="autoDetectFavicon('plat-link-${g.id}', 'plat-icon-${g.id}', 'thumb-${g.id}', '${g.id}')" style="background:#6366f1; white-space:nowrap; padding:6px 12px; font-size:11px;" title="Buscar favicon automaticamente">
                             <i class="fa-solid fa-wand-magic-sparkles"></i> Auto Favicon
+                        </button>
+                        <button type="button" class="btn-save" onclick="pickFromPlatformFolder('plat-icon-${g.id}', 'thumb-${g.id}')" style="background:#334155; white-space:nowrap; padding:6px 12px; font-size:11px;" title="Escolher imagem da pasta assets/platforms/">
+                            <i class="fa-solid fa-folder-open"></i> Da Pasta
                         </button>
                     </div>
                 </div>`;
@@ -2732,6 +2743,42 @@
             showToast('Enviando ícone...');
             try {
                 const res = await fetch('/api/admin/platforms/upload-icon', {
+                    meth        // --- PLATFORMS ACTIONS (Enhanced) ---
+        function formatPlatformUrl(link) {
+            if (!link) return '#';
+            let raw = String(link).trim();
+            if (!raw) return '#';
+            if (!/^https?:\/\//i.test(raw)) {
+                raw = 'https://' + raw;
+            }
+            return raw;
+        }
+
+        function getAdminPlatIcon(g) {
+            if (g && g.icon && g.icon.trim()) {
+                const icon = g.icon.trim();
+                if (icon.startsWith('/') || icon.startsWith('http://') || icon.startsWith('https://')) {
+                    return icon;
+                }
+                return '/assets/platforms/' + icon;
+            }
+            try {
+                let raw = formatPlatformUrl(g && g.link ? g.link : '');
+                const u = new URL(raw);
+                return `https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${encodeURIComponent(u.origin)}&size=128`;
+            } catch(e) {
+                return '/assets/favicon.png';
+            }
+        }
+
+        async function uploadPlatIconFile(inputEl, targetInputId, previewImgId) {
+            const file = inputEl.files && inputEl.files[0];
+            if (!file) return;
+            const formData = new FormData();
+            formData.append('icon', file);
+            showToast('Enviando imagem para assets/platforms/...');
+            try {
+                const res = await fetch('/api/admin/platforms/upload-icon', {
                     method: 'POST',
                     headers: authHeaders(),
                     body: formData
@@ -2742,25 +2789,44 @@
                     if (target) target.value = data.iconPath;
                     const preview = document.getElementById(previewImgId);
                     if (preview) preview.src = data.iconPath;
-                    showToast('Ícone enviado com sucesso!');
+                    showToast('Imagem salva em assets/platforms/ com sucesso!');
                 } else {
-                    showToast('Erro ao enviar ícone: ' + (data.error || ''), 'error');
+                    showToast('Erro ao enviar imagem: ' + (data.error || ''), 'error');
                 }
             } catch (e) {
-                showToast('Erro de conexão ao enviar ícone', 'error');
+                showToast('Erro de conexão ao enviar imagem', 'error');
             }
         }
 
-        function autoDetectFavicon(linkInputId, targetIconInputId, previewImgId) {
+        async function autoDetectFavicon(linkInputId, targetIconInputId, previewImgId, platformId) {
             const linkVal = (document.getElementById(linkInputId)?.value || '').trim();
             if (!linkVal) {
                 showToast('Insira o link primeiro', 'error');
                 return;
             }
+            const normUrl = formatPlatformUrl(linkVal);
+            showToast('Buscando e salvando favicon da plataforma...');
             try {
-                let raw = linkVal;
-                if (!raw.startsWith('http://') && !raw.startsWith('https://')) raw = 'https://' + raw;
-                const u = new URL(raw);
+                const res = await fetch('/api/admin/platforms/auto-favicon', {
+                    method: 'POST',
+                    headers: authHeaders(),
+                    body: JSON.stringify({ link: normUrl, id: platformId })
+                });
+                const data = await res.json();
+                if (data.success && data.iconPath) {
+                    const target = document.getElementById(targetIconInputId);
+                    if (target) target.value = data.iconPath;
+                    const preview = document.getElementById(previewImgId);
+                    if (preview) preview.src = data.iconPath;
+                    showToast('Favicon salvo com sucesso!');
+                    return;
+                }
+            } catch (err) {
+                console.warn('Fallback para favicon direto:', err);
+            }
+
+            try {
+                const u = new URL(normUrl);
                 const faviconUrl = `https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${encodeURIComponent(u.origin)}&size=128`;
                 const target = document.getElementById(targetIconInputId);
                 if (target) target.value = faviconUrl;
@@ -2772,6 +2838,40 @@
             }
         }
 
+        async function pickFromPlatformFolder(targetInputId, previewImgId) {
+            try {
+                const res = await fetch('/api/admin/platforms/local-icons', { headers: authHeaders() });
+                const icons = await res.json();
+                if (!icons || icons.length === 0) {
+                    showToast('Nenhuma imagem encontrada na pasta assets/platforms/', 'warning');
+                    return;
+                }
+                const promptMsg = 'Imagens disponíveis na pasta assets/platforms/:\n\n' +
+                    icons.map((ic, idx) => `${idx + 1}. ${ic.name}`).join('\n') +
+                    '\n\nDigite o NÚMERO ou o NOME da imagem:';
+                const chosen = prompt(promptMsg);
+                if (!chosen) return;
+                let selectedIcon = null;
+                const num = parseInt(chosen.trim(), 10);
+                if (!isNaN(num) && num >= 1 && num <= icons.length) {
+                    selectedIcon = icons[num - 1];
+                } else {
+                    selectedIcon = icons.find(ic => ic.name.toLowerCase() === chosen.trim().toLowerCase());
+                }
+                if (selectedIcon) {
+                    const target = document.getElementById(targetInputId);
+                    if (target) target.value = selectedIcon.url;
+                    const preview = document.getElementById(previewImgId);
+                    if (preview) preview.src = selectedIcon.url;
+                    showToast('Imagem selecionada: ' + selectedIcon.name);
+                } else {
+                    showToast('Imagem não encontrada', 'error');
+                }
+            } catch (e) {
+                showToast('Erro ao listar imagens da pasta', 'error');
+            }
+        }
+
         async function addPlatform(btn) {
             const nomeInfo = document.getElementById('new-plat-name');
             const linkInfo = document.getElementById('new-plat-link');
@@ -2779,11 +2879,12 @@
             const badgeInfo = document.getElementById('new-plat-badge');
 
             const nome = (nomeInfo?.value || '').trim();
-            const link = (linkInfo?.value || '').trim();
+            let link = (linkInfo?.value || '').trim();
             const icon = (iconInfo?.value || '').trim();
             const badge = (badgeInfo?.value || '').trim();
 
             if (!nome || !link) { showToast('Preencha nome e link', 'error'); return; }
+            link = formatPlatformUrl(link);
 
             btn.disabled = true;
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
@@ -2815,11 +2916,14 @@
 
         async function savePlatform(id, btn) {
             const nome = (document.getElementById(`plat-name-${id}`)?.value || '').trim();
-            const link = (document.getElementById(`plat-link-${id}`)?.value || '').trim();
+            let link = (document.getElementById(`plat-link-${id}`)?.value || '').trim();
             const icon = (document.getElementById(`plat-icon-${id}`)?.value || '').trim();
             const badge = (document.getElementById(`plat-badge-${id}`)?.value || '').trim();
 
             if (!nome || !link) { showToast('Preencha nome e link', 'error'); return; }
+            link = formatPlatformUrl(link);
+            const linkInput = document.getElementById(`plat-link-${id}`);
+            if (linkInput) linkInput.value = link;
 
             btn.disabled = true;
             btn.classList.add('saving');
@@ -2838,52 +2942,22 @@
                     showToast('Plataforma atualizada!');
                     setTimeout(() => {
                         btn.classList.remove('saved');
+                        btn.disabled = false;
                         btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Salvar';
-                    }, 2000);
+                    }, 1200);
                 } else {
                     showToast('Erro: ' + data.error, 'error');
+                    btn.disabled = false;
                     btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Salvar';
                 }
             } catch (e) {
                 showToast('Erro de conexão', 'error');
+                btn.disabled = false;
                 btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Salvar';
-            } finally {
-                btn.disabled = false;
-                btn.classList.remove('saving');
             }
         }
 
-        async function deletePlatform(id, btn) {
-            if (!confirm('Tem certeza que deseja excluir esta plataforma?')) return;
-
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
-
-            try {
-                const res = await fetch(`/api/admin/platforms/${id}`, {
-                    method: 'DELETE',
-                    headers: authHeaders()
-                });
-                const data = await res.json();
-                if (data.success) {
-                    showToast('Plataforma excluída!');
-                    loadGames();
-                } else {
-                    showToast('Erro: ' + data.error, 'error');
-                    btn.innerHTML = '<i class="fa-solid fa-trash"></i>';
-                    btn.disabled = false;
-                }
-            } catch (e) {
-                showToast('Erro de conexão', 'error');
-                btn.innerHTML = '<i class="fa-solid fa-trash"></i>';
-                btn.disabled = false;
-            }
-        }
-
-        // ===== SAVE INDIVIDUAL =====
-        async function saveGame(cardNo, btn) {
-            const input = document.getElementById(`href - ${cardNo} `);
-            const href = input.value.trim();
+          const href = input.value.trim();
             if (!href) { showToast('Link não pode ser vazio', 'error'); return; }
 
             btn.classList.add('saving');

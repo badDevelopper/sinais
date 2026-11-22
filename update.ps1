@@ -64,6 +64,7 @@ $UserFiles = @(
 $UserDirs = @(
     "assets/games",
     "assets/navbar",
+    "assets/platforms",
     "downloaded",
     "scrapper/export",
     "scrapper/cards"
@@ -73,6 +74,7 @@ $UserDirs = @(
 $UserImagePatterns = @(
     "assets/profile-photo*",
     "assets/banner-*",
+    "assets/plat-*",
     "assets/favicon.png",
     "assets/2favicon.png"
 )

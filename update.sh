@@ -80,6 +80,7 @@ USER_FILES=(
 USER_DIRS=(
     "assets/games"
     "assets/navbar"
+    "assets/platforms"
     "downloaded"
     "scrapper/export"
     "scrapper/cards"
@@ -91,6 +92,7 @@ USER_IMAGES=(
     "assets/2favicon.png"
     "assets/profile-photo.*"
     "assets/banner-*"
+    "assets/plat-*"
 )
 
 # 3. Criar diretorio de backup temporario

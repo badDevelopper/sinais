@@ -928,13 +928,26 @@
                     applyFilter(document.querySelector('.ftab.active')?.dataset?.filter || 'all', false);
                 }
 
+                function formatPlatformUrl(link) {
+                    if (!link) return '#';
+                    let raw = String(link).trim();
+                    if (!raw) return '#';
+                    if (!/^https?:\/\//i.test(raw)) {
+                        raw = 'https://' + raw;
+                    }
+                    return raw;
+                }
+
                 function getPlatformIcon(platform) {
                     if (platform.icon && platform.icon.trim()) {
-                        return platform.icon.trim();
+                        const icon = platform.icon.trim();
+                        if (icon.startsWith('/') || icon.startsWith('http://') || icon.startsWith('https://')) {
+                            return icon;
+                        }
+                        return '/assets/platforms/' + icon;
                     }
                     try {
-                        let raw = (platform.link || '').trim();
-                        if (!raw.startsWith('http://') && !raw.startsWith('https://')) raw = 'https://' + raw;
+                        let raw = formatPlatformUrl(platform.link);
                         const u = new URL(raw);
                         return `https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${encodeURIComponent(u.origin)}&size=128`;
                     } catch(e) {
@@ -944,8 +957,7 @@
 
                 function getPlatformDomain(link) {
                     try {
-                        let raw = (link || '').trim();
-                        if (!raw.startsWith('http://') && !raw.startsWith('https://')) raw = 'https://' + raw;
+                        let raw = formatPlatformUrl(link);
                         return new URL(raw).hostname.replace(/^www\./, '');
                     } catch(e) {
                         return link || '';
@@ -1001,11 +1013,12 @@
                         row.className = 'platforms-grid';
                         row.innerHTML = platforms.map(g => {
                             const iconUrl = getPlatformIcon(g);
+                            const platUrl = formatPlatformUrl(g.link);
                             const badgeHtml = g.badge ? `<span class="plat-badge ${g.badge.toLowerCase()}">${g.badge}</span>` : '';
                             return `
-                                <a href="${g.link}" target="_blank" rel="noopener noreferrer" class="plat-grid-item" title="${g.nome}">
+                                <a href="${platUrl}" target="_blank" rel="noopener noreferrer" class="plat-grid-item" title="${g.nome}">
                                     ${badgeHtml}
-                                    <img src="${iconUrl}" alt="${g.nome}" class="plat-grid-img" loading="lazy" onerror="handlePlatImgError(this, '${g.link}')">
+                                    <img src="${iconUrl}" alt="${g.nome}" class="plat-grid-img" loading="lazy" onerror="handlePlatImgError(this, '${platUrl}')">
                                     <span class="plat-grid-label">${g.nome}</span>
                                 </a>
                             `;
@@ -1014,12 +1027,13 @@
                         row.className = 'platforms-list';
                         row.innerHTML = platforms.map(g => {
                             const iconUrl = getPlatformIcon(g);
-                            const domain = getPlatformDomain(g.link);
+                            const platUrl = formatPlatformUrl(g.link);
+                            const domain = getPlatformDomain(platUrl);
                             const badgeHtml = g.badge ? `<span class="plat-badge ${g.badge.toLowerCase()}" style="position:static;display:inline-block;">${g.badge}</span>` : '';
                             return `
-                                <a href="${g.link}" target="_blank" rel="noopener noreferrer" class="plat-list-item">
+                                <a href="${platUrl}" target="_blank" rel="noopener noreferrer" class="plat-list-item">
                                     <div class="plat-list-icon-wrap">
-                                        <img src="${iconUrl}" alt="${g.nome}" class="plat-list-icon" loading="lazy" onerror="handlePlatImgError(this, '${g.link}')">
+                                        <img src="${iconUrl}" alt="${g.nome}" class="plat-list-icon" loading="lazy" onerror="handlePlatImgError(this, '${platUrl}')">
                                     </div>
                                     <div class="plat-list-info">
                                         <div class="plat-list-name-row">

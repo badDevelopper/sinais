@@ -14,9 +14,12 @@ platforms.json
 # Estado persistente do contador de acessos
 visitor-stats.json
 
-# Imagens uploadadas pelo usuário (perfil, banners customizados)
+# Imagens uploadadas pelo usuário (perfil, banners customizados, plataformas)
 assets/profile-photo.*
 assets/banner-*
+assets/plat-*
+assets/platforms/*
+!assets/platforms/.gitkeep
 assets/favicon.png
 assets/2favicon.png
 
